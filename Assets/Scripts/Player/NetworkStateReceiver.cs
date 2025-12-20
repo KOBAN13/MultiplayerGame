@@ -70,7 +70,7 @@ namespace Player
 
             if (_sfs.MySelf.Id == joinRequest.UserId)
             {
-                _cameraFactory.CreateCamera(player.GetTransform()).Forget();
+                _cameraFactory.CreateCamera(player.GetCameraTarget()).Forget();
             }
         }
         

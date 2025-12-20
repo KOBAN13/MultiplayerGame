@@ -61,6 +61,21 @@ namespace Input
             }
         }
 
+        public void OnLook(InputAction.CallbackContext context)
+        {
+            
+        }
+
+        public void OnAim(InputAction.CallbackContext context)
+        {
+            
+        }
+
+        public void OnShoot(InputAction.CallbackContext context)
+        {
+            
+        }
+
         public void Dispose()
         {
             _playerInput?.Disable();

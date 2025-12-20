@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: CameraParameters
   m_EditorClassIdentifier: 
   <CameraFOV>k__BackingField: 70
-  <BindingMode>k__BackingField: 3
-  <PositionDamping>k__BackingField: {x: 0, y: 0, z: 0}
-  <FollowOffset>k__BackingField: {x: 0, y: 5, z: -10}
+  <Damping>k__BackingField: {x: 0.1, y: 0.25, z: 0.3}
+  <ShoulderOffset>k__BackingField: {x: 0.75, y: 0.25, z: 0}
+  <CameraSide>k__BackingField: 1
+  <CameraDistance>k__BackingField: 4

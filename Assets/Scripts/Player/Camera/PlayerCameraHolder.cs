@@ -33,11 +33,12 @@ namespace Player.Camera
             {
                 camera.Priority = ACTIVE_PRIORITY;
 
-                var cinemachineFollow = camera.gameObject.GetComponent<CinemachineFollow>();
-                
-                cinemachineFollow.FollowOffset = _cameraParameters.FollowOffset;
-                cinemachineFollow.TrackerSettings.PositionDamping = _cameraParameters.PositionDamping;
-                cinemachineFollow.TrackerSettings.BindingMode = _cameraParameters.BindingMode;
+                var cinemachineFollow = camera.gameObject.GetComponent<CinemachineThirdPersonFollow>();
+
+                cinemachineFollow.Damping = _cameraParameters.Damping;
+                cinemachineFollow.ShoulderOffset = _cameraParameters.ShoulderOffset;
+                cinemachineFollow.CameraSide = _cameraParameters.CameraSide;
+                cinemachineFollow.CameraDistance = _cameraParameters.CameraDistance;
                 
                 AttachFollowTarget(camera,target);
             }

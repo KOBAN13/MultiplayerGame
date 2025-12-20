@@ -1,5 +1,4 @@
 ﻿using Db.Interface;
-using Unity.Cinemachine.TargetTracking;
 using UnityEngine;
 
 namespace Db
@@ -8,8 +7,15 @@ namespace Db
     public class CameraParameters : ScriptableObject, ICameraParameters
     {
         [field: SerializeField] public int CameraFOV { get; private set; }
-        [field: SerializeField] public BindingMode BindingMode { get; private set; }
-        [field: SerializeField] public Vector3 PositionDamping { get; private set; }
-        [field: SerializeField] public Vector3 FollowOffset { get; private set; }
+        
+        [field: SerializeField] public Vector3 Damping { get; private set; }
+        
+        [field: SerializeField] public Vector3 ShoulderOffset { get; private set; }
+        
+        [field: SerializeField]
+        [field: Range(0, 1)]
+        public float CameraSide { get; private set; }
+        
+        [field: SerializeField] public float CameraDistance { get; private set; }
     }
 }
