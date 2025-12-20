@@ -1,7 +1,10 @@
-﻿namespace Player.Interface
+﻿using UnityEngine;
+
+namespace Player.Interface
 {
     public interface IRotationComponent
     {
-        void RotateCharacter();
+        void RotateCharacter(Quaternion cameraRotation);
+        Quaternion RotateCamera(Vector2 position);
     }
 }

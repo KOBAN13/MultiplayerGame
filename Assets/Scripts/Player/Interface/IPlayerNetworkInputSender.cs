@@ -1,8 +1,4 @@
-﻿using Input;
-using Sfs2X;
-using UnityEngine;
-
-namespace Player.Interface
+﻿namespace Player.Interface
 {
     public interface IPlayerNetworkInputSender
     {

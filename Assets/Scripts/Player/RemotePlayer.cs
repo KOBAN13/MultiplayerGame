@@ -1,6 +1,8 @@
-﻿using Db.Interface;
+﻿using System;
+using Db.Interface;
 using Input;
 using Player.Interface;
+using R3;
 using Services.Interface;
 using Sfs2X;
 using UnityEngine;
@@ -25,6 +27,7 @@ namespace Player
         private IPlayerNetworkInputReader _playerNetworkInputReader;
         private ISnapshotsService _snapshotsService;
         private SmartFox _sfs;
+        private UnityEngine.Camera _camera;
         
         [Inject]
         private void Construct(
@@ -70,17 +73,33 @@ namespace Player
         }
 
         public Transform GetTransform() => transform;
-        
+
+        private void Awake()
+        {
+            _camera = UnityEngine.Camera.main;
+        }
+
+        private void OnEnable()
+        {
+            _playerNetworkInputReader.Look
+                .Subscribe(position =>
+                {
+                    var rotation = _remotePlayerRotation.RotateCamera(position);
+
+                    _cameraTarget.rotation = rotation;
+                })
+                .AddTo(this);
+        }
+
         private void Update()
         {
             _remotePlayerMovement.Move();
-            _remotePlayerRotation.RotateCharacter();
+            _remotePlayerRotation.RotateCharacter(_camera.transform.rotation);
         }
         
         private void OnDestroy()
         {
             _playerNetworkInputSender.Dispose();
         }
-
     }
 }

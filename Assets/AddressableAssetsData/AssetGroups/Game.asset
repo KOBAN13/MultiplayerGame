@@ -79,6 +79,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - config
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9c16f7f2b400fe2498f475a8e899a527
+    m_Address: Assets/Configs/RotationCameraParameters.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9fc0d4010bbf28b4594072e72b8655ab
     m_Address: Assets/Scenes/MainMenu.unity
     m_ReadOnly: 0

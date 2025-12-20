@@ -10,12 +10,18 @@ namespace Input
     {
         private readonly PlayerInput _playerInput;
         private readonly ReactiveProperty<Vector3> _movement = new();
+        private readonly ReactiveProperty<Vector2> _look = new();
+        private readonly ReactiveProperty<bool> _aim = new();
+        private readonly ReactiveProperty<bool> _shoot = new();
         private readonly ReactiveProperty<bool> _jump = new();
         private readonly ReactiveProperty<bool> _run = new();
         
         public ReadOnlyReactiveProperty<Vector3> Movement => _movement;
         public ReadOnlyReactiveProperty<bool> Jump => _jump;
         public ReadOnlyReactiveProperty<bool> Run => _run;
+        public ReadOnlyReactiveProperty<Vector2> Look => _look;
+        public ReadOnlyReactiveProperty<bool> Aim => _aim;
+        public ReadOnlyReactiveProperty<bool> Shoot => _shoot;
         
         public PlayerNetworkInputReader(PlayerInput playerInput)
         {
@@ -63,17 +69,33 @@ namespace Input
 
         public void OnLook(InputAction.CallbackContext context)
         {
-            
+            _look.Value = context.ReadValue<Vector2>();
         }
 
         public void OnAim(InputAction.CallbackContext context)
         {
-            
+            switch (context.phase)
+            {
+                case InputActionPhase.Started:
+                    _aim.Value = true;
+                    break;
+                case InputActionPhase.Canceled:
+                    _aim.Value = false;
+                    break;
+            }
         }
 
         public void OnShoot(InputAction.CallbackContext context)
         {
-            
+            switch (context.phase)
+            {
+                case InputActionPhase.Started:
+                    _shoot.Value = true;
+                    break;
+                case InputActionPhase.Canceled:
+                    _aim.Value = false;
+                    break;
+            }
         }
 
         public void Dispose()

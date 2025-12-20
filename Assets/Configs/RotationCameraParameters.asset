@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b273cfe631d94ef1a20a980d3b4258ca, type: 3}
   m_Name: RotationCameraParameters
   m_EditorClassIdentifier: 
-  <Sensitivity>k__BackingField: 0
-  <TopClamp>k__BackingField: 0
-  <BottomClamp>k__BackingField: 0
+  <Sensitivity>k__BackingField: 1
+  <TopClamp>k__BackingField: 70
+  <BottomClamp>k__BackingField: -30
   <AngleOverride>k__BackingField: 0

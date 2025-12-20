@@ -11,8 +11,12 @@ namespace Player
         private readonly Transform _transform;
         private readonly float _rotationSpeed;
         private readonly ISnapshotsService _snapshotsService;
-        private readonly IRotationCameraParameters  _rotationCameraParameters;
-        
+        private readonly IRotationCameraParameters _rotationCameraParameters;
+
+        private float _cinemachineTargetYaw;
+        private float _cinemachineTargetPitch;
+        private const float THRESHOLD = 0.01f;
+
         public RemoteRotationPlayer(
             CharacterController characterController, 
             Transform transform, 
@@ -28,24 +32,60 @@ namespace Player
             _rotationCameraParameters = rotationCameraParameters;
         }
         
-        public void RotateCharacter()
+        public void RotateCharacter(Quaternion cameraRotation)
         {
-            var moveDirection = _snapshotsService.GetInterpolatedRotationDirection();
-            
             if (_characterController.isGrounded)
             {
-                if (Vector3.Angle(moveDirection, _transform.forward) > 0)
-                {
-                    var newDirection = Vector3.RotateTowards(_transform.forward, moveDirection, _rotationSpeed * Time.deltaTime, 0);
-                    
-                    _transform.rotation = Quaternion.LookRotation(newDirection);
-                }
+                var currentVelocity = _characterController.velocity.magnitude;
+                
+                var moveDirection = _snapshotsService.GetInterpolatedRotationDirection();
+            
+                var targetRotation = Mathf.Atan2(moveDirection.x, moveDirection.z) * Mathf.Rad2Deg + cameraRotation.eulerAngles.y;
+            
+                var rotation = Mathf.SmoothDampAngle(_transform.eulerAngles.y, targetRotation, ref currentVelocity, _rotationSpeed);
+            
+                _transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
             }
+            
+            // if (_characterController.isGrounded)
+            // {
+            //     if (Vector3.Angle(moveDirection, _transform.forward) > 0)
+            //     {
+            //         var newDirection = Vector3.RotateTowards(_transform.forward, moveDirection, _rotationSpeed * Time.deltaTime, 0);
+            //         
+            //         _transform.rotation = Quaternion.LookRotation(newDirection);
+            //     }
+            // }
         }
 
-        public void RotateCamera()
+        public Quaternion RotateCamera(Vector2 position)
         {
+            var bottomClamp = _rotationCameraParameters.BottomClamp;
+            var topClamp = _rotationCameraParameters.TopClamp;
+            var cameraAngleOverride = _rotationCameraParameters.AngleOverride;
+            var sensitivity = _rotationCameraParameters.Sensitivity;
             
+            if (position.sqrMagnitude >= THRESHOLD)
+            {
+                _cinemachineTargetYaw += position.x * Time.deltaTime * sensitivity;
+                _cinemachineTargetPitch += position.y * Time.deltaTime * sensitivity;
+            }
+            
+            _cinemachineTargetYaw = ClampAngle(_cinemachineTargetYaw, float.MinValue, float.MaxValue);
+            _cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, bottomClamp, topClamp);
+            
+            return Quaternion.Euler(_cinemachineTargetPitch + cameraAngleOverride, _cinemachineTargetYaw, 0.0f);
+        }
+        
+        private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
+        {
+            if (lfAngle < -360f) 
+                lfAngle += 360f;
+            
+            if (lfAngle > 360f) 
+                lfAngle -= 360f;
+            
+            return Mathf.Clamp(lfAngle, lfMin, lfMax);
         }
     }
 }
