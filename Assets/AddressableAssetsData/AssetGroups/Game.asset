@@ -1,0 +1,164 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Game
+  m_EditorClassIdentifier: 
+  m_GroupName: Game
+  m_GUID: ca3a1faeb5a70e74c8085193a6bba460
+  m_SerializeEntries:
+  - m_GUID: 08879641ff7515148a65241eb8c5c07b
+    m_Address: Assets/Prefabs/Screens/RegistartionScreen.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 14953fe163cfb1a4eb235a11fcd5416c
+    m_Address: Assets/Prefabs/Screens/PlayerLobbyItem.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 19c257f330a0c514c9c4d35166217e7e
+    m_Address: Assets/Prefabs/Screens/ConnectionErrorScreen.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1cdfdd21f37a39d4bbcb7c3f89b46464
+    m_Address: Assets/Prefabs/Screens/ErrorByAuthorization.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1fe53b9fab9919b42bf95f8c4f6b375f
+    m_Address: Assets/Prefabs/Screens/RestorePasswordScreen.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2c49a6448fe096040bc408d1b535c75e
+    m_Address: Assets/Configs/PlayerParameters.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3dc26993e95af8d47816639a496cb87e
+    m_Address: Assets/Prefabs/Screens/MainMenu.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3df321eed384493418acdae3787c9bf9
+    m_Address: Assets/Scenes/InitialScene.unity
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6420994d001579e48b0c1dd323f83db4
+    m_Address: Assets/Configs/FadeButtonAnimationData.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 681065faa94f8ce4d8bff4984ae9a88a
+    m_Address: Assets/Configs/CameraParameters.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7d46842bb1b583741ba01007f64944c8
+    m_Address: Assets/Prefabs/Screens/LoadingScreen.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8883f83b6369e21499e61433a91c7e02
+    m_Address: Assets/Configs/ScreensConfig.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9fc0d4010bbf28b4594072e72b8655ab
+    m_Address: Assets/Scenes/MainMenu.unity
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: aa806205c0e8c4f44aee425a1a4361ad
+    m_Address: Assets/Scenes/LoadingScene.unity
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: af75160c4805f9049b11c4464313e0ab
+    m_Address: Assets/Configs/GameData.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: afc61651a94a1ce45ac9e028b88b5561
+    m_Address: Assets/Asset/Prefabs/VirtualCameras.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b626188a12eb35c4db782288fcf014ff
+    m_Address: Assets/Prefabs/Screens/LobbyScreen.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b80a32b7e826d2347a974e2864c04ba9
+    m_Address: Assets/Prefabs/Screens/GameListItem.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cd29c8e5a69eae24e97372ce2b9a914c
+    m_Address: Assets/Prefabs/Screens/LobbyLoginScreen.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d6d7728ef5b74934695412baa3579f0c
+    m_Address: Assets/Prefabs/Screens/LobbyScreen 1.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ddc2fffdbb3a44d088b6d792262507e8
+    m_Address: Assets/Prefabs/Screens/NoteScreen.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e7c33ffe4ef80cf4ba93f5b3cfcec405
+    m_Address: Assets/Scenes/LobbyScene.unity
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e8517cec17d1aa3498c111f8db65022b
+    m_Address: Assets/Scenes/GameScene.unity
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: effc72344dd37dc45bbfa1b343a7f70b
+    m_Address: Assets/Prefabs/Screens/LoginScreen.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f0b6fb6407163d14a9830ed188943651
+    m_Address: Assets/Configs/SnapshotParameters.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fd727933ef7bf854aad742d20d4a0ad6
+    m_Address: Assets/Asset/Prefabs/Player.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: feb33397fb6dded478e4530e8277b24e
+    m_Address: Assets/Prefabs/Screens/CreateLobbyScreen.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: d4f0c8abfe3174143b63cc02662bfb2c, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: edfa3db556c33d14a855838e084797c5, type: 2}
+    - {fileID: 11400000, guid: 3884145fbe82a264dafa6aa96ebfb1dd, type: 2}

@@ -1,0 +1,130 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c23dec224564dc38ecf5e5fdd7108d9, type: 3}
+  m_Name: ScreensConfig
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  <Root>k__BackingField: {fileID: 7039047270545588408, guid: b52c6f58ab177904c844066570ca519b, type: 3}
+  _screens:
+  - type: UI.View.LoadingScreen
+    asset:
+      m_AssetGUID: 7d46842bb1b583741ba01007f64944c8
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+  - type: UI.View.AuthorizationErrorScreen
+    asset:
+      m_AssetGUID: 1cdfdd21f37a39d4bbcb7c3f89b46464
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+  - type: UI.View.ConnectionErrorScreen
+    asset:
+      m_AssetGUID: 19c257f330a0c514c9c4d35166217e7e
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+  - type: UI.View.LoginScreen
+    asset:
+      m_AssetGUID: effc72344dd37dc45bbfa1b343a7f70b
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+  - type: UI.View.MainMenuScreen
+    asset:
+      m_AssetGUID: 3dc26993e95af8d47816639a496cb87e
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+  - type: UI.View.RestorePasswordScreen
+    asset:
+      m_AssetGUID: 1fe53b9fab9919b42bf95f8c4f6b375f
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+  - type: UI.View.SignInScreen
+    asset:
+      m_AssetGUID: effc72344dd37dc45bbfa1b343a7f70b
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+  - type: UI.View.SignUpScreen
+    asset:
+      m_AssetGUID: 08879641ff7515148a65241eb8c5c07b
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+  - type: UI.View.NoteScreen
+    asset:
+      m_AssetGUID: ddc2fffdbb3a44d088b6d792262507e8
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+  - type: UI.View.GameRoomHubScreen
+    asset:
+      m_AssetGUID: b626188a12eb35c4db782288fcf014ff
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+  - type: UI.View.GameListItem
+    asset:
+      m_AssetGUID: b80a32b7e826d2347a974e2864c04ba9
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+  - type: UI.View.CreateRoomScreen
+    asset:
+      m_AssetGUID: feb33397fb6dded478e4530e8277b24e
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+  - type: UI.View.PlayerLobbyItem
+    asset:
+      m_AssetGUID: 14953fe163cfb1a4eb235a11fcd5416c
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+  - type: UI.View.LobbyScreen
+    asset:
+      m_AssetGUID: d6d7728ef5b74934695412baa3579f0c
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+  - type: UI.View.LobbyLoginScreen
+    asset:
+      m_AssetGUID: cd29c8e5a69eae24e97372ce2b9a914c
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
