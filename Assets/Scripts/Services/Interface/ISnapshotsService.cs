@@ -8,6 +8,6 @@ namespace Services.Interface
         void SyncServerTime(float serverTime);
         void AddSnapshot(ref SnapshotData snapshot);
         Vector3 GetInterpolatedPosition();
-        Vector3 GetInterpolatedRotationDirection();
+        float GetInterpolatedRotationDirection();
     }
 }

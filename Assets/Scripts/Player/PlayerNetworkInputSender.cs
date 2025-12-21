@@ -2,7 +2,6 @@
 using Helpers;
 using Input;
 using Player.Interface;
-using R3;
 using Sfs2X;
 using Sfs2X.Entities.Data;
 using Sfs2X.Requests;
@@ -15,18 +14,20 @@ namespace Player
         private readonly IPlayerNetworkInputReader _playerNetworkInputReader;
         private readonly SmartFox _sfs;
         private readonly CharacterController _characterController;
+        private readonly Transform _cameraTransform;
         private IDisposable _subscription;
         
         public PlayerNetworkInputSender(
             IPlayerNetworkInputReader playerNetworkInputReader,
             SmartFox sfs,
-            CharacterController characterController
+            CharacterController characterController, Transform cameraTransform
         )
         {
             _playerNetworkInputReader = playerNetworkInputReader;
             _sfs = sfs;
             _characterController = characterController;
-            
+            _cameraTransform = cameraTransform;
+
             Initialize();
         }
 
@@ -37,16 +38,16 @@ namespace Player
 
         private void Initialize()
         {
-            _subscription = Observable
-                .Merge(
-                    _playerNetworkInputReader.Movement.AsUnitObservable(),
-                    _playerNetworkInputReader.Jump.AsUnitObservable(),
-                    _playerNetworkInputReader.Run.AsUnitObservable()
-                )
-                .Subscribe(SendServerPlayerInput);
+            // _subscription = Observable
+            //     .Merge(
+            //         _playerNetworkInputReader.Movement.AsUnitObservable(),
+            //         _playerNetworkInputReader.Jump.AsUnitObservable(),
+            //         _playerNetworkInputReader.Run.AsUnitObservable()
+            //     )
+            //     .Subscribe(SendServerPlayerInput);
         }
 
-        private void SendServerPlayerInput(Unit unit)
+        public void SendServerPlayerInput()
         {
             var data = SFSObject.NewInstance();
             data.PutFloat("horizontal", _playerNetworkInputReader.Movement.CurrentValue.x);
@@ -54,6 +55,7 @@ namespace Player
             data.PutBool("isJumping", _playerNetworkInputReader.Jump.CurrentValue);
             data.PutBool("isRunning", _playerNetworkInputReader.Run.CurrentValue);
             data.PutBool("isOnGround", _characterController.isGrounded);
+            data.PutFloat("eulerAngleY", _cameraTransform.eulerAngles.y);
                     
             _sfs.Send(new ExtensionRequest(SFSResponseHelper.PLAYER_INPUT, data, _sfs.LastJoinedRoom));
         }

@@ -62,10 +62,8 @@ namespace Player
             player.SetAnimationState(joinRequest.AnimationState);
 
             _remotePlayers.Add(joinRequest.UserId, player);
-
-            Debug.Log($"Player {joinRequest.UserId} joined game");
             
-            player.SetSnapshot(joinRequest.Position, Vector3.zero, 0f);
+            player.SetSnapshot(joinRequest.Position, Vector3.zero, 0f, 0f);
             player.SetAnimationState(joinRequest.AnimationState);
 
             if (_sfs.MySelf.Id == joinRequest.UserId)
@@ -100,7 +98,6 @@ namespace Player
                 var x = playerData.GetFloat("x");
                 var z = playerData.GetFloat("z");
                 var animationState = playerData.GetUtfString("animationState");
-
                 var position = new Vector3(x, 0f, z);
 
                 _playerJoinGameService.AddPlayerJoinRequest(new PlayerJoinRequest(position, animationState, userId));
@@ -124,19 +121,20 @@ namespace Player
                 var xPosition = playerData.GetFloat("x");
                 var yPosition = playerData.GetFloat("y");
                 var zPosition = playerData.GetFloat("z");
-                var xRotationDirection = playerData.GetFloat("xRotationDirection");
-                var zRotationDirection = playerData.GetFloat("zRotationDirection");
                 var serverTime = playerData.GetFloat("serverTime");
+                var rotation = playerData.GetFloat("rotation");
+                var xDirection = playerData.GetFloat("horizontal");
+                var zDirection = playerData.GetFloat("vertical");
                 
                 var animationState = playerData.GetUtfString("animationState");
                 
                 var position = new Vector3(xPosition, yPosition, zPosition);
-                var rotationDirection = new Vector3(xRotationDirection, 0f, zRotationDirection);
+                var direction = new Vector3(xDirection, 0f, zDirection);
                 
                 if (!_remotePlayers.TryGetValue(userId, out var remotePlayer))
                     continue;
                 
-                remotePlayer.SetSnapshot(position, rotationDirection, serverTime);
+                remotePlayer.SetSnapshot(position, direction, rotation, serverTime);
                 remotePlayer.SetAnimationState(animationState);
             }
         }

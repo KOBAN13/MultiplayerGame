@@ -5,6 +5,6 @@ namespace Player.Interface
 {
     public interface IPlayerSnapshotReceiver
     {
-        void SetSnapshot(Vector3 position, Vector3 rotationDirection, float serverTime);
+        void SetSnapshot(Vector3 position, Vector3 inputDirection, float rotation, float serverTime);
     }
 }

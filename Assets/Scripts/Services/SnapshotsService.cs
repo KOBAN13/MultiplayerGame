@@ -77,14 +77,14 @@ namespace Services
             return _snapshots[^1].Position;
         }
         
-        public Vector3 GetInterpolatedRotationDirection()
+        public float GetInterpolatedRotationDirection()
         {
             switch (_snapshots.Count)
             {
                 case 0:
-                    return Vector3.zero;
+                    return 0f;
                 case 1:
-                    return _snapshots[0].RotationDirection;
+                    return _snapshots[0].Rotation;
             }
 
             var serverTime = GetServerTime();
@@ -99,14 +99,12 @@ namespace Services
                 var newer = i < _snapshots.Count - 1 ? _snapshots[i + 1] : older;
 
                 if (Mathf.Approximately(older.ServerTime, newer.ServerTime))
-                    return older.RotationDirection;
-
-                var time = Mathf.InverseLerp(older.ServerTime, newer.ServerTime, interpolationBackTime);
-
-                return Vector3.Lerp(older.RotationDirection, newer.RotationDirection, time);
+                    return older.Rotation;
+                
+                return newer.Rotation;
             }
 
-            return _snapshots[^1].RotationDirection;
+            return _snapshots[^1].Rotation;
         }
 
         public void SyncServerTime(float serverTime)

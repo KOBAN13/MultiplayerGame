@@ -15,6 +15,7 @@ namespace Player
 
         private float _cinemachineTargetYaw;
         private float _cinemachineTargetPitch;
+        private float _rotationVelocity;
         private const float THRESHOLD = 0.01f;
 
         public RemoteRotationPlayer(
@@ -32,30 +33,21 @@ namespace Player
             _rotationCameraParameters = rotationCameraParameters;
         }
         
-        public void RotateCharacter(Quaternion cameraRotation)
+        public void RotateCharacter(Transform cameraTransform)
         {
-            if (_characterController.isGrounded)
-            {
-                var currentVelocity = _characterController.velocity.magnitude;
-                
-                var moveDirection = _snapshotsService.GetInterpolatedRotationDirection();
-            
-                var targetRotation = Mathf.Atan2(moveDirection.x, moveDirection.z) * Mathf.Rad2Deg + cameraRotation.eulerAngles.y;
-            
-                var rotation = Mathf.SmoothDampAngle(_transform.eulerAngles.y, targetRotation, ref currentVelocity, _rotationSpeed);
-            
-                _transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
-            }
-            
-            // if (_characterController.isGrounded)
-            // {
-            //     if (Vector3.Angle(moveDirection, _transform.forward) > 0)
-            //     {
-            //         var newDirection = Vector3.RotateTowards(_transform.forward, moveDirection, _rotationSpeed * Time.deltaTime, 0);
-            //         
-            //         _transform.rotation = Quaternion.LookRotation(newDirection);
-            //     }
-            // }
+            if (!_characterController.isGrounded)
+                return;
+
+            var yaw = _snapshotsService.GetInterpolatedRotationDirection();
+
+            var rotation = Mathf.SmoothDampAngle(
+                _transform.eulerAngles.y,
+                yaw,
+                ref _rotationVelocity,
+                _rotationSpeed
+            );
+
+            _transform.rotation = Quaternion.Euler(0f, rotation, 0f);
         }
 
         public Quaternion RotateCamera(Vector2 position)

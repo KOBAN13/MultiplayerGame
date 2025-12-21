@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: PlayerParameters
   m_EditorClassIdentifier: 
   <SmoothSpeed>k__BackingField: 12
-  <RotationSpeed>k__BackingField: 10
+  <RotationSmoothTime>k__BackingField: 0.12

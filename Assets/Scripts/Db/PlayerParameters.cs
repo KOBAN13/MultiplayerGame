@@ -7,6 +7,6 @@ namespace Db
     public class PlayerParameters : ScriptableObject, IPlayerParameters
     {
         [field: SerializeField] public float SmoothSpeed { get; private set; }
-        [field: SerializeField] public float RotationSpeed { get; private set; }
+        [field: SerializeField] public float RotationSmoothTime { get; private set; }
     }
 }

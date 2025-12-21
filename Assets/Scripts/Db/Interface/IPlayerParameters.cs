@@ -3,6 +3,6 @@
     public interface IPlayerParameters
     {
         float SmoothSpeed { get; }
-        float RotationSpeed { get; }
+        float RotationSmoothTime { get; }
     }
 }

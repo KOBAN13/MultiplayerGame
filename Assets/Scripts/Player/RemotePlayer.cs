@@ -48,13 +48,13 @@ namespace Player
                 = new RemotePlayerMovement(_snapshotsService, _characterController, transform, _playerParameters.SmoothSpeed);
             
             _remotePlayerRotation 
-                = new RemoteRotationPlayer(_characterController, transform, _playerParameters.RotationSpeed, _snapshotsService, _rotationCameraParameters);
+                = new RemoteRotationPlayer(_characterController, transform, _playerParameters.RotationSmoothTime, _snapshotsService, _rotationCameraParameters);
             
             _playerSnapshotReceiver
                 = new PlayerSnapshotReceiver(_snapshotsService);
             
             _playerNetworkInputSender 
-                = new PlayerNetworkInputSender(_playerNetworkInputReader, _sfs, _characterController);
+                = new PlayerNetworkInputSender(_playerNetworkInputReader, _sfs, _characterController, _cameraTarget);
         }
 
         public Transform GetCameraTarget()
@@ -67,9 +67,9 @@ namespace Player
             // TODO: реализовать переключение анимаций
         }
 
-        public void SetSnapshot(Vector3 position, Vector3 rotationDirection, float serverTime)
+        public void SetSnapshot(Vector3 position, Vector3 inputDirection, float rotation, float serverTime)
         {
-            _playerSnapshotReceiver.SetSnapshot(position, rotationDirection, serverTime);
+            _playerSnapshotReceiver.SetSnapshot(position, inputDirection, rotation, serverTime);
         }
 
         public Transform GetTransform() => transform;
@@ -93,8 +93,11 @@ namespace Player
 
         private void Update()
         {
+            _playerNetworkInputSender.SendServerPlayerInput();
+            
+            _remotePlayerRotation.RotateCharacter(_camera.transform);
+            
             _remotePlayerMovement.Move();
-            _remotePlayerRotation.RotateCharacter(_camera.transform.rotation);
         }
         
         private void OnDestroy()

@@ -14,12 +14,13 @@ namespace Player
             _snapshotsService = snapshotsService;
         }
         
-        public void SetSnapshot(Vector3 position, Vector3 rotationDirection, float serverTime)
+        public void SetSnapshot(Vector3 position, Vector3 inputDirection, float rotation, float serverTime)
         {
             var snapshot = new SnapshotData
             {
                 Position = position,
-                RotationDirection = rotationDirection,
+                Input = inputDirection,
+                Rotation = rotation,
                 ServerTime = serverTime
             };
             

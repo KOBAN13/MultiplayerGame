@@ -5,7 +5,8 @@ namespace Player.Db
     public struct SnapshotData
     {
         public Vector3 Position;
-        public Vector3 RotationDirection;
+        public Vector3 Input;
+        public float Rotation;
         public float ServerTime;
     }
 }
