@@ -4,7 +4,7 @@ namespace Player.Interface
 {
     public interface IRotationComponent
     {
-        void RotateCharacter(Transform cameraTransform);
+        void RotateCharacter();
         Quaternion RotateCamera(Vector2 position);
     }
 }

@@ -12,6 +12,7 @@ namespace Services
         private readonly ISnapshotParameters _snapshotParameters;
 
         private const float POSITION_EPSILON_SQR = 0.0001f;
+        private const float ROTATION_EPSILON = 0.1f;
 
         private bool _hasServerTime;
         private float _serverTimeOffset;
@@ -33,6 +34,14 @@ namespace Services
                 
                 if ((snapshot.Position - lastSnapshot.Position).sqrMagnitude < POSITION_EPSILON_SQR)
                 {
+                    if (Mathf.Abs(Mathf.DeltaAngle(lastSnapshot.Rotation, snapshot.Rotation)) < ROTATION_EPSILON)
+                    {
+                        lastSnapshot.ServerTime = snapshot.ServerTime;
+                        _snapshots[lastSnapshotIndex] = lastSnapshot;
+                        return;
+                    }
+
+                    lastSnapshot.Rotation = snapshot.Rotation;
                     lastSnapshot.ServerTime = snapshot.ServerTime;
                     _snapshots[lastSnapshotIndex] = lastSnapshot;
                     return;
@@ -101,7 +110,9 @@ namespace Services
                 if (Mathf.Approximately(older.ServerTime, newer.ServerTime))
                     return older.Rotation;
                 
-                return newer.Rotation;
+                var time = Mathf.InverseLerp(older.ServerTime, newer.ServerTime, interpolationBackTime);
+
+                return Mathf.LerpAngle(older.Rotation, newer.Rotation, time);
             }
 
             return _snapshots[^1].Rotation;

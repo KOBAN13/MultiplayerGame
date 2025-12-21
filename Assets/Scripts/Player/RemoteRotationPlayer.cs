@@ -33,7 +33,7 @@ namespace Player
             _rotationCameraParameters = rotationCameraParameters;
         }
         
-        public void RotateCharacter(Transform cameraTransform)
+        public void RotateCharacter()
         {
             if (!_characterController.isGrounded)
                 return;

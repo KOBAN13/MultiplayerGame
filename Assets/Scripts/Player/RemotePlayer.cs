@@ -95,7 +95,7 @@ namespace Player
         {
             _playerNetworkInputSender.SendServerPlayerInput();
             
-            _remotePlayerRotation.RotateCharacter(_camera.transform);
+            _remotePlayerRotation.RotateCharacter();
             
             _remotePlayerMovement.Move();
         }
