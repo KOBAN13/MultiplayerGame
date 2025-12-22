@@ -75,8 +75,7 @@ namespace Player.Camera
         {
             camera.Target = new CameraTarget
             {
-                CustomLookAtTarget = true,
-                LookAtTarget = followTarget,
+                CustomLookAtTarget = false,
                 TrackingTarget = followTarget
             };
         }
