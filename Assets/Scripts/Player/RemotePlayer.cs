@@ -27,7 +27,6 @@ namespace Player
         private IPlayerNetworkInputReader _playerNetworkInputReader;
         private ISnapshotsService _snapshotsService;
         private SmartFox _sfs;
-        private UnityEngine.Camera _camera;
         
         [Inject]
         private void Construct(
@@ -74,23 +73,6 @@ namespace Player
 
         public Transform GetTransform() => transform;
 
-        private void Awake()
-        {
-            _camera = UnityEngine.Camera.main;
-        }
-
-        private void OnEnable()
-        {
-            _playerNetworkInputReader.Look
-                .Subscribe(position =>
-                {
-                    var rotation = _remotePlayerRotation.RotateCamera(position);
-
-                    _cameraTarget.rotation = rotation;
-                })
-                .AddTo(this);
-        }
-
         private void Update()
         {
             _playerNetworkInputSender.SendServerPlayerInput();
@@ -99,7 +81,12 @@ namespace Player
             
             _remotePlayerMovement.Move();
         }
-        
+
+        private void LateUpdate()
+        {
+            _cameraTarget.rotation = _remotePlayerRotation.RotateCamera(_playerNetworkInputReader.Look.CurrentValue);
+        }
+
         private void OnDestroy()
         {
             _playerNetworkInputSender.Dispose();
