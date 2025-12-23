@@ -1,4 +1,7 @@
-﻿using Db.Interface;
+﻿using System.Collections.Generic;
+using Db.Dictionary;
+using Db.Interface;
+using Player.Camera;
 using UnityEngine;
 
 namespace Db
@@ -6,16 +9,9 @@ namespace Db
     [CreateAssetMenu(fileName = "CameraParameters", menuName = "Db/CameraParameters")]
     public class CameraParameters : ScriptableObject, ICameraParameters
     {
-        [field: SerializeField] public int CameraFOV { get; private set; }
-        
-        [field: SerializeField] public Vector3 Damping { get; private set; }
-        
-        [field: SerializeField] public Vector3 ShoulderOffset { get; private set; }
-        
-        [field: SerializeField]
-        [field: Range(0, 1)]
-        public float CameraSide { get; private set; }
-        
-        [field: SerializeField] public float CameraDistance { get; private set; }
+        [SerializeField] private PlayerCameraParametersDictionary _cameraParametersByType = new();
+
+        public IReadOnlyDictionary<EVirtualCameraType, PlayerCamerasParameters> CameraParametersByType
+            => _cameraParametersByType;
     }
 }

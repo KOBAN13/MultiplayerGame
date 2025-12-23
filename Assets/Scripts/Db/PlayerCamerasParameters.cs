@@ -6,10 +6,16 @@ namespace Db
     [Serializable]
     public class PlayerCamerasParameters
     {
-        public int CameraFOV { get; private set; }
-        public Vector3 Damping { get; private set; }
-        public Vector3 ShoulderOffset { get; private set; }
-        public float CameraSide { get; private set; }
-        public float CameraDistance { get; private set; }
+        [SerializeField] private int _cameraFov;
+        [SerializeField] private Vector3 _damping;
+        [SerializeField] private Vector3 _shoulderOffset;
+        [SerializeField, Range(0, 1)] private float _cameraSide;
+        [SerializeField] private float _cameraDistance;
+
+        public int CameraFOV => _cameraFov;
+        public Vector3 Damping => _damping;
+        public Vector3 ShoulderOffset => _shoulderOffset;
+        public float CameraSide => _cameraSide;
+        public float CameraDistance => _cameraDistance;
     }
 }

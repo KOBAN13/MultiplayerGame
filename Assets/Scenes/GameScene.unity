@@ -243,7 +243,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  CustomBlends: {fileID: 0}
+  CustomBlends: {fileID: 11400000, guid: 144d327568092d0429289a7aa2d3c8ae, type: 2}
 --- !u!1 &209954856
 GameObject:
   m_ObjectHideFlags: 0

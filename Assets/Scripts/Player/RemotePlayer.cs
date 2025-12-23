@@ -2,7 +2,6 @@
 using Db.Interface;
 using Input;
 using Player.Interface;
-using R3;
 using Services.Interface;
 using Sfs2X;
 using UnityEngine;
@@ -17,7 +16,6 @@ namespace Player
         [SerializeField] private Transform _cameraTarget;
         
         private IPlayerParameters _playerParameters;
-        private IRotationCameraParameters _rotationCameraParameters;
         
         private IRemotePlayerMovement _remotePlayerMovement;
         private IRotationComponent _remotePlayerRotation;
@@ -27,6 +25,11 @@ namespace Player
         private IPlayerNetworkInputReader _playerNetworkInputReader;
         private ISnapshotsService _snapshotsService;
         private SmartFox _sfs;
+
+        private Func<ISnapshotsService, CharacterController, Transform, float, IRemotePlayerMovement> _remotePlayerMovementFactory;
+        private Func<ISnapshotsService, CharacterController, Transform, float, IRotationComponent> _remotePlayerRotationFactory;
+        private Func<ISnapshotsService, IPlayerSnapshotReceiver> _playerSnapshotReceiverFactory;
+        private Func<IPlayerNetworkInputReader, SmartFox, CharacterController, Transform, IPlayerNetworkInputSender> _playerNetworkInputSenderFactory;
         
         [Inject]
         private void Construct(
@@ -34,26 +37,41 @@ namespace Player
             SmartFox sfs, 
             ISnapshotsService snapshotsService, 
             IPlayerParameters playerParameters,
-            IRotationCameraParameters rotationCameraParameters
+            Func<ISnapshotsService, CharacterController, Transform, float, IRemotePlayerMovement> remotePlayerMovementFactory,
+            Func<ISnapshotsService, CharacterController, Transform, float, IRotationComponent> remotePlayerRotationFactory,
+            Func<ISnapshotsService, IPlayerSnapshotReceiver> playerSnapshotReceiverFactory,
+            Func<IPlayerNetworkInputReader, SmartFox, CharacterController, Transform, IPlayerNetworkInputSender> playerNetworkInputSenderFactory
         )
         {
             _snapshotsService = snapshotsService;
             _playerNetworkInputReader = playerNetworkInputReader;
             _sfs = sfs;
             _playerParameters = playerParameters;
-            _rotationCameraParameters = rotationCameraParameters;
-            
-            _remotePlayerMovement 
-                = new RemotePlayerMovement(_snapshotsService, _characterController, transform, _playerParameters.SmoothSpeed);
-            
-            _remotePlayerRotation 
-                = new RemoteRotationPlayer(_characterController, transform, _playerParameters.RotationSmoothTime, _snapshotsService, _rotationCameraParameters);
-            
-            _playerSnapshotReceiver
-                = new PlayerSnapshotReceiver(_snapshotsService);
-            
-            _playerNetworkInputSender 
-                = new PlayerNetworkInputSender(_playerNetworkInputReader, _sfs, _characterController, _cameraTarget);
+
+            _remotePlayerMovementFactory = remotePlayerMovementFactory;
+            _remotePlayerRotationFactory = remotePlayerRotationFactory;
+            _playerSnapshotReceiverFactory = playerSnapshotReceiverFactory;
+            _playerNetworkInputSenderFactory = playerNetworkInputSenderFactory;
+
+            _remotePlayerMovement = _remotePlayerMovementFactory(
+                _snapshotsService,
+                _characterController,
+                transform,
+                _playerParameters.SmoothSpeed);
+
+            _remotePlayerRotation = _remotePlayerRotationFactory(
+                _snapshotsService,
+                _characterController,
+                transform,
+                _playerParameters.RotationSmoothTime);
+
+            _playerSnapshotReceiver = _playerSnapshotReceiverFactory(_snapshotsService);
+
+            _playerNetworkInputSender = _playerNetworkInputSenderFactory(
+                _playerNetworkInputReader,
+                _sfs,
+                _characterController,
+                _cameraTarget);
         }
 
         public Transform GetCameraTarget()

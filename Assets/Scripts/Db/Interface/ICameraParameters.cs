@@ -1,14 +1,10 @@
-﻿using Unity.Cinemachine.TargetTracking;
-using UnityEngine;
+﻿using System.Collections.Generic;
+using Player.Camera;
 
 namespace Db.Interface
 {
     public interface ICameraParameters
     {
-        int CameraFOV { get; }
-        Vector3 Damping { get; }
-        Vector3 ShoulderOffset { get; }
-        float CameraSide { get; }
-        float CameraDistance { get; }
+        IReadOnlyDictionary<EVirtualCameraType, PlayerCamerasParameters> CameraParametersByType { get; }
     }
 }
