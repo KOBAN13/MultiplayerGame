@@ -48,9 +48,9 @@ namespace Di
             Builder.RegisterFactory<ISnapshotsService, IPlayerSnapshotReceiver>(
                 snapshotsService => new PlayerSnapshotReceiver(snapshotsService));
 
-            Builder.RegisterFactory<IPlayerNetworkInputReader, SmartFox, CharacterController, Transform, IPlayerNetworkInputSender>(
-                (playerNetworkInputReader, sfs, characterController, cameraTarget) =>
-                    new PlayerNetworkInputSender(playerNetworkInputReader, sfs, characterController, cameraTarget));
+            Builder.RegisterFactory<SmartFox, CharacterController, Transform, IPlayerNetworkInputSender>(
+                (sfs, characterController, cameraTarget) =>
+                    new PlayerNetworkInputSender(sfs, characterController, cameraTarget));
         }
 
         private void BindNetwork()
@@ -68,6 +68,7 @@ namespace Di
         {
             Register<PlayerInput>(Lifetime.Singleton);
             Register<PlayerNetworkInputReader>(Lifetime.Singleton);
+            Register<LocalInputSource>(Lifetime.Singleton);
         }
     }
 }

@@ -22,29 +22,30 @@ namespace Player
         private IPlayerSnapshotReceiver _playerSnapshotReceiver;
         private IPlayerNetworkInputSender _playerNetworkInputSender;
         
-        private IPlayerNetworkInputReader _playerNetworkInputReader;
+        private IInputSource _inputSource;
         private ISnapshotsService _snapshotsService;
         private SmartFox _sfs;
+        private InputFrame _lastInputFrame;
 
         private Func<ISnapshotsService, CharacterController, Transform, float, IRemotePlayerMovement> _remotePlayerMovementFactory;
         private Func<ISnapshotsService, CharacterController, Transform, float, IRotationComponent> _remotePlayerRotationFactory;
         private Func<ISnapshotsService, IPlayerSnapshotReceiver> _playerSnapshotReceiverFactory;
-        private Func<IPlayerNetworkInputReader, SmartFox, CharacterController, Transform, IPlayerNetworkInputSender> _playerNetworkInputSenderFactory;
+        private Func<SmartFox, CharacterController, Transform, IPlayerNetworkInputSender> _playerNetworkInputSenderFactory;
         
         [Inject]
         private void Construct(
-            IPlayerNetworkInputReader playerNetworkInputReader, 
+            IInputSource inputSource, 
             SmartFox sfs, 
             ISnapshotsService snapshotsService, 
             IPlayerParameters playerParameters,
             Func<ISnapshotsService, CharacterController, Transform, float, IRemotePlayerMovement> remotePlayerMovementFactory,
             Func<ISnapshotsService, CharacterController, Transform, float, IRotationComponent> remotePlayerRotationFactory,
             Func<ISnapshotsService, IPlayerSnapshotReceiver> playerSnapshotReceiverFactory,
-            Func<IPlayerNetworkInputReader, SmartFox, CharacterController, Transform, IPlayerNetworkInputSender> playerNetworkInputSenderFactory
+            Func<SmartFox, CharacterController, Transform, IPlayerNetworkInputSender> playerNetworkInputSenderFactory
         )
         {
             _snapshotsService = snapshotsService;
-            _playerNetworkInputReader = playerNetworkInputReader;
+            _inputSource = inputSource;
             _sfs = sfs;
             _playerParameters = playerParameters;
 
@@ -68,7 +69,6 @@ namespace Player
             _playerSnapshotReceiver = _playerSnapshotReceiverFactory(_snapshotsService);
 
             _playerNetworkInputSender = _playerNetworkInputSenderFactory(
-                _playerNetworkInputReader,
                 _sfs,
                 _characterController,
                 _cameraTarget);
@@ -93,7 +93,8 @@ namespace Player
 
         private void Update()
         {
-            _playerNetworkInputSender.SendServerPlayerInput();
+            _lastInputFrame = _inputSource.Read();
+            _playerNetworkInputSender.SendServerPlayerInput(_lastInputFrame);
             
             _remotePlayerRotation.RotateCharacter();
             
@@ -102,7 +103,7 @@ namespace Player
 
         private void LateUpdate()
         {
-            _cameraTarget.rotation = _remotePlayerRotation.RotateCamera(_playerNetworkInputReader.Look.CurrentValue);
+            _cameraTarget.rotation = _remotePlayerRotation.RotateCamera(_lastInputFrame.Look);
         }
 
         private void OnDestroy()
