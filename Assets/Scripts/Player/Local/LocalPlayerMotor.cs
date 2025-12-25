@@ -8,7 +8,7 @@ using VContainer;
 
 namespace Player.Local
 {
-    public class LocalPlayerController : MonoBehaviour, ILocalPlayerMotor
+    public class LocalPlayerMotor : MonoBehaviour, ILocalPlayerMotor
     {
         [SerializeField] private Transform _cameraTarget;
         [SerializeField] private CharacterController _characterController;

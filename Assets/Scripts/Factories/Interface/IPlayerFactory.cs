@@ -1,12 +1,11 @@
 ﻿using Cysharp.Threading.Tasks;
-using Player;
-using Player.Interface;
+using Player.Utils;
 using UnityEngine;
 
 namespace Factories.Interface
 {
     public interface IPlayerFactory
     {
-        UniTask<IRemotePlayer> CreatePlayer(Vector3 position, Quaternion rotation);
+        UniTask<T> CreatePlayer<T>(EPlayerType playerType, Vector3 position, Quaternion rotation) where T : Component;
     }
 }

@@ -9,6 +9,7 @@ using Player.Interface.Local;
 using Player.Local;
 using Player.Remote;
 using Services;
+using Services.Connections;
 using Services.Interface;
 using Sfs2X;
 using UnityEngine;
@@ -32,21 +33,21 @@ namespace Di
             Register<PlayerFactory>(Lifetime.Singleton);
             Register<PlayerCameraFactory>(Lifetime.Singleton);
             Register<PlayerCameraHolder>(Lifetime.Singleton);
+            Register<RemotePlayerRegistry>(Lifetime.Singleton);
+            Register<PlayerSpawnService>(Lifetime.Singleton);
+            Register<PlayerJoinGameService>(Lifetime.Singleton);
 
             Builder.RegisterFactory<ISnapshotsService, CharacterController, Transform, float, IRemotePlayerMovement>(
                 (snapshotsService, characterController, playerTransform, smoothSpeed) =>
                     new RemotePlayerMovement(snapshotsService, characterController, playerTransform, smoothSpeed));
 
             Builder.RegisterFactory<ISnapshotsService, CharacterController, Transform, float, IRotationComponent>(
-                resolver =>
-                    (snapshotsService, characterController, playerTransform, rotationSpeed) =>
-                        new RemoteRotationPlayer(
-                            characterController,
-                            playerTransform,
-                            rotationSpeed,
-                            snapshotsService,
-                            resolver.Resolve<IRotationCameraParameters>()),
-                Lifetime.Singleton);
+                (snapshotsService, characterController, playerTransform, rotationSpeed) =>
+                    new RemoteRotationPlayer(
+                        characterController,
+                        playerTransform,
+                        rotationSpeed,
+                        snapshotsService));
 
             Builder.RegisterFactory<ISnapshotsService, IPlayerSnapshotReceiver>(
                 snapshotsService => new PlayerSnapshotReceiver(snapshotsService));

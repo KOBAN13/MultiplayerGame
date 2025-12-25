@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
-using Factories.Interface;
 using Helpers;
-using Player.Interface;
-using Services.Connections;
+using Player.Utils;
 using Services.Db;
 using Services.Interface;
 using Sfs2X;
@@ -19,24 +15,20 @@ namespace Player.Remote
     public class NetworkStateReceiver : IInitializable, IDisposable
     {
         private readonly SmartFox _sfs;
-        private readonly IPlayerFactory _playerFactory;
-        private readonly IPlayerCameraFactory _cameraFactory;
-        private readonly Dictionary<int, IRemotePlayer> _remotePlayers;
         private readonly IPlayerJoinGameService _playerJoinGameService;
+        private readonly IRemotePlayerRegistry _remotePlayerRegistry;
         
         private const string ROOM_GROUP_NAME = "Game";
         
         public NetworkStateReceiver(
             SmartFox sfs,
-            IPlayerFactory playerFactory, 
-            IPlayerCameraFactory cameraFactory
+            IPlayerJoinGameService playerJoinGameService,
+            IRemotePlayerRegistry remotePlayerRegistry
         )
         {
             _sfs = sfs;
-            _playerFactory = playerFactory;
-            _cameraFactory = cameraFactory;
-            _remotePlayers = new Dictionary<int, IRemotePlayer>();
-            _playerJoinGameService = new PlayerJoinGameService(this);
+            _playerJoinGameService = playerJoinGameService;
+            _remotePlayerRegistry = remotePlayerRegistry;
         }
         
         public void Initialize()
@@ -49,33 +41,8 @@ namespace Player.Remote
             _sfs.Send(new SubscribeRoomGroupRequest(ROOM_GROUP_NAME));
         }
         
-        //TODO: Стоит добавить чтоб не приходили повторные id с сервера и убрать проверку id хоть и он приходит с сервера.
-        public async UniTask InitializeRemotePlayer(PlayerJoinRequest joinRequest)
-        {
-            if (_remotePlayers.ContainsKey(joinRequest.UserId))
-            {
-                Debug.LogWarning($"Player {joinRequest.UserId} already exists — skipping");
-                return;
-            }
-
-            var player = await _playerFactory.CreatePlayer(joinRequest.Position, Quaternion.identity);
-            player.SetAnimationState(joinRequest.AnimationState);
-
-            _remotePlayers.Add(joinRequest.UserId, player);
-            
-            player.SetSnapshot(joinRequest.Position, Vector3.zero, 0f, 0f);
-            player.SetAnimationState(joinRequest.AnimationState);
-
-            if (_sfs.MySelf.Id == joinRequest.UserId)
-            {
-                _cameraFactory.CreateCamera(player.GetCameraTarget()).Forget();
-            }
-        }
-        
         public void Dispose()
         {
-            _playerJoinGameService?.Dispose();
-            
             _sfs.RemoveEventListener(SFSEvent.EXTENSION_RESPONSE, OnPlayerState);
             _sfs.RemoveEventListener(SFSEvent.EXTENSION_RESPONSE, OnPlayerEnterGame);
         }
@@ -99,8 +66,12 @@ namespace Player.Remote
                 var z = playerData.GetFloat("z");
                 var animationState = playerData.GetUtfString("animationState");
                 var position = new Vector3(x, 0f, z);
-
-                _playerJoinGameService.AddPlayerJoinRequest(new PlayerJoinRequest(position, animationState, userId));
+                
+                var playerType = _sfs.MySelf.Id == userId 
+                    ? EPlayerType.Local 
+                    : EPlayerType.Remote;
+                
+                _playerJoinGameService.AddPlayerJoinRequest(new PlayerJoinRequest(position, animationState, userId, playerType));
             }
         }
 
@@ -131,7 +102,7 @@ namespace Player.Remote
                 var position = new Vector3(xPosition, yPosition, zPosition);
                 var direction = new Vector3(xDirection, 0f, zDirection);
                 
-                if (!_remotePlayers.TryGetValue(userId, out var remotePlayer))
+                if (!_remotePlayerRegistry.TryGet(userId, out var remotePlayer))
                     continue;
                 
                 remotePlayer.SetSnapshot(position, direction, rotation, serverTime);

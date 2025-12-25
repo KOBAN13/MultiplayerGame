@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using Cysharp.Threading.Tasks;
-using Player;
-using Player.Remote;
 using R3;
 using Services.Db;
 using Services.Interface;
@@ -12,13 +10,13 @@ namespace Services.Connections
     public class PlayerJoinGameService : IPlayerJoinGameService
     {
         private readonly ConcurrentQueue<PlayerJoinRequest> _pendingPlayerJoins = new();
-        private readonly NetworkStateReceiver _networkStateReceiver;
+        private readonly IPlayerSpawnService _playerSpawnService;
         private bool _isProcessingJoinQueue;
         private IDisposable _disposable;
 
-        public PlayerJoinGameService(NetworkStateReceiver networkStateReceiver)
+        public PlayerJoinGameService(IPlayerSpawnService playerSpawnService)
         {
-            _networkStateReceiver = networkStateReceiver;
+            _playerSpawnService = playerSpawnService;
             
             Initialize();
         }
@@ -49,7 +47,7 @@ namespace Services.Connections
             {
                 while (_pendingPlayerJoins.TryDequeue(out var joinRequest))
                 {
-                    await _networkStateReceiver.InitializeRemotePlayer(joinRequest);
+                    await _playerSpawnService.SpawnPlayer(joinRequest);
                 }
             }
             finally
