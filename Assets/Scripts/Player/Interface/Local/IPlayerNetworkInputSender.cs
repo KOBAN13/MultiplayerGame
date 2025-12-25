@@ -1,6 +1,6 @@
 ﻿using Input;
 
-namespace Player.Interface
+namespace Player.Interface.Local
 {
     public interface IPlayerNetworkInputSender
     {

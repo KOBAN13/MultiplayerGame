@@ -14,7 +14,7 @@ using Sfs2X.Requests;
 using UnityEngine;
 using VContainer.Unity;
 
-namespace Player
+namespace Player.Remote
 {
     public class NetworkStateReceiver : IInitializable, IDisposable
     {

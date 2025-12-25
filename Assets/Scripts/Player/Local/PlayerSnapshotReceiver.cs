@@ -3,7 +3,7 @@ using Player.Interface;
 using Services.Interface;
 using UnityEngine;
 
-namespace Player
+namespace Player.Local
 {
     public class PlayerSnapshotReceiver : IPlayerSnapshotReceiver
     {

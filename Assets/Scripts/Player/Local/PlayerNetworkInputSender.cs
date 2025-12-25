@@ -2,12 +2,13 @@
 using Helpers;
 using Input;
 using Player.Interface;
+using Player.Interface.Local;
 using Sfs2X;
 using Sfs2X.Entities.Data;
 using Sfs2X.Requests;
 using UnityEngine;
 
-namespace Player
+namespace Player.Local
 {
     public class PlayerNetworkInputSender : IPlayerNetworkInputSender
     {

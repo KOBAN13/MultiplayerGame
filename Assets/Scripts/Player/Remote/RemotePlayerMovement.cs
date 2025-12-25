@@ -2,7 +2,7 @@
 using Services.Interface;
 using UnityEngine;
 
-namespace Player
+namespace Player.Remote
 {
     public class RemotePlayerMovement : IRemotePlayerMovement
     {

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Player.Interface;
+using Player.Interface.Local;
 using Unity.Cinemachine;
 using UnityEngine;
 using VContainer;

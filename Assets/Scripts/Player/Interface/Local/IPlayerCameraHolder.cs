@@ -3,7 +3,7 @@ using Player.Camera;
 using Unity.Cinemachine;
 using UnityEngine;
 
-namespace Player.Interface
+namespace Player.Interface.Local
 {
     public interface IPlayerCameraHolder
     {

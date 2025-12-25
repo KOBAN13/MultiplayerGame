@@ -5,6 +5,7 @@ using Db.Interface;
 using Factories.Interface;
 using Player;
 using Player.Interface;
+using Player.Remote;
 using Services.Interface;
 using UnityEngine;
 using VContainer;
