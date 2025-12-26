@@ -8,6 +8,7 @@ using Player.Interface;
 using Player.Interface.Local;
 using Player.Local;
 using Player.Remote;
+using Player.Shared;
 using Services;
 using Services.Connections;
 using Services.Interface;
@@ -37,17 +38,13 @@ namespace Di
             Register<PlayerSpawnService>(Lifetime.Singleton);
             Register<PlayerJoinGameService>(Lifetime.Singleton);
 
-            Builder.RegisterFactory<ISnapshotsService, CharacterController, Transform, float, IRemotePlayerMovement>(
-                (snapshotsService, characterController, playerTransform, smoothSpeed) =>
-                    new RemotePlayerMovement(snapshotsService, characterController, playerTransform, smoothSpeed));
-
-            Builder.RegisterFactory<ISnapshotsService, CharacterController, Transform, float, IRotationComponent>(
-                (snapshotsService, characterController, playerTransform, rotationSpeed) =>
-                    new RemoteRotationPlayer(
+            Builder.RegisterFactory<ISnapshotsService, CharacterController, Transform, IPlayerParameters, IPlayerSnapshotMotor>(
+                (snapshotsService, characterController, playerTransform, playerParameters) =>
+                    new SnapshotCharacterMotor(
+                        snapshotsService,
                         characterController,
-                        playerTransform,
-                        rotationSpeed,
-                        snapshotsService));
+                        playerTransform, 
+                        playerParameters));
 
             Builder.RegisterFactory<ISnapshotsService, IPlayerSnapshotReceiver>(
                 snapshotsService => new PlayerSnapshotReceiver(snapshotsService));

@@ -12,14 +12,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0419c2588ef84ec2abe10b0f9b489fdb, type: 3}
   m_Name: GameData
   m_EditorClassIdentifier: 
-  <PlayerPrefab>k__BackingField:
-    type: Player.RemotePlayer
+  <RemotePlayerPrefab>k__BackingField:
+    type: Player.Remote.RemotePlayer
+    asset:
+      m_AssetGUID: 5cbe22ccd84c0a346a7509f135638e34
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+  <LocalPlayerPrefab>k__BackingField:
+    type: Player.Local.LocalPlayerMotor
     asset:
       m_AssetGUID: fd727933ef7bf854aad742d20d4a0ad6
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
-      m_EditorAssetChanged: 0
+      m_EditorAssetChanged: 1
   <PlayerCameraPrefab>k__BackingField:
     type: Player.Camera.VirtualCameraView
     asset:

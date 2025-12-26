@@ -65,16 +65,9 @@ namespace Services.Connections
 
             player.SetSnapshot(joinRequest.Position, Vector3.zero, 0f, 0f);
             player.SetAnimationState(joinRequest.AnimationState);
-
-            if (player is not Component playerComponent)
-                return;
-
-            var localMotor = playerComponent.GetComponent<ILocalPlayerMotor>();
             
-            if (localMotor == null)
-                return;
 
-            _cameraFactory.CreateCamera(localMotor.GetCameraTarget()).Forget();
+            _cameraFactory.CreateCamera(player.GetCameraTarget()).Forget();
         }
 
         private void InitializeRemotePlayer(in PlayerJoinRequest joinRequest, RemotePlayer player)

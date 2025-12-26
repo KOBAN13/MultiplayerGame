@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Player;
 using Player.Interface;
 using Services.Interface;
 
@@ -6,19 +7,19 @@ namespace Services.Connections
 {
     public class RemotePlayerRegistry : IRemotePlayerRegistry
     {
-        private readonly Dictionary<int, IRemotePlayer> _remotePlayers = new();
+        private readonly Dictionary<int, APlayer> _remotePlayers = new();
 
         public bool Contains(int userId)
         {
             return _remotePlayers.ContainsKey(userId);
         }
 
-        public bool TryAdd(int userId, IRemotePlayer remotePlayer)
+        public bool TryAdd(int userId, APlayer remotePlayer)
         {
             return _remotePlayers.TryAdd(userId, remotePlayer);
         }
 
-        public bool TryGet(int userId, out IRemotePlayer remotePlayer)
+        public bool TryGet(int userId, out APlayer remotePlayer)
         {
             return _remotePlayers.TryGetValue(userId, out remotePlayer);
         }

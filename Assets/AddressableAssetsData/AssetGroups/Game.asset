@@ -56,6 +56,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5cbe22ccd84c0a346a7509f135638e34
+    m_Address: Assets/Asset/Prefabs/Player/RemotePlayer.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 6420994d001579e48b0c1dd323f83db4
     m_Address: Assets/Configs/FadeButtonAnimationData.asset
     m_ReadOnly: 0
@@ -153,7 +158,7 @@ MonoBehaviour:
     - config
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: fd727933ef7bf854aad742d20d4a0ad6
-    m_Address: Assets/Asset/Prefabs/Player.prefab
+    m_Address: Assets/Asset/Prefabs/Player/LocalPlayer.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

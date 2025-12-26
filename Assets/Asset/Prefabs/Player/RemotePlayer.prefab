@@ -257,5 +257,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e9f60661c764753949f760f02f3ae66, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _characterController: {fileID: 1043398335293364979}
-  _animator: {fileID: 1490301680379816048}
+  CharacterController: {fileID: 1043398335293364979}
+  Animator: {fileID: 1490301680379816048}

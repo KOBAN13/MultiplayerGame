@@ -8,37 +8,37 @@ using VContainer;
 
 namespace Player.Local
 {
-    public class LocalPlayerMotor : MonoBehaviour, ILocalPlayerMotor
+    public class LocalPlayerMotor : APlayer
     {
         [SerializeField] private Transform _cameraTarget;
-        [SerializeField] private CharacterController _characterController;
-        [SerializeField] private Animator _animator;
         
         private IInputSource _inputSource;
         private IPlayerNetworkInputSender _playerNetworkInputSender;
-        private ILocalPlayerMotor _localPlayerMotor;
         private IRotationCameraParameters _rotationCameraParameters;
         private SmartFox _sfs;
         
         private InputFrame _lastInputFrame;
         private float _cinemachineTargetYaw;
         private float _cinemachineTargetPitch;
-        private float _rotationVelocity;
         private const float THRESHOLD = 0.01f;
         
         private Func<SmartFox, CharacterController, Transform, IPlayerNetworkInputSender> _playerNetworkInputSenderFactory;
-
+        
         [Inject]
-        public void Construct(IInputSource inputSource, IPlayerNetworkInputSender playerNetworkInputSender, SmartFox sfs)
+        public void Construct(
+            IInputSource inputSource,
+            SmartFox sfs,
+            IRotationCameraParameters rotationCameraParameters,
+            Func<SmartFox, CharacterController, Transform, IPlayerNetworkInputSender> playerNetworkInputSenderFactory)
         {
             _inputSource = inputSource;
-            _playerNetworkInputSender = playerNetworkInputSender;
             _sfs = sfs;
-
+            _rotationCameraParameters = rotationCameraParameters;
+            _playerNetworkInputSenderFactory = playerNetworkInputSenderFactory;
 
             _playerNetworkInputSender = _playerNetworkInputSenderFactory(
                 _sfs,
-                _characterController,
+                CharacterController,
                 _cameraTarget);
         }
         

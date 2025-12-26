@@ -258,9 +258,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8ba99f5d92844798fc4f22dc7d69c18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  CharacterController: {fileID: 1043398335293364979}
+  Animator: {fileID: 1490301680379816048}
   _cameraTarget: {fileID: 6615212372059156992}
-  _characterController: {fileID: 1043398335293364979}
-  _animator: {fileID: 1490301680379816048}
 --- !u!1 &4273409232650484036
 GameObject:
   m_ObjectHideFlags: 0
