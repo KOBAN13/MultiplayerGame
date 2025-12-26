@@ -32,6 +32,25 @@ namespace Player.Camera
             {
                 AttachFollowTarget(camera, target);
             }
+            
+            SetVirtualCamera(EVirtualCameraType.Gameplay);
+        }
+        
+        public CinemachineCamera GetCurrentCamera()
+        {
+            return _cameras?[EVirtualCameraType.Gameplay];
+        }
+        
+        public void SetVirtualCamera(EVirtualCameraType virtualCameraType)
+        {
+            if (_cameras is null)
+                return;
+
+            foreach (var (type, camera) in _cameras)
+            {
+                var typesMatch = type == virtualCameraType;
+                camera.Priority = typesMatch ? ACTIVE_PRIORITY : INACTIVE_PRIORITY;
+            }
         }
 
         private void InitCameras()
@@ -50,23 +69,6 @@ namespace Player.Camera
                 cinemachineFollow.ShoulderOffset = cameraParameters.ShoulderOffset;
                 cinemachineFollow.CameraSide = cameraParameters.CameraSide;
                 cinemachineFollow.CameraDistance = cameraParameters.CameraDistance;
-            }
-        }
-
-        public CinemachineCamera GetCurrentCamera()
-        {
-            return _cameras?[EVirtualCameraType.Gameplay];
-        }
-        
-        public void SetVirtualCamera(EVirtualCameraType virtualCameraType)
-        {
-            if (_cameras is null)
-                return;
-
-            foreach (var (type, camera) in _cameras)
-            {
-                var typesMatch = type == virtualCameraType;
-                camera.Priority = typesMatch ? ACTIVE_PRIORITY : INACTIVE_PRIORITY;
             }
         }
         

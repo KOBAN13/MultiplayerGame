@@ -2,6 +2,9 @@
 {
     public class RemotePlayer : APlayer
     {
-        
+        private void Update()
+        {
+            SnapshotMotor.Tick();
+        }
     }
 }

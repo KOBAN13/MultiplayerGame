@@ -15,6 +15,7 @@ namespace Player.Local
         private IInputSource _inputSource;
         private IPlayerNetworkInputSender _playerNetworkInputSender;
         private IRotationCameraParameters _rotationCameraParameters;
+        private IPlayerCameraHolder _playerCameraHolder;
         private SmartFox _sfs;
         
         private InputFrame _lastInputFrame;
@@ -23,18 +24,20 @@ namespace Player.Local
         private const float THRESHOLD = 0.01f;
         
         private Func<SmartFox, CharacterController, Transform, IPlayerNetworkInputSender> _playerNetworkInputSenderFactory;
-        
+
         [Inject]
         public void Construct(
             IInputSource inputSource,
             SmartFox sfs,
             IRotationCameraParameters rotationCameraParameters,
-            Func<SmartFox, CharacterController, Transform, IPlayerNetworkInputSender> playerNetworkInputSenderFactory)
+            Func<SmartFox, CharacterController, Transform, IPlayerNetworkInputSender> playerNetworkInputSenderFactory,
+            IPlayerCameraHolder playerCameraHolder)
         {
             _inputSource = inputSource;
             _sfs = sfs;
             _rotationCameraParameters = rotationCameraParameters;
             _playerNetworkInputSenderFactory = playerNetworkInputSenderFactory;
+            _playerCameraHolder = playerCameraHolder;
 
             _playerNetworkInputSender = _playerNetworkInputSenderFactory(
                 _sfs,
@@ -56,6 +59,7 @@ namespace Player.Local
         {
             _lastInputFrame = _inputSource.Read();
             _playerNetworkInputSender.SendServerPlayerInput(_lastInputFrame);
+            SnapshotMotor.Tick();   
         }
 
         public void LateUpdate()

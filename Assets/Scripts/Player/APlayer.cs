@@ -52,10 +52,5 @@ namespace Player
         {
             PlayerSnapshotReceiver.SetSnapshot(position, inputDirection, rotation, serverTime);
         }
-
-        private void Update()
-        {
-            SnapshotMotor.Tick();
-        }
     }
 }
