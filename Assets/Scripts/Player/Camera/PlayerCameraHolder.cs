@@ -26,12 +26,7 @@ namespace Player.Camera
             _cameras = cameraTypeData;
             
             InitFov();
-            InitCameras();
-            
-            if (_cameras.TryGetValue(EVirtualCameraType.Gameplay, out var camera))
-            {
-                AttachFollowTarget(camera, target);
-            }
+            InitCameras(target);
             
             SetVirtualCamera(EVirtualCameraType.Gameplay);
         }
@@ -53,7 +48,7 @@ namespace Player.Camera
             }
         }
 
-        private void InitCameras()
+        private void InitCameras(Transform target)
         {
             foreach (var kayValueCamera in _cameras)
             {
@@ -69,6 +64,8 @@ namespace Player.Camera
                 cinemachineFollow.ShoulderOffset = cameraParameters.ShoulderOffset;
                 cinemachineFollow.CameraSide = cameraParameters.CameraSide;
                 cinemachineFollow.CameraDistance = cameraParameters.CameraDistance;
+                
+                AttachFollowTarget(camera, target);
             }
         }
         

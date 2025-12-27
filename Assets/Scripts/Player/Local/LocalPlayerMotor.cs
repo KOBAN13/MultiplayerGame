@@ -1,7 +1,9 @@
 ﻿using System;
 using Db.Interface;
 using Input;
+using Player.Camera;
 using Player.Interface.Local;
+using R3;
 using Sfs2X;
 using UnityEngine;
 using VContainer;
@@ -53,6 +55,18 @@ namespace Player.Local
         public Transform GetCameraTarget()
         {
             return _cameraTarget;
+        }
+
+        public void OnEnable()
+        {
+            _inputSource.AimCommand
+                .Subscribe(isAim =>
+                {
+                    _playerCameraHolder.SetVirtualCamera(isAim
+                        ? EVirtualCameraType.Aim
+                        : EVirtualCameraType.Gameplay);
+                })
+                .AddTo(this);
         }
 
         public void Update()

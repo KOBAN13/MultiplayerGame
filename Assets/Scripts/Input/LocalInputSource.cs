@@ -1,17 +1,23 @@
+using System;
+using R3;
 using UnityEngine;
+using VContainer.Unity;
 
 namespace Input
 {
-    public class LocalInputSource : IInputSource
+    public class LocalInputSource : IInputSource, IDisposable, IInitializable
     {
         private readonly IPlayerNetworkInputReader _playerNetworkInputReader;
+        private readonly CompositeDisposable  _disposables = new();
         private int _sequenceId;
+        
+        public ReactiveCommand<bool> AimCommand { get; private set; } = new();
 
         public LocalInputSource(IPlayerNetworkInputReader playerNetworkInputReader)
         {
             _playerNetworkInputReader = playerNetworkInputReader;
         }
-
+        
         public InputFrame Read()
         {
             return new InputFrame
@@ -26,5 +32,19 @@ namespace Input
                 SequenceId = _sequenceId++
             };
         }
+        
+        public void Initialize()
+        {
+            _playerNetworkInputReader.Aim
+                .Subscribe(isAim => AimCommand.Execute(isAim))
+                .AddTo(_disposables);
+        }
+        
+        public void Dispose()
+        {
+            _disposables.Clear();
+            _disposables.Dispose();
+        }
+        
     }
 }
