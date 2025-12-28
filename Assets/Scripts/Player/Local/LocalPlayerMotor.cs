@@ -3,6 +3,7 @@ using Db.Interface;
 using Input;
 using Player.Camera;
 using Player.Interface.Local;
+using Player.Shoot;
 using R3;
 using Sfs2X;
 using UnityEngine;
@@ -18,6 +19,7 @@ namespace Player.Local
         private IPlayerNetworkInputSender _playerNetworkInputSender;
         private IRotationCameraParameters _rotationCameraParameters;
         private IPlayerCameraHolder _playerCameraHolder;
+        private ISimpleShotController _simpleShotController;
         private SmartFox _sfs;
         
         private InputFrame _lastInputFrame;
@@ -33,8 +35,11 @@ namespace Player.Local
             SmartFox sfs,
             IRotationCameraParameters rotationCameraParameters,
             Func<SmartFox, CharacterController, Transform, IPlayerNetworkInputSender> playerNetworkInputSenderFactory,
-            IPlayerCameraHolder playerCameraHolder)
+            IPlayerCameraHolder playerCameraHolder,
+            ISimpleShotController simpleShotController
+        )
         {
+            _simpleShotController = simpleShotController;
             _inputSource = inputSource;
             _sfs = sfs;
             _rotationCameraParameters = rotationCameraParameters;
@@ -66,6 +71,10 @@ namespace Player.Local
                         ? EVirtualCameraType.Aim
                         : EVirtualCameraType.Gameplay);
                 })
+                .AddTo(this);
+            
+            _inputSource.ShotCommand
+                .Subscribe(_ => _simpleShotController.Shot())
                 .AddTo(this);
         }
 

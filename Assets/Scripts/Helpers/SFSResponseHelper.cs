@@ -27,5 +27,7 @@
         public const string PLAYER_INPUT = "playerInput";
         public const string PLAYER_STATE = "playerState";
         public const string PLAYER_JOIN_ROOM = "playerJoinRoom";
+        
+        public const string RAYCAST = "raycast";
     }
 }

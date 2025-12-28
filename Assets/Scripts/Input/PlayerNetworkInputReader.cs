@@ -93,7 +93,7 @@ namespace Input
                     _shoot.Value = true;
                     break;
                 case InputActionPhase.Canceled:
-                    _aim.Value = false;
+                    _shoot.Value = false;
                     break;
             }
         }
