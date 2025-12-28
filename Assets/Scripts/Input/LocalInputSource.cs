@@ -12,7 +12,7 @@ namespace Input
         private int _sequenceId;
         
         public ReactiveCommand<bool> AimCommand { get; private set; } = new();
-        public ReactiveCommand ShotCommand { get; private set; } = new();
+        public ReactiveCommand<bool> ShotCommand { get; private set; } = new();
 
         public LocalInputSource(IPlayerNetworkInputReader playerNetworkInputReader)
         {
@@ -41,7 +41,7 @@ namespace Input
                 .AddTo(_disposables);
             
             _playerNetworkInputReader.Shoot
-                .Subscribe(_ => ShotCommand.Execute(Unit.Default))
+                .Subscribe(isShot => ShotCommand.Execute(isShot))
                 .AddTo(_disposables);
         }
         

@@ -74,6 +74,7 @@ namespace Player.Local
                 .AddTo(this);
             
             _inputSource.ShotCommand
+                .Where(isShot => isShot)
                 .Subscribe(_ => _simpleShotController.Shot())
                 .AddTo(this);
         }
