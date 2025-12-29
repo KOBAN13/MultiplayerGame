@@ -2,6 +2,7 @@
 using Player.Camera;
 using Unity.Cinemachine;
 using UnityEngine;
+using Utils.Enums;
 
 namespace Player.Interface.Local
 {

@@ -13,6 +13,7 @@ using UI.Utils;
 using UI.View;
 using UnityEngine;
 using Utils;
+using Utils.Enums;
 using VContainer;
 
 namespace UI.ViewModel

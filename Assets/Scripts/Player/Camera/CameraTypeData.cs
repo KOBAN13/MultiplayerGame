@@ -1,5 +1,6 @@
 ﻿using System;
 using Unity.Cinemachine;
+using Utils.Enums;
 
 namespace Player.Camera
 {

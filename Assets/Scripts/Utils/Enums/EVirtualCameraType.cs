@@ -1,4 +1,4 @@
-﻿namespace Player.Camera
+﻿namespace Utils.Enums
 {
     public enum EVirtualCameraType
     {

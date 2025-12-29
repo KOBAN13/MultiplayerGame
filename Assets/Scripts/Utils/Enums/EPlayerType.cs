@@ -1,4 +1,4 @@
-﻿namespace Player.Utils
+﻿namespace Utils.Enums
 {
     public enum EPlayerType
     {

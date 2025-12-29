@@ -7,6 +7,7 @@ using Player.Shoot;
 using R3;
 using Sfs2X;
 using UnityEngine;
+using Utils.Enums;
 using VContainer;
 
 namespace Player.Local

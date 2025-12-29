@@ -13,6 +13,7 @@ using Sfs2X.Entities.Data;
 using Sfs2X.Requests;
 using UnityEngine;
 using Utils;
+using Utils.Enums;
 
 namespace Services.Connections
 {

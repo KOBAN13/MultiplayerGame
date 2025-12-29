@@ -4,11 +4,11 @@ using Factories.Interface;
 using Player.Interface.Local;
 using Player.Local;
 using Player.Remote;
-using Player.Utils;
 using Services.Db;
 using Services.Interface;
 using Sfs2X;
 using UnityEngine;
+using Utils.Enums;
 
 namespace Services.Connections
 {

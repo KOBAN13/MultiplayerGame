@@ -1,5 +1,5 @@
 ﻿using System;
-using Player.Camera;
+using Utils.Enums;
 using Utils.SerializedDictionary;
 
 namespace Db.Dictionary

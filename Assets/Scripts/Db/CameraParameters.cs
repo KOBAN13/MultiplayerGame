@@ -3,6 +3,7 @@ using Db.Dictionary;
 using Db.Interface;
 using Player.Camera;
 using UnityEngine;
+using Utils.Enums;
 
 namespace Db
 {

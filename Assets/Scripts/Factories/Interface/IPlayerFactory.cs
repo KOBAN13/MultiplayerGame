@@ -1,6 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
-using Player.Utils;
 using UnityEngine;
+using Utils.Enums;
 
 namespace Factories.Interface
 {

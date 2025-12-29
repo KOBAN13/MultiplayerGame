@@ -7,9 +7,9 @@ using Player;
 using Player.Interface;
 using Player.Local;
 using Player.Remote;
-using Player.Utils;
 using Services.Interface;
 using UnityEngine;
+using Utils.Enums;
 using VContainer;
 using VContainer.Unity;
 

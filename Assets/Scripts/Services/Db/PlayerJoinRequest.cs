@@ -1,5 +1,5 @@
-﻿using Player.Utils;
-using UnityEngine;
+﻿using UnityEngine;
+using Utils.Enums;
 
 namespace Services.Db
 {

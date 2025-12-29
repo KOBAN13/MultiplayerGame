@@ -1,4 +1,4 @@
-﻿namespace Utils
+﻿namespace Utils.Enums
 {
     public enum ERoomRole
     {

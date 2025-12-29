@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Player.Camera;
+using Utils.Enums;
 
 namespace Db.Interface
 {

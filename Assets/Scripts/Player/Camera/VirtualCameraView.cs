@@ -4,6 +4,7 @@ using Player.Interface;
 using Player.Interface.Local;
 using Unity.Cinemachine;
 using UnityEngine;
+using Utils.Enums;
 using VContainer;
 
 namespace Player.Camera
