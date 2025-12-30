@@ -23,9 +23,10 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
-    - Name: objectPoolsDictionary
+    - Name: _objectPoolsDictionary
       Entry: 7
-      Data: 0|Db.Dictionary.ObjectPoolsDictionary, Assembly-CSharp
+      Data: 0|System.Collections.Generic.Dictionary`2[[Utils.Enums.EObjectInPoolName,
+        Assembly-CSharp],[Db.Pool.PoolEntry, Assembly-CSharp]], mscorlib
     - Name: comparer
       Entry: 7
       Data: 1|System.Collections.Generic.EnumEqualityComparer`1[[Utils.Enums.EObjectInPoolName,
