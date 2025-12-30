@@ -1,7 +1,9 @@
-﻿namespace Player.Shoot
+﻿using UnityEngine;
+
+namespace Player.Shoot
 {
     public interface ISimpleShotController
     {
-        void Shot();
+        void Shot(Transform shotPoint);
     }
 }

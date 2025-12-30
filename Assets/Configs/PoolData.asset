@@ -13,5 +13,9 @@ MonoBehaviour:
   m_Name: PoolData
   m_EditorClassIdentifier: 
   objectPoolsDictionary:
-    _keyData: 
-    _valueData: []
+    _keyData: 0100000002000000
+    _valueData:
+    - prefab: {fileID: 6863857337172796869, guid: 54482a4d62e9f26408907a48a4d020c4, type: 3}
+      prewarmCount: 10
+    - prefab: {fileID: 613433886817584986, guid: 96ede523b83d5e541be2f5e25b5b7286, type: 3}
+      prewarmCount: 10

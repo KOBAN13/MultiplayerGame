@@ -2,7 +2,6 @@
 using Factories;
 using Input;
 using Installer;
-using Player;
 using Player.Camera;
 using Player.Interface;
 using Player.Interface.Local;
@@ -15,6 +14,7 @@ using Services.Connections;
 using Services.Interface;
 using Sfs2X;
 using UnityEngine;
+using Utils.Pool;
 using VContainer;
 
 namespace Di
@@ -24,6 +24,7 @@ namespace Di
         protected override void Configure(IContainerBuilder builder)
         {
             Builder = builder;
+            BindService();
             BindNetwork();
             BindInput();
             BindInstaller();
@@ -72,6 +73,11 @@ namespace Di
             Register<PlayerInput>(Lifetime.Singleton);
             Register<PlayerNetworkInputReader>(Lifetime.Singleton);
             Register<LocalInputSource>(Lifetime.Singleton);
+        }
+        
+        private void BindService()
+        {
+            Register<PoolService>(Lifetime.Singleton);
         }
     }
 }

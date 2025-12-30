@@ -142,6 +142,12 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e3def7c35707b0a4c98220b94f0c2600
+    m_Address: Assets/Configs/PoolData.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e7c33ffe4ef80cf4ba93f5b3cfcec405
     m_Address: Assets/Scenes/LobbyScene.unity
     m_ReadOnly: 0
@@ -159,6 +165,12 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f0b6fb6407163d14a9830ed188943651
     m_Address: Assets/Configs/SnapshotParameters.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f237bfd8b8221b942a485516f70ff8ac
+    m_Address: Assets/Configs/BulletData.asset
     m_ReadOnly: 0
     m_SerializedLabels:
     - config

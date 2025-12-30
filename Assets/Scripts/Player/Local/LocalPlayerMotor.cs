@@ -15,6 +15,7 @@ namespace Player.Local
     public class LocalPlayerMotor : APlayer
     {
         [SerializeField] private Transform _cameraTarget;
+        [SerializeField] private Transform _shotPosition;
         
         private IInputSource _inputSource;
         private IPlayerNetworkInputSender _playerNetworkInputSender;
@@ -76,7 +77,7 @@ namespace Player.Local
             
             _inputSource.ShotCommand
                 .Where(isShot => isShot)
-                .Subscribe(_ => _simpleShotController.Shot())
+                .Subscribe(_ => _simpleShotController.Shot(_shotPosition))
                 .AddTo(this);
         }
 

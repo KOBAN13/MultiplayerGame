@@ -3,6 +3,7 @@
     public enum EObjectInPoolName
     {
         None = 0,
-        Projectile = 1,
+        BulletProjectile = 1,
+        BulletImpactEffect = 2,
     }
 }
