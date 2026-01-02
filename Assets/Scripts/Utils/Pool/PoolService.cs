@@ -46,6 +46,8 @@ namespace Utils.Pool
 
         public void ReturnToPool<T>(EObjectInPoolName id, T obj) where T : Component
         {
+            Debug.LogError("Returning to the pool");
+            
             var pool = GetPool<T>(id);
 
             pool?.ReturnToPool(obj);

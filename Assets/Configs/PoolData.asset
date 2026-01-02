@@ -57,7 +57,7 @@ MonoBehaviour:
       Data: 0
     - Name: prewarmCount
       Entry: 3
-      Data: 10
+      Data: 30
     - Name: objectType
       Entry: 7
       Data: 3|System.RuntimeType, mscorlib
@@ -87,7 +87,7 @@ MonoBehaviour:
       Data: 1
     - Name: prewarmCount
       Entry: 3
-      Data: 10
+      Data: 30
     - Name: objectType
       Entry: 7
       Data: 5|System.RuntimeType, mscorlib

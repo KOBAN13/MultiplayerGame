@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Utils.Enums;
 
@@ -16,18 +17,26 @@ namespace Player.Weapon.Projectile
             var contact = collision.contacts[0];
                 
             var collisionPoint = contact.point;
-                
-            ImpactEffect.transform.position = collisionPoint;
             
-            ImpactEffect.gameObject.SetActive(true);
+            Debug.LogError("Rotation in hit: " + transform.rotation);
             
-            ImpactEffect.Play();
+            if (PoolService.TrySpawn<ParticleSystem>(ImpactEffectId, true, collisionPoint, out var impactEffect))
+            {
+                impactEffect.transform.rotation = Quaternion.LookRotation(contact.normal);
+                impactEffect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                impactEffect.Clear(true);
+                impactEffect.Play();
+
+                var main = impactEffect.main;
+                var totalLifetime = main.duration + main.startLifetime.constantMax;
+
+                UniTask.Delay(TimeSpan.FromSeconds(totalLifetime),
+                        cancellationToken: impactEffect.GetCancellationTokenOnDestroy())
+                    .ContinueWith(() => PoolService.ReturnToPool(EObjectInPoolName.BulletImpactEffect, impactEffect))
+                    .Forget();
+            }
             
             DestroyProjectile(EObjectInPoolName.BulletProjectile);
-
-            UniTask.WaitUntil(() => !ImpactEffect.IsAlive())
-                .ContinueWith(() => PoolService.ReturnToPool(EObjectInPoolName.BulletImpactEffect, ImpactEffect))
-                .Forget();
         }
 
         // private float CalculateDamage(out bool isCrit, out float finalDamage)

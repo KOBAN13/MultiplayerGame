@@ -22,7 +22,6 @@ namespace Player.Shoot
         private Vector3 _lastShotRayOrigin;
         private Vector3 _lastShotRayDirection;
         private Vector3 _lastShotPointPosition;
-        private bool _hasPendingShot;
 
         public SimpleShotController(
             SmartFox sfs,
@@ -53,7 +52,6 @@ namespace Player.Shoot
             _lastShotRayOrigin = ray.origin;
             _lastShotRayDirection = ray.direction;
             _lastShotPointPosition = shotPoint.position;
-            _hasPendingShot = true;
                 
             var data = SFSObject.NewInstance();
             
@@ -84,8 +82,6 @@ namespace Player.Shoot
             
             if (cmd != SFSResponseHelper.RAYCAST)
                 return;
-            if (!_hasPendingShot)
-                return;
 
             var sfsObject = (SFSObject)evt.Params["params"];
             
@@ -101,9 +97,16 @@ namespace Player.Shoot
                 var z = sfsObject.GetFloat("z");
                 var hitPoint = new Vector3(x, y, z);
                 var direction = hitPoint - _lastShotPointPosition;
+                
+                if (direction.sqrMagnitude < 0.0001f)
+                    direction = _lastShotRayDirection;
 
-                if (direction.sqrMagnitude > 0.0001f && _poolService.TrySpawn<AProjectile>(
-                        EObjectInPoolName.BulletProjectile, true, _lastShotPointPosition, out var projectile))
+                if (_poolService.TrySpawn<AProjectile>(
+                        EObjectInPoolName.BulletProjectile, 
+                        true, 
+                        _lastShotPointPosition, 
+                        out var projectile)
+                )
                 {
                     projectile.InitializeProjectile(_bulletData, _poolService);
                     projectile.Launch(EObjectInPoolName.BulletImpactEffect, direction, _bulletData.Speed);
@@ -115,8 +118,6 @@ namespace Player.Shoot
             {
                 Debug.DrawLine(_lastShotRayOrigin, _lastShotRayOrigin + _lastShotRayDirection * distance, Color.yellow, 1.0f);
             }
-
-            _hasPendingShot = false;
         }
     }
 }

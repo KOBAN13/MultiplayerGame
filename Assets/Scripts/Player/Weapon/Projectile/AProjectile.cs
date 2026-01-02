@@ -10,8 +10,8 @@ namespace Player.Weapon.Projectile
     {
         protected AProjectileData Data;
         protected IPoolService PoolService;
-        protected ParticleSystem ImpactEffect;
         protected Rigidbody Rigidbody;
+        protected EObjectInPoolName ImpactEffectId;
         
         public virtual void InitializeProjectile(AProjectileData data, IPoolService poolService)
         {
@@ -22,25 +22,29 @@ namespace Player.Weapon.Projectile
             PoolService = poolService;
             Rigidbody = GetComponent<Rigidbody>();
         }
-        
+
         public virtual void Launch(EObjectInPoolName impactEffectId, Vector3 direction, float speed)
-        { 
+        {
+            Rigidbody.linearVelocity = Vector3.zero;
+            Rigidbody.angularVelocity = Vector3.zero;
             Rigidbody.WakeUp();
-            
+
             var directionEnd = direction.normalized;
 
-            transform.forward = directionEnd;
+            var rotation = Quaternion.LookRotation(directionEnd, Vector3.up);
             
+            transform.rotation = rotation;
             Rigidbody.linearVelocity = directionEnd * speed;
             
-            if(PoolService.TrySpawn<ParticleSystem>(impactEffectId, false, out var impactEffect))
-            {
-                ImpactEffect = impactEffect;
-            }
+            ImpactEffectId = impactEffectId;
+            
+            Debug.LogError("Rotation in launch: " + transform.rotation);
         }
         
         public virtual void DestroyProjectile(EObjectInPoolName id)
         {
+            Rigidbody.linearVelocity = Vector3.zero;
+            Rigidbody.angularVelocity = Vector3.zero;
             Rigidbody.Sleep();
             PoolService.ReturnToPool(id, this);
         }

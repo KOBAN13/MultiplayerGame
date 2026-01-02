@@ -45,7 +45,7 @@ namespace Utils.Pool
                 for (var i = 0; i < toSpawn; i++)
                 {
                     var obj = CreateNew();
-                    obj.transform.SetParent(_poolRoot?.transform);
+                    obj.transform.SetParent(_poolRoot.transform);
                     obj.gameObject.SetActive(false);
                     _pool.Push(obj);
                     spawned++;
@@ -57,16 +57,29 @@ namespace Utils.Pool
 
         public T Get()
         {
-            var obj = _pool.Count > 0 ? _pool.Pop() : CreateNew();
+            while (_pool.Count > 0)
+            {
+                var pooled = _pool.Pop();
+                
+                pooled.transform.SetParent(null);
+                pooled.gameObject.SetActive(false);
+                return pooled;
+            }
+
+            var obj = CreateNew();
             obj.transform.SetParent(null);
-            obj.gameObject.SetActive(true);
+            obj.gameObject.SetActive(false);
             return obj;
         }
 
         public void ReturnToPool(T obj)
         {
-            obj.transform.SetParent(_poolRoot?.transform);
+            if (obj == null)
+                return;
+
             obj.gameObject.SetActive(false);
+            obj.transform.SetParent(_poolRoot.transform);
+            obj.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
             _pool.Push(obj);
         }
 
