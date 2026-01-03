@@ -1,0 +1,13 @@
+# Blender MTL File: 'None'
+# Material Count: 1
+
+newmtl Texture
+Ns 19.180554
+Ka 1.000000 1.000000 1.000000
+Kd 0.588235 0.588235 0.588235
+Ks 0.591241 0.591241 0.591241
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd C:\\Users\\Asus\\Downloads\\Gun2(1)\\Gun2\\Textures\\Gun 02 Low Poly_Gun2_BaseColor.png
