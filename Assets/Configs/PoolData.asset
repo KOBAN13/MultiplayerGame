@@ -16,7 +16,6 @@ MonoBehaviour:
     SerializedFormat: 2
     SerializedBytes: 
     ReferencedUnityObjects:
-    - {fileID: 6863857337172796869, guid: 54482a4d62e9f26408907a48a4d020c4, type: 3}
     - {fileID: 613433886817584986, guid: 96ede523b83d5e541be2f5e25b5b7286, type: 3}
     SerializedBytesString: 
     Prefab: {fileID: 0}
@@ -42,7 +41,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 2
+      Data: 1
     - Name: 
       Entry: 7
       Data: 
@@ -61,36 +60,6 @@ MonoBehaviour:
     - Name: objectType
       Entry: 7
       Data: 3|System.RuntimeType, mscorlib
-    - Name: 
-      Entry: 1
-      Data: Player.Weapon.Projectile.BulletProjectile, Assembly-CSharp
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 2
-    - Name: $v
-      Entry: 7
-      Data: 4|Db.Pool.PoolEntry, Assembly-CSharp
-    - Name: prefab
-      Entry: 10
-      Data: 1
-    - Name: prewarmCount
-      Entry: 3
-      Data: 30
-    - Name: objectType
-      Entry: 7
-      Data: 5|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
       Data: UnityEngine.ParticleSystem, UnityEngine.ParticleSystemModule

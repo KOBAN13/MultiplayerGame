@@ -8,7 +8,7 @@ using Player.Interface.Local;
 using Player.Local;
 using Player.Remote;
 using Player.Shared;
-using Player.Shoot;
+using Player.Weapon.Projectile;
 using Services;
 using Services.Connections;
 using Services.Interface;
@@ -39,7 +39,6 @@ namespace Di
             Register<RemotePlayerRegistry>(Lifetime.Singleton);
             Register<PlayerSpawnService>(Lifetime.Singleton);
             Register<PlayerJoinGameService>(Lifetime.Singleton);
-            Register<SimpleShotController>(Lifetime.Scoped);
 
             Builder.RegisterFactory<ISnapshotsService, CharacterController, Transform, IPlayerParameters, IPlayerSnapshotMotor>(
                 (snapshotsService, characterController, playerTransform, playerParameters) =>

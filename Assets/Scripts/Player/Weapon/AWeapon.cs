@@ -2,12 +2,13 @@
 using Db.Projectile;
 using UnityEngine;
 using Utils.Enums;
+using VContainer;
 
 namespace Player.Weapon
 {
     public abstract class AWeapon : MonoBehaviour, IWeapon
     {
-        public abstract EWeaponType WeaponType { get; protected set; }
+        public abstract EWeaponType WeaponType { get; }
         
         protected AWeaponData Data;
         protected GameObject Owner;
@@ -15,6 +16,28 @@ namespace Player.Weapon
         private float _currentProjectileCount;
         private bool _isReloading;
         private float _nextAttackTime;
+        
+        [Inject]
+        private void Construct(WeaponData weaponData)
+        {
+            if (weaponData == null)
+            {
+                Debug.LogError($"{name}: WeaponData is not registered in the container.", this);
+                enabled = false;
+                return;
+            }
+
+            if (!weaponData.TryGet(WeaponType, out var data) || data == null)
+            {
+                Debug.LogError($"{name}: Missing weapon data for {WeaponType}.", this);
+                enabled = false;
+                return;
+            }
+
+            Data = data;
+            Owner = gameObject;
+            _currentProjectileCount = Data.MagazineSize;
+        }
 
         public virtual void Attack()
         {
@@ -46,14 +69,6 @@ namespace Player.Weapon
         public void SetOwner(GameObject owner) => Owner = owner;
         
         protected abstract void PerformedAttack();
-        
-        protected virtual void InitializeWeapon(AWeaponData data, GameObject owner)
-        {
-            Data = data;
-            Owner = owner;
-            
-            _currentProjectileCount = Data.MagazineSize;
-        }
 
         private async UniTaskVoid ReloadAsync()
         {

@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3e6792904a35437aa28264d3ab6d0d3b, type: 3}
-  m_Name: SingleShotWeapon
+  m_Script: {fileID: 11500000, guid: 8d72108a6b494345b3ac446bbcaac2a0, type: 3}
+  m_Name: AutomaticShotWeapon
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -21,12 +21,8 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  <WeaponType>k__BackingField: 1
-  <AttackRate>k__BackingField: 0.12
-  <ReloadTime>k__BackingField: 0.15
-  <MagazineSize>k__BackingField: 30
+  <WeaponType>k__BackingField: 2
+  <AttackRate>k__BackingField: 0
+  <ReloadTime>k__BackingField: 0
+  <MagazineSize>k__BackingField: 0
   <ProjectileData>k__BackingField: {fileID: 11400000, guid: f237bfd8b8221b942a485516f70ff8ac, type: 2}
-  <LayerMask>k__BackingField:
-    serializedVersion: 2
-    m_Bits: 72
-  <DistanceToShot>k__BackingField: 0

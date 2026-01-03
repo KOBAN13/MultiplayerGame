@@ -7,22 +7,11 @@ namespace Player.Weapon.Projectile
 {
     public class BulletProjectile : AProjectile
     {
-        private void OnCollisionEnter(Collision other) => OnHit(other);
-        
-        public override void OnHit(Collision collision)
+        public override void OnHit(Vector3 hitPoint, Quaternion rotation)
         {
-            if (collision.contactCount <= 0)
-                return;
-            
-            var contact = collision.contacts[0];
-                
-            var collisionPoint = contact.point;
-            
-            Debug.LogError("Rotation in hit: " + transform.rotation);
-            
-            if (PoolService.TrySpawn<ParticleSystem>(ImpactEffectId, true, collisionPoint, out var impactEffect))
+            if (PoolService.TrySpawn<ParticleSystem>(ImpactEffectId, true, hitPoint, out var impactEffect))
             {
-                impactEffect.transform.rotation = Quaternion.LookRotation(contact.normal);
+                impactEffect.transform.rotation = rotation;
                 impactEffect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
                 impactEffect.Clear(true);
                 impactEffect.Play();
@@ -36,7 +25,12 @@ namespace Player.Weapon.Projectile
                     .Forget();
             }
             
-            DestroyProjectile(EObjectInPoolName.BulletProjectile);
+            DestroyProjectile(EObjectInPoolName.BulletImpactEffect);
+        }
+
+        public override void DestroyProjectile(EObjectInPoolName id)
+        {
+            //TODO: Может какой то эффект или еще чего
         }
 
         // private float CalculateDamage(out bool isCrit, out float finalDamage)

@@ -6,11 +6,10 @@ using Utils.Pool;
 
 namespace Player.Weapon.Projectile
 {
-    public abstract class AProjectile : MonoBehaviour, IProjectile
+    public abstract class AProjectile : IProjectile
     {
         protected AProjectileData Data;
         protected IPoolService PoolService;
-        protected Rigidbody Rigidbody;
         protected EObjectInPoolName ImpactEffectId;
         
         public virtual void InitializeProjectile(AProjectileData data, IPoolService poolService)
@@ -20,36 +19,23 @@ namespace Player.Weapon.Projectile
             
             Data = data;
             PoolService = poolService;
-            Rigidbody = GetComponent<Rigidbody>();
         }
 
-        public virtual void Launch(EObjectInPoolName impactEffectId, Vector3 direction, float speed)
+        public virtual void Launch(EObjectInPoolName impactEffectId, Vector3 hitPoint)
         {
-            Rigidbody.linearVelocity = Vector3.zero;
-            Rigidbody.angularVelocity = Vector3.zero;
-            Rigidbody.WakeUp();
-
-            var directionEnd = direction.normalized;
+            var directionEnd = hitPoint.normalized;
 
             var rotation = Quaternion.LookRotation(directionEnd, Vector3.up);
             
-            transform.rotation = rotation;
-            Rigidbody.linearVelocity = directionEnd * speed;
-            
             ImpactEffectId = impactEffectId;
             
-            Debug.LogError("Rotation in launch: " + transform.rotation);
-        }
-        
-        public virtual void DestroyProjectile(EObjectInPoolName id)
-        {
-            Rigidbody.linearVelocity = Vector3.zero;
-            Rigidbody.angularVelocity = Vector3.zero;
-            Rigidbody.Sleep();
-            PoolService.ReturnToPool(id, this);
+            OnHit(hitPoint, rotation);
         }
 
+        public abstract void DestroyProjectile(EObjectInPoolName id);
+
         public AProjectileData GetData() => Data;
-        public abstract void OnHit(Collision collision);
+
+        public abstract void OnHit(Vector3 hitPoint, Quaternion rotation);
     }
 }

@@ -1,9 +1,8 @@
 ﻿using System;
 using Db.Interface;
 using Input;
-using Player.Camera;
 using Player.Interface.Local;
-using Player.Shoot;
+using Player.Weapon;
 using R3;
 using Sfs2X;
 using UnityEngine;
@@ -15,13 +14,12 @@ namespace Player.Local
     public class LocalPlayerMotor : APlayer
     {
         [SerializeField] private Transform _cameraTarget;
-        [SerializeField] private Transform _shotPosition;
+        [SerializeField] private AWeapon _currentWeapon;
         
         private IInputSource _inputSource;
         private IPlayerNetworkInputSender _playerNetworkInputSender;
         private IRotationCameraParameters _rotationCameraParameters;
         private IPlayerCameraHolder _playerCameraHolder;
-        private ISimpleShotController _simpleShotController;
         private SmartFox _sfs;
         
         private InputFrame _lastInputFrame;
@@ -37,11 +35,9 @@ namespace Player.Local
             SmartFox sfs,
             IRotationCameraParameters rotationCameraParameters,
             Func<SmartFox, CharacterController, Transform, IPlayerNetworkInputSender> playerNetworkInputSenderFactory,
-            IPlayerCameraHolder playerCameraHolder,
-            ISimpleShotController simpleShotController
+            IPlayerCameraHolder playerCameraHolder
         )
         {
-            _simpleShotController = simpleShotController;
             _inputSource = inputSource;
             _sfs = sfs;
             _rotationCameraParameters = rotationCameraParameters;
@@ -77,7 +73,7 @@ namespace Player.Local
             
             _inputSource.ShotCommand
                 .Where(isShot => isShot)
-                .Subscribe(_ => _simpleShotController.Shot(_shotPosition))
+                .Subscribe(_ => _currentWeapon.Attack())
                 .AddTo(this);
         }
 

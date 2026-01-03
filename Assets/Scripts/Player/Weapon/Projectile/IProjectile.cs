@@ -6,8 +6,7 @@ namespace Player.Weapon.Projectile
 {
     public interface IProjectile
     {
-        void Launch(EObjectInPoolName impactEffectId, Vector3 direction, float speed);
-        void OnHit(Collision collision);
+        void OnHit(Vector3 hitPoint, Quaternion rotation);
         void DestroyProjectile(EObjectInPoolName id);
         AProjectileData GetData();
     }

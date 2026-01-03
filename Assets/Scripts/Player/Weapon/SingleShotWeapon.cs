@@ -1,5 +1,4 @@
-﻿using Db.Interface;
-using Db.Projectile;
+﻿using Db.Projectile;
 using Helpers;
 using Player.Weapon.Projectile;
 using Sfs2X;
@@ -9,49 +8,53 @@ using Sfs2X.Requests;
 using UnityEngine;
 using Utils.Enums;
 using Utils.Pool;
-using VContainer.Unity;
+using VContainer;
 
-namespace Player.Shoot
+namespace Player.Weapon
 {
-    public class SimpleShotController : ISimpleShotController, IInitializable
+    public class SingleShotWeapon : AWeapon
     {
-        private readonly SmartFox _sfs;
-        private readonly IPoolService _poolService;
-        private readonly IShotParameters _parameters;
-        private readonly BulletData _bulletData;
+        [Header("References")]
+        [SerializeField] private Transform _shotPoint;
+        
+        public override EWeaponType WeaponType => EWeaponType.SingleShot;
+        
+        private SmartFox _sfs;
+        private IPoolService _poolService;
+        private AProjectile _projectile = new BulletProjectile();
         private Vector3 _lastShotRayOrigin;
         private Vector3 _lastShotRayDirection;
         private Vector3 _lastShotPointPosition;
+        
+        private SingleShotWeaponData SingleShotWeaponData => (SingleShotWeaponData)Data;
 
-        public SimpleShotController(
-            SmartFox sfs,
-            IPoolService poolService,
-            IShotParameters parameters,
-            BulletData bulletData)
+        [Inject]
+        private void Construct(SmartFox sfs, IPoolService poolService)
         {
             _sfs = sfs;
             _poolService = poolService;
-            _parameters = parameters;
-            _bulletData = bulletData;
-        }
-
-        public void Initialize()
-        {
+            
             _sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, HandlerRaycast);
         }
-
-        public void Shot(Transform shotPoint)
+        
+        protected override void PerformedAttack()
+        {
+            Shot(SingleShotWeaponData);
+        }
+        
+        private void Shot(SingleShotWeaponData weaponData)
         {
             var screenCenterPoint = new Vector2(Screen.width / 2f, Screen.height / 2f);
-            var camera = UnityEngine.Camera.main;
+            
+            var main = UnityEngine.Camera.main;
 
-            if (camera == null) 
+            if (main == null) 
                 return;
             
-            var ray = camera.ScreenPointToRay(screenCenterPoint);
+            var ray = main.ScreenPointToRay(screenCenterPoint);
             _lastShotRayOrigin = ray.origin;
             _lastShotRayDirection = ray.direction;
-            _lastShotPointPosition = shotPoint.position;
+            _lastShotPointPosition = _shotPoint.position;
                 
             var data = SFSObject.NewInstance();
             
@@ -70,8 +73,8 @@ namespace Player.Shoot
                 
             data.PutSFSArray("originVector", originArray);
             data.PutSFSArray("directionVector", directionArray);
-            data.PutInt("layerMask", _parameters.LayerMask);
-            data.PutFloat("distance", _parameters.DistanceToShot);
+            data.PutInt("layerMask", weaponData.LayerMask);
+            data.PutFloat("distance", weaponData.DistanceToShot);
                     
             _sfs.Send(new ExtensionRequest(SFSResponseHelper.RAYCAST, data, _sfs.LastJoinedRoom));
         }
@@ -88,29 +91,24 @@ namespace Player.Shoot
             var hit = sfsObject.GetBool("hit");
             var distance = sfsObject.ContainsKey("distance")
                 ? sfsObject.GetFloat("distance")
-                : _parameters.DistanceToShot;
+                : SingleShotWeaponData.DistanceToShot;
 
             if (hit && sfsObject.ContainsKey("x") && sfsObject.ContainsKey("y") && sfsObject.ContainsKey("z"))
             {
-                var x = sfsObject.GetFloat("x");
-                var y = sfsObject.GetFloat("y");
-                var z = sfsObject.GetFloat("z");
-                var hitPoint = new Vector3(x, y, z);
+                var xPoint = sfsObject.GetFloat("xPoint");
+                var yPoint = sfsObject.GetFloat("yPoint");
+                var zPoint = sfsObject.GetFloat("zPoint");
+                
+                var hitPoint = new Vector3(xPoint, yPoint, zPoint);
                 var direction = hitPoint - _lastShotPointPosition;
                 
                 if (direction.sqrMagnitude < 0.0001f)
                     direction = _lastShotRayDirection;
-
-                if (_poolService.TrySpawn<AProjectile>(
-                        EObjectInPoolName.BulletProjectile, 
-                        true, 
-                        _lastShotPointPosition, 
-                        out var projectile)
-                )
-                {
-                    projectile.InitializeProjectile(_bulletData, _poolService);
-                    projectile.Launch(EObjectInPoolName.BulletImpactEffect, direction, _bulletData.Speed);
-                }
+                
+                var projectileData = SingleShotWeaponData.ProjectileData;
+                    
+                _projectile.InitializeProjectile(projectileData, _poolService);
+                _projectile.Launch(EObjectInPoolName.BulletImpactEffect, direction);
 
                 Debug.DrawLine(_lastShotRayOrigin, hitPoint, Color.red, 1.0f);
             }

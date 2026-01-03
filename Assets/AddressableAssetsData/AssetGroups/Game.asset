@@ -56,6 +56,12 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 46e94d38e4c75a94d8c981ef48641eb1
+    m_Address: Assets/Configs/WeaponData.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5cbe22ccd84c0a346a7509f135638e34
     m_Address: Assets/Asset/Prefabs/Player/RemotePlayer.prefab
     m_ReadOnly: 0
@@ -80,12 +86,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8883f83b6369e21499e61433a91c7e02
     m_Address: Assets/Configs/ScreensConfig.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - config
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 8ff57324b5bffce45bf6dacfa5078f95
-    m_Address: Assets/Configs/ShotParameters.asset
     m_ReadOnly: 0
     m_SerializedLabels:
     - config
