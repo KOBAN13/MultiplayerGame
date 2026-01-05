@@ -6,6 +6,7 @@ using Player.Weapon;
 using R3;
 using Sfs2X;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Utils.Enums;
 using VContainer;
 
@@ -15,6 +16,7 @@ namespace Player.Local
     {
         [SerializeField] private Transform _cameraTarget;
         [SerializeField] private AWeapon _currentWeapon;
+        [SerializeField] private LayerMask _aimColliderLayerMask;
         
         private IInputSource _inputSource;
         private IPlayerNetworkInputSender _playerNetworkInputSender;
@@ -99,22 +101,26 @@ namespace Player.Local
 
         private void LocalRotate()
         {
-            var ray = _mainCamera.ScreenPointToRay(_lastInputFrame.Look);
-            var plane = new Plane(Vector3.up, transform.position);
-
-            if (!plane.Raycast(ray, out var enter))
-            {
-                return;
-            }
-
-            var worldAimTarget = ray.GetPoint(enter);
-            worldAimTarget.y = transform.position.y;
-
-            var aimDirection = worldAimTarget - transform.position;
+            var mouseWorldPosition = Vector3.zero;
             
-            var targetRotation = Quaternion.LookRotation(aimDirection, Vector3.up);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 20f);
+            var screenCenterPoint = new Vector2(Screen.width / 2f, Screen.height / 2f);
+            
+            var ray = _mainCamera.ScreenPointToRay(screenCenterPoint);
+            
+            Transform hitTransform = null;
+            
+            if (Physics.Raycast(ray, out var raycastHit, 999f, _aimColliderLayerMask)) 
+            {
+                mouseWorldPosition = raycastHit.point;
+            }
+            
+            var worldAimTarget = mouseWorldPosition;
+            worldAimTarget.y = transform.position.y;
+            var aimDirection = (worldAimTarget - transform.position).normalized;
+            
+            transform.forward = Vector3.Lerp(transform.forward, aimDirection, Time.deltaTime * 20f);
         }
+        
         
         private Quaternion RotateCamera(Vector2 position)
         {

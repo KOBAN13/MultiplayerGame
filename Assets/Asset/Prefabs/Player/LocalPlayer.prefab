@@ -200,6 +200,9 @@ MonoBehaviour:
   Animator: {fileID: 6636690418272243136}
   _cameraTarget: {fileID: 2662657865831511742}
   _currentWeapon: {fileID: 4528788046502173804}
+  _aimColliderLayerMask:
+    serializedVersion: 2
+    m_Bits: 127
 --- !u!1001 &968510779455942737
 PrefabInstance:
   m_ObjectHideFlags: 0
