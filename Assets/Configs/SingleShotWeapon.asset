@@ -22,11 +22,11 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   <WeaponType>k__BackingField: 1
-  <AttackRate>k__BackingField: 0.12
+  <AttackRate>k__BackingField: 1.2
   <ReloadTime>k__BackingField: 0.15
   <MagazineSize>k__BackingField: 30
   <ProjectileData>k__BackingField: {fileID: 11400000, guid: f237bfd8b8221b942a485516f70ff8ac, type: 2}
   <LayerMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 72
-  <DistanceToShot>k__BackingField: 0
+  <DistanceToShot>k__BackingField: 100

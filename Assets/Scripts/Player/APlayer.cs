@@ -1,6 +1,7 @@
 ﻿using System;
 using Db.Interface;
 using Player.Interface;
+using Player.Interface.Local;
 using Services.Interface;
 using UnityEngine;
 using VContainer;

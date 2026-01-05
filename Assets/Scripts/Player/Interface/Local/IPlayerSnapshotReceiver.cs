@@ -1,7 +1,6 @@
-﻿using Services.Interface;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Player.Interface
+namespace Player.Interface.Local
 {
     public interface IPlayerSnapshotReceiver
     {

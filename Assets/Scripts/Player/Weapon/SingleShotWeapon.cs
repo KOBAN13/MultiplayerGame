@@ -21,10 +21,9 @@ namespace Player.Weapon
         
         private SmartFox _sfs;
         private IPoolService _poolService;
-        private AProjectile _projectile = new BulletProjectile();
+        private readonly AProjectile _projectile = new BulletProjectile();
         private Vector3 _lastShotRayOrigin;
         private Vector3 _lastShotRayDirection;
-        private Vector3 _lastShotPointPosition;
         
         private SingleShotWeaponData SingleShotWeaponData => (SingleShotWeaponData)Data;
 
@@ -54,7 +53,6 @@ namespace Player.Weapon
             var ray = main.ScreenPointToRay(screenCenterPoint);
             _lastShotRayOrigin = ray.origin;
             _lastShotRayDirection = ray.direction;
-            _lastShotPointPosition = _shotPoint.position;
                 
             var data = SFSObject.NewInstance();
             
@@ -93,22 +91,18 @@ namespace Player.Weapon
                 ? sfsObject.GetFloat("distance")
                 : SingleShotWeaponData.DistanceToShot;
 
-            if (hit && sfsObject.ContainsKey("x") && sfsObject.ContainsKey("y") && sfsObject.ContainsKey("z"))
+            if (hit)
             {
                 var xPoint = sfsObject.GetFloat("xPoint");
                 var yPoint = sfsObject.GetFloat("yPoint");
                 var zPoint = sfsObject.GetFloat("zPoint");
                 
                 var hitPoint = new Vector3(xPoint, yPoint, zPoint);
-                var direction = hitPoint - _lastShotPointPosition;
-                
-                if (direction.sqrMagnitude < 0.0001f)
-                    direction = _lastShotRayDirection;
                 
                 var projectileData = SingleShotWeaponData.ProjectileData;
                     
                 _projectile.InitializeProjectile(projectileData, _poolService);
-                _projectile.Launch(EObjectInPoolName.BulletImpactEffect, direction);
+                _projectile.Launch(EObjectInPoolName.BulletImpactEffect, hitPoint);
 
                 Debug.DrawLine(_lastShotRayOrigin, hitPoint, Color.red, 1.0f);
             }

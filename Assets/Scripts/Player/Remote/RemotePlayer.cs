@@ -4,7 +4,7 @@
     {
         private void Update()
         {
-            SnapshotMotor.Tick();
+            SnapshotMotor.Tick(false);
         }
     }
 }

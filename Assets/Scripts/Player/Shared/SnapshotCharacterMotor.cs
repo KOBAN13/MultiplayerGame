@@ -26,9 +26,9 @@ namespace Player.Shared
             _playerParameters = playerParameters;
         }
 
-        public void Tick()
+        public void Tick(bool isAim)
         {
-            Rotate();
+            Rotate(isAim);
             Move();
         }
 
@@ -39,7 +39,7 @@ namespace Player.Shared
             _characterController.Move(direction);
         }
 
-        private void Rotate()
+        private void Rotate(bool isAimRotation)
         {
             if (!_characterController.isGrounded)
                 return;
@@ -53,7 +53,10 @@ namespace Player.Shared
                 _playerParameters.RotationSmoothTime
             );
 
-            _transform.rotation = Quaternion.Euler(0f, rotation, 0f);
+            if (!isAimRotation)
+            {
+                _transform.rotation = Quaternion.Euler(0f, rotation, 0f);
+            }
         }
     }
 }

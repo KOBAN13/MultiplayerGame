@@ -2,6 +2,6 @@ namespace Player.Interface
 {
     public interface IPlayerSnapshotMotor
     {
-        void Tick();
+        void Tick(bool isAim);
     }
 }

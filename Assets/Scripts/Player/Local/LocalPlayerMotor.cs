@@ -25,6 +25,7 @@ namespace Player.Local
         private InputFrame _lastInputFrame;
         private float _cinemachineTargetYaw;
         private float _cinemachineTargetPitch;
+        private UnityEngine.Camera _mainCamera;
         private const float THRESHOLD = 0.01f;
         
         private Func<SmartFox, CharacterController, Transform, IPlayerNetworkInputSender> _playerNetworkInputSenderFactory;
@@ -62,6 +63,8 @@ namespace Player.Local
 
         public void OnEnable()
         {
+            _mainCamera = UnityEngine.Camera.main;
+            
             _inputSource.AimCommand
                 .Subscribe(isAim =>
                 {
@@ -72,7 +75,7 @@ namespace Player.Local
                 .AddTo(this);
             
             _inputSource.ShotCommand
-                .Where(isShot => isShot)
+                .Where(isShot => isShot && _lastInputFrame.Aim)
                 .Subscribe(_ => _currentWeapon.Attack())
                 .AddTo(this);
         }
@@ -81,12 +84,36 @@ namespace Player.Local
         {
             _lastInputFrame = _inputSource.Read();
             _playerNetworkInputSender.SendServerPlayerInput(_lastInputFrame);
-            SnapshotMotor.Tick();   
+            SnapshotMotor.Tick(_lastInputFrame.Aim); 
+            
+            if (_lastInputFrame.Aim)
+            {
+                LocalRotate();
+            }
         }
 
         public void LateUpdate()
         {
             _cameraTarget.rotation = RotateCamera(_lastInputFrame.Look);
+        }
+
+        private void LocalRotate()
+        {
+            var ray = _mainCamera.ScreenPointToRay(_lastInputFrame.Look);
+            var plane = new Plane(Vector3.up, transform.position);
+
+            if (!plane.Raycast(ray, out var enter))
+            {
+                return;
+            }
+
+            var worldAimTarget = ray.GetPoint(enter);
+            worldAimTarget.y = transform.position.y;
+
+            var aimDirection = worldAimTarget - transform.position;
+            
+            var targetRotation = Quaternion.LookRotation(aimDirection, Vector3.up);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 20f);
         }
         
         private Quaternion RotateCamera(Vector2 position)
