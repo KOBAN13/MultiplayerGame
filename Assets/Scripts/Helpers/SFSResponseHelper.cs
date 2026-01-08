@@ -28,6 +28,7 @@
         public const string PLAYER_STATE = "playerState";
         public const string PLAYER_JOIN_ROOM = "playerJoinRoom";
         
+        public const string COLLISION_DATA = "collisionData";
         public const string RAYCAST = "raycast";
     }
 }

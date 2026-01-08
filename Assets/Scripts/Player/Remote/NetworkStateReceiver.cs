@@ -39,6 +39,8 @@ namespace Player.Remote
             _sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnPlayerEnterGame);
             
             _sfs.Send(new SubscribeRoomGroupRequest(ROOM_GROUP_NAME));
+            
+            _sfs.Send(new ExtensionRequest(SFSEvent.EXTENSION_RESPONSE, SFSObjectLite.NewInstance(), _sfs.LastJoinedRoom));
         }
         
         public void Dispose()
@@ -70,7 +72,13 @@ namespace Player.Remote
                 var playerType = _sfs.MySelf.Id == userId 
                     ? EPlayerType.Local 
                     : EPlayerType.Remote;
-                
+#if UNITY_EDITOR
+                if (playerType == EPlayerType.Local)
+                {
+                    _sfs.Send(new ExtensionRequest(SFSResponseHelper.COLLISION_DATA, SFSObject.NewInstance(), _sfs.LastJoinedRoom));
+                    Debug.Log($"Player {userId} joined room {_sfs.LastJoinedRoom}");
+                }
+#endif
                 _playerJoinGameService.AddPlayerJoinRequest(new PlayerJoinRequest(position, animationState, userId, playerType));
             }
         }
