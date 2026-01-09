@@ -107,7 +107,8 @@ namespace DebugUtils
             {
                 if (shape.HasObb)
                 {
-                    Gizmos.matrix = Matrix4x4.TRS(shape.ObbC, shape.ObbRotation, Vector3.one);
+                    var rotation = SafeQuaternion(shape.ObbRotation);
+                    Gizmos.matrix = Matrix4x4.TRS(shape.ObbC, rotation, Vector3.one);
                     Gizmos.DrawWireCube(Vector3.zero, shape.ObbH * 2f);
                 }
                 else
@@ -121,6 +122,28 @@ namespace DebugUtils
 
             Gizmos.matrix = originalMatrix;
         }
+        
+        private static Quaternion SafeQuaternion(Quaternion q)
+        {
+            if (float.IsNaN(q.x) || float.IsNaN(q.y) || float.IsNaN(q.z) || float.IsNaN(q.w) ||
+                float.IsInfinity(q.x) || float.IsInfinity(q.y) || float.IsInfinity(q.z) || float.IsInfinity(q.w))
+            {
+                return Quaternion.identity;
+            }
+            
+            var magSq = q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w;
+            if (magSq < 1e-12f)
+                return Quaternion.identity;
+
+            var invMag = 1.0f / Mathf.Sqrt(magSq);
+            q.x *= invMag;
+            q.y *= invMag;
+            q.z *= invMag;
+            q.w *= invMag;
+
+            return q;
+        }
+
         
         private struct ShapeData
         {
