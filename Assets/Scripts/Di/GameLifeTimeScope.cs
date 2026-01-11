@@ -39,6 +39,8 @@ namespace Di
             Register<RemotePlayerRegistry>(Lifetime.Singleton);
             Register<PlayerSpawnService>(Lifetime.Singleton);
             Register<PlayerJoinGameService>(Lifetime.Singleton);
+            Register<PlayerNetworkInputReader>(Lifetime.Singleton);
+            Register<ClientStateProvider>(Lifetime.Singleton);
 
             Builder.RegisterFactory<ISnapshotsService, CharacterController, Transform, IPlayerParameters, IPlayerSnapshotMotor>(
                 (snapshotsService, characterController, playerTransform, playerParameters) =>
@@ -50,10 +52,6 @@ namespace Di
 
             Builder.RegisterFactory<ISnapshotsService, IPlayerSnapshotReceiver>(
                 snapshotsService => new PlayerSnapshotReceiver(snapshotsService));
-
-            Builder.RegisterFactory<SmartFox, CharacterController, Transform, IPlayerNetworkInputSender>(
-                (sfs, characterController, cameraTarget) =>
-                    new PlayerNetworkInputSender(sfs, characterController, cameraTarget));
         }
 
         private void BindNetwork()

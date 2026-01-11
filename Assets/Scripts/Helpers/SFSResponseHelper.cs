@@ -9,7 +9,7 @@
         public const string RESTORE_RESULT = "restoreResult";
         public const string REGISTER_RESULT = "registerResult";
         public const string CHANGE_USER_PRIVILEGE = "changeUserPrivilege";
-        
+
         public const string USER_ID = "userId";
         public const string USER_NAME = "username";
         public const string PASSWORD = "password";
@@ -21,11 +21,13 @@
         public const string CREATE_ROOM = "createLobby";
         public const string USER_JOIN_ROOM = "userJoinRoom";
         public const string ROOM_USER_CONNECTED = "roomUserConnected";
-        
+
         public const string ROOM_START_GAME = "roomStartGame";
         public const string CREATE_GAME_ROOM = "createGameRoom";
         public const string PLAYER_INPUT = "playerInput";
-        public const string PLAYER_STATE = "playerState";
+        public const string PLAYER_CLIENT_STATE = "playerClientState";
+        
+        public const string PLAYER_SERVER_STATE = "playerServerState";
         public const string PLAYER_JOIN_ROOM = "playerJoinRoom";
         
         public const string COLLISION_DATA = "collisionData";

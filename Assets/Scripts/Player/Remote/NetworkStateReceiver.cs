@@ -35,7 +35,7 @@ namespace Player.Remote
         {
             StartGame();
             
-            _sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnPlayerState);
+            _sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnServerPlayerState);
             _sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnPlayerEnterGame);
             
             _sfs.Send(new SubscribeRoomGroupRequest(ROOM_GROUP_NAME));
@@ -45,7 +45,7 @@ namespace Player.Remote
         
         public void Dispose()
         {
-            _sfs.RemoveEventListener(SFSEvent.EXTENSION_RESPONSE, OnPlayerState);
+            _sfs.RemoveEventListener(SFSEvent.EXTENSION_RESPONSE, OnServerPlayerState);
             _sfs.RemoveEventListener(SFSEvent.EXTENSION_RESPONSE, OnPlayerEnterGame);
         }
 
@@ -76,18 +76,17 @@ namespace Player.Remote
                 if (playerType == EPlayerType.Local)
                 {
                     _sfs.Send(new ExtensionRequest(SFSResponseHelper.COLLISION_DATA, SFSObject.NewInstance(), _sfs.LastJoinedRoom));
-                    Debug.Log($"Player {userId} joined room {_sfs.LastJoinedRoom}");
                 }
 #endif
                 _playerJoinGameService.AddPlayerJoinRequest(new PlayerJoinRequest(position, animationState, userId, playerType));
             }
         }
 
-        private void OnPlayerState(BaseEvent evt)
+        private void OnServerPlayerState(BaseEvent evt)
         {
             var cmd = (string)evt.Params[SFSResponseHelper.CMD];
             
-            if (cmd != SFSResponseHelper.PLAYER_STATE)
+            if (cmd != SFSResponseHelper.PLAYER_SERVER_STATE)
                 return;
             
             var data = (SFSObject)evt.Params["params"];

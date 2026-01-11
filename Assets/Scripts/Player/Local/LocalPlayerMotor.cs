@@ -1,12 +1,12 @@
 ﻿using System;
 using Db.Interface;
 using Input;
+using Player.Db;
 using Player.Interface.Local;
 using Player.Weapon;
 using R3;
 using Sfs2X;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Utils.Enums;
 using VContainer;
 
@@ -15,39 +15,45 @@ namespace Player.Local
     public class LocalPlayerMotor : APlayer
     {
         [SerializeField] private Transform _cameraTarget;
+        [SerializeField] private Transform _yawTarget;
         [SerializeField] private AWeapon _currentWeapon;
-        [SerializeField] private LayerMask _aimColliderLayerMask;
         
         private IInputSource _inputSource;
-        private IPlayerNetworkInputSender _playerNetworkInputSender;
+        private IClientStateProvider _clientStateProvider;
+        private IPlayerNetworkStateSender _playerNetworkStateSender;
         private IRotationCameraParameters _rotationCameraParameters;
         private IPlayerCameraHolder _playerCameraHolder;
         private SmartFox _sfs;
         
+        private readonly RaycastHit[] _hits = new RaycastHit[1];
         private InputFrame _lastInputFrame;
-        private float _cinemachineTargetYaw;
-        private float _cinemachineTargetPitch;
+        private ClientStateFrame _lastClientStateFrame;
+        private Vector3 _aimDirection;
+        private float _targetYaw;
+        private float _targetPitch;
         private UnityEngine.Camera _mainCamera;
         private const float THRESHOLD = 0.01f;
         
-        private Func<SmartFox, CharacterController, Transform, IPlayerNetworkInputSender> _playerNetworkInputSenderFactory;
+        private Func<SmartFox, CharacterController, Transform, IPlayerNetworkStateSender> _playerNetworkInputSenderFactory;
 
         [Inject]
         public void Construct(
             IInputSource inputSource,
             SmartFox sfs,
+            IClientStateProvider clientStateProvider,
             IRotationCameraParameters rotationCameraParameters,
-            Func<SmartFox, CharacterController, Transform, IPlayerNetworkInputSender> playerNetworkInputSenderFactory,
+            Func<SmartFox, CharacterController, Transform, IPlayerNetworkStateSender> playerNetworkInputSenderFactory,
             IPlayerCameraHolder playerCameraHolder
         )
         {
+            _clientStateProvider = clientStateProvider;
             _inputSource = inputSource;
             _sfs = sfs;
             _rotationCameraParameters = rotationCameraParameters;
             _playerNetworkInputSenderFactory = playerNetworkInputSenderFactory;
             _playerCameraHolder = playerCameraHolder;
 
-            _playerNetworkInputSender = _playerNetworkInputSenderFactory(
+            _playerNetworkStateSender = _playerNetworkInputSenderFactory(
                 _sfs,
                 CharacterController,
                 _cameraTarget);
@@ -84,9 +90,17 @@ namespace Player.Local
 
         public void Update()
         {
+            _clientStateProvider.Write(_mainCamera.transform.rotation.eulerAngles.y, _aimDirection, _targetPitch);
             _lastInputFrame = _inputSource.Read();
-            _playerNetworkInputSender.SendServerPlayerInput(_lastInputFrame);
+            _lastClientStateFrame = _clientStateProvider.Read(_lastInputFrame);
+            _playerNetworkStateSender.SendServerPlayerState(_lastInputFrame);
+            _playerNetworkStateSender.SendServerPlayerInput(_lastClientStateFrame);
             SnapshotMotor.Tick(_lastInputFrame.Aim); 
+        }
+
+        public void LateUpdate()
+        {
+            _cameraTarget.rotation = RotateCamera(_lastInputFrame.Look);
             
             if (_lastInputFrame.Aim)
             {
@@ -94,33 +108,44 @@ namespace Player.Local
             }
         }
 
-        public void LateUpdate()
-        {
-            _cameraTarget.rotation = RotateCamera(_lastInputFrame.Look);
-        }
-
         private void LocalRotate()
         {
-            var mouseWorldPosition = Vector3.zero;
-            
             var screenCenterPoint = new Vector2(Screen.width / 2f, Screen.height / 2f);
             
             var ray = _mainCamera.ScreenPointToRay(screenCenterPoint);
             
-            Transform hitTransform = null;
+            var count = Physics.RaycastNonAlloc(
+                ray,
+                _hits, 
+                _rotationCameraParameters.RaycastDistance, 
+                _rotationCameraParameters.AimColliderLayerMask,
+                QueryTriggerInteraction.Ignore
+            );
             
-            if (Physics.Raycast(ray, out var raycastHit, 999f, _aimColliderLayerMask)) 
-            {
-                mouseWorldPosition = raycastHit.point;
-            }
+            var mouseWorldPosition = count > 0 ? 
+                _hits[0].point 
+                : ray.GetPoint(_rotationCameraParameters.RaycastDistance);
             
-            var worldAimTarget = mouseWorldPosition;
-            worldAimTarget.y = transform.position.y;
-            var aimDirection = (worldAimTarget - transform.position).normalized;
+            var direction = mouseWorldPosition - transform.position;
+            direction.y = 0f;
+
+            if (direction.sqrMagnitude < 0.0001f)
+                return;
+
+            var targetRotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * _rotationCameraParameters.RotateSpeed);
             
-            transform.forward = Vector3.Lerp(transform.forward, aimDirection, Time.deltaTime * 20f);
+            var cameraAngleOverride = _rotationCameraParameters.AngleOverride;
+            
+            var yawRotation = Quaternion.Euler(_targetPitch + cameraAngleOverride, 0.0f, 0.0f);
+            
+            _yawTarget.localRotation = Quaternion.Slerp(
+                _yawTarget.localRotation,
+                yawRotation,
+                Time.deltaTime * _rotationCameraParameters.RotateSpeed);
+            
+            _aimDirection = direction.normalized;
         }
-        
         
         private Quaternion RotateCamera(Vector2 position)
         {
@@ -131,14 +156,14 @@ namespace Player.Local
             
             if (position.sqrMagnitude >= THRESHOLD)
             {
-                _cinemachineTargetYaw += position.x * Time.deltaTime * sensitivity;
-                _cinemachineTargetPitch += position.y * Time.deltaTime * sensitivity;
+                _targetYaw += position.x * Time.deltaTime * sensitivity;
+                _targetPitch += position.y * Time.deltaTime * sensitivity;
             }
             
-            _cinemachineTargetYaw = ClampAngle(_cinemachineTargetYaw, float.MinValue, float.MaxValue);
-            _cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, bottomClamp, topClamp);
+            _targetYaw = ClampAngle(_targetYaw, float.MinValue, float.MaxValue);
+            _targetPitch = ClampAngle(_targetPitch, bottomClamp, topClamp);
             
-            return Quaternion.Euler(_cinemachineTargetPitch + cameraAngleOverride, _cinemachineTargetYaw, 0.0f);
+            return Quaternion.Euler(_targetPitch + cameraAngleOverride, _targetYaw, 0.0f);
         }
         
         private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
