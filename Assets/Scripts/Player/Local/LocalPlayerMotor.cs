@@ -23,7 +23,6 @@ namespace Player.Local
         private IPlayerNetworkStateSender _playerNetworkStateSender;
         private IRotationCameraParameters _rotationCameraParameters;
         private IPlayerCameraHolder _playerCameraHolder;
-        private SmartFox _sfs;
         
         private readonly RaycastHit[] _hits = new RaycastHit[1];
         private InputFrame _lastInputFrame;
@@ -32,31 +31,24 @@ namespace Player.Local
         private float _targetYaw;
         private float _targetPitch;
         private UnityEngine.Camera _mainCamera;
+
         private const float THRESHOLD = 0.01f;
-        
-        private Func<SmartFox, CharacterController, Transform, IPlayerNetworkStateSender> _playerNetworkInputSenderFactory;
 
         [Inject]
         public void Construct(
             IInputSource inputSource,
-            SmartFox sfs,
-            IClientStateProvider clientStateProvider,
             IRotationCameraParameters rotationCameraParameters,
-            Func<SmartFox, CharacterController, Transform, IPlayerNetworkStateSender> playerNetworkInputSenderFactory,
-            IPlayerCameraHolder playerCameraHolder
+            Func<CharacterController, ClientStateProvider> clientStateProviderFactory,
+            IPlayerCameraHolder playerCameraHolder,
+            IPlayerNetworkStateSender playerNetworkStateSender
         )
         {
-            _clientStateProvider = clientStateProvider;
+            _playerNetworkStateSender = playerNetworkStateSender;
             _inputSource = inputSource;
-            _sfs = sfs;
             _rotationCameraParameters = rotationCameraParameters;
-            _playerNetworkInputSenderFactory = playerNetworkInputSenderFactory;
             _playerCameraHolder = playerCameraHolder;
-
-            _playerNetworkStateSender = _playerNetworkInputSenderFactory(
-                _sfs,
-                CharacterController,
-                _cameraTarget);
+            
+            _clientStateProvider = clientStateProviderFactory(CharacterController);
         }
         
         public Transform GetTransform()
@@ -79,6 +71,10 @@ namespace Player.Local
                     _playerCameraHolder.SetVirtualCamera(isAim
                         ? EVirtualCameraType.Aim
                         : EVirtualCameraType.Gameplay);
+                    
+                    if (!isAim)
+                        _yawTarget.transform.localRotation = Quaternion.identity;
+                        
                 })
                 .AddTo(this);
             

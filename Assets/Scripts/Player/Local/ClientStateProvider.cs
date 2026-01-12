@@ -13,6 +13,11 @@ namespace Player.Local
         private Vector3 _aimDirection;
         private float _aimPitch;
 
+        public ClientStateProvider(CharacterController characterController)
+        {
+            _characterController = characterController;
+        }
+
         public void Write(float rotationCameraY, Vector3 aimDirection, float aimPitch)
         {
             _rotationCameraY = rotationCameraY;

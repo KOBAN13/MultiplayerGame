@@ -7,6 +7,5 @@ namespace Player.Interface.Local
     {
         void SendServerPlayerState(InputFrame inputFrame);
         void SendServerPlayerInput(ClientStateFrame stateFrame);
-        void Dispose();
     }
 }

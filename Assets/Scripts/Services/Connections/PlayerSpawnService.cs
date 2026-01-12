@@ -17,19 +17,16 @@ namespace Services.Connections
         private readonly IPlayerFactory _playerFactory;
         private readonly IPlayerCameraFactory _cameraFactory;
         private readonly IRemotePlayerRegistry _remotePlayerRegistry;
-        private readonly SmartFox _sfs;
 
         public PlayerSpawnService(
             IPlayerFactory playerFactory,
             IPlayerCameraFactory cameraFactory,
-            IRemotePlayerRegistry remotePlayerRegistry,
-            SmartFox sfs
+            IRemotePlayerRegistry remotePlayerRegistry
         )
         {
             _playerFactory = playerFactory;
             _cameraFactory = cameraFactory;
             _remotePlayerRegistry = remotePlayerRegistry;
-            _sfs = sfs;
         }
 
         public async UniTask SpawnPlayer(PlayerJoinRequest joinRequest)
@@ -66,7 +63,6 @@ namespace Services.Connections
             player.SetSnapshot(joinRequest.Position, Vector3.zero, 0f, 0f);
             player.SetAnimationState(joinRequest.AnimationState);
             
-
             _cameraFactory.CreateCamera(player.GetCameraTarget()).Forget();
         }
 

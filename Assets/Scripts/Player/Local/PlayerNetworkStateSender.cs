@@ -1,5 +1,4 @@
-﻿using System;
-using Helpers;
+﻿using Helpers;
 using Input;
 using Player.Db;
 using Player.Interface.Local;
@@ -12,18 +11,12 @@ namespace Player.Local
     public class PlayerNetworkStateSender : IPlayerNetworkStateSender
     {
         private readonly SmartFox _sfs;
-        private IDisposable _subscription;
         
         public PlayerNetworkStateSender(SmartFox sfs)
         {
             _sfs = sfs;
         }
-
-        public void Dispose()
-        {
-            _subscription?.Dispose();
-        }
-
+        
         public void SendServerPlayerState(InputFrame inputFrame)
         {
             var data = SFSObject.NewInstance();
@@ -40,10 +33,10 @@ namespace Player.Local
             var data = SFSObject.NewInstance();
             data.PutBool("isOnGround", stateFrame.IsGrounded);
             data.PutFloat("eulerAngleY", stateFrame.RotationY);
-            data.PutFloat("targetDirX", stateFrame.AimDirection.x);
-            data.PutFloat("targetDirY", stateFrame.AimDirection.y);
-            data.PutFloat("targetDirZ", stateFrame.AimDirection.z);
-            data.PutFloat("targetPitch", stateFrame.AimPitch);
+            data.PutFloat("aimDirectionX", stateFrame.AimDirection.x);
+            data.PutFloat("aimDirectionY", stateFrame.AimDirection.y);
+            data.PutFloat("aimDirectionZ", stateFrame.AimDirection.z);
+            data.PutFloat("aimPitch", stateFrame.AimPitch);
                     
             _sfs.Send(new ExtensionRequest(SFSResponseHelper.PLAYER_CLIENT_STATE, data, _sfs.LastJoinedRoom));
         }
