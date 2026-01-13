@@ -50,6 +50,5 @@ namespace Input
             _disposables.Clear();
             _disposables.Dispose();
         }
-        
     }
 }

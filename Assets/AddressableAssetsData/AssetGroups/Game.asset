@@ -62,11 +62,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - config
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 5cbe22ccd84c0a346a7509f135638e34
-    m_Address: Assets/Asset/Prefabs/Player/RemotePlayer.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 6420994d001579e48b0c1dd323f83db4
     m_Address: Assets/Configs/FadeButtonAnimationData.asset
     m_ReadOnly: 0
@@ -114,6 +109,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: afc61651a94a1ce45ac9e028b88b5561
     m_Address: Assets/Asset/Prefabs/VirtualCameras.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b2894d7dadb7a9b4ea68e8ff71a1dc10
+    m_Address: Assets/Asset/Prefabs/Player/RemotePlayer.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

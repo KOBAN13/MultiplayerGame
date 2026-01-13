@@ -1,6 +1,8 @@
 ﻿#if UNITY_EDITOR
+using Db;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Utils.Enums;
 
 namespace Editor
 {
@@ -65,8 +67,19 @@ namespace Editor
                     baseShapeData.Center = transform.TransformPoint(capsule.center);
                     baseShapeData.Radius = capsule.radius * Mathf.Max(Mathf.Abs(transform.lossyScale.x),
                         Mathf.Abs(transform.lossyScale.y), Mathf.Abs(transform.lossyScale.z));
-                    baseShapeData.Height = capsule.height * AxisScale(transform.lossyScale, capsule.direction);
-                    baseShapeData.Direction = capsule.direction;
+                    baseShapeData.Height = capsule.height;
+                    break;
+                case CharacterController characterController:
+                    baseShapeData.Rotation = transform.rotation;
+                    baseShapeData.Scale = transform.localScale;
+                    baseShapeData.Name = characterController.gameObject.name;
+                    baseShapeData.Type = ECollisionShapeType.Capsule;
+                    baseShapeData.Layer = layer;
+                    baseShapeData.LayerName = LayerMask.LayerToName(layer);
+                    baseShapeData.Center = transform.TransformPoint(characterController.center);
+                    baseShapeData.Radius = characterController.radius * Mathf.Max(Mathf.Abs(transform.lossyScale.x),
+                        Mathf.Abs(transform.lossyScale.y), Mathf.Abs(transform.lossyScale.z));
+                    baseShapeData.Height = characterController.height;
                     break;
                 case MeshCollider mesh:
                     baseShapeData.Name = collider.gameObject.name;

@@ -30,6 +30,7 @@
         public const string PLAYER_SERVER_STATE = "playerServerState";
         public const string PLAYER_JOIN_ROOM = "playerJoinRoom";
         
+        public const string PLAYER_COLLIDER_DATA = "playerColliderData";
         public const string COLLISION_DATA = "collisionData";
         public const string RAYCAST = "raycast";
     }
