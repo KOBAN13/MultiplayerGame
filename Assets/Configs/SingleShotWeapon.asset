@@ -28,5 +28,5 @@ MonoBehaviour:
   <ProjectileData>k__BackingField: {fileID: 11400000, guid: f237bfd8b8221b942a485516f70ff8ac, type: 2}
   <LayerMask>k__BackingField:
     serializedVersion: 2
-    m_Bits: 72
+    m_Bits: 200
   <DistanceToShot>k__BackingField: 100

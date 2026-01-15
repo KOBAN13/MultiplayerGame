@@ -59,16 +59,28 @@ namespace DebugUtils
                     var obbRotationY = sfsData.GetFloat("obbQy");
                     var obbRotationZ = sfsData.GetFloat("obbQz");
                     var obbRotationW = sfsData.GetFloat("obbQw");
-                    
-                    _shapeData.Add(shapeId, new ShapeData()
+
+                    if (_shapeData.TryGetValue(shapeId, out var shapeData))
                     {
-                        HasObb = true,
-                        ObbC = new Vector3(obbCx, obbCy, obbCz),
-                        ObbH = new  Vector3(obbHx, obbHy, obbHz),
-                        ObbRotation = new Quaternion(obbRotationX, obbRotationY, obbRotationZ, obbRotationW),
-                        Min = Vector3.zero,
-                        Max = Vector3.zero,
-                    });
+                        shapeData.HasObb = true;
+                        shapeData.ObbC = new Vector3(obbCx, obbCy, obbCz);
+                        shapeData.ObbH = new Vector3(obbHx, obbHy, obbHz);
+                        shapeData.ObbRotation = new Quaternion(obbRotationX, obbRotationY, obbRotationZ, obbRotationW);
+                        shapeData.Min = Vector3.zero;
+                        shapeData.Max = Vector3.zero;
+                    }
+                    else
+                    {
+                        _shapeData.Add(shapeId, new ShapeData()
+                        {
+                            HasObb = true,
+                            ObbC = new Vector3(obbCx, obbCy, obbCz),
+                            ObbH = new  Vector3(obbHx, obbHy, obbHz),
+                            ObbRotation = new Quaternion(obbRotationX, obbRotationY, obbRotationZ, obbRotationW),
+                            Min = Vector3.zero,
+                            Max = Vector3.zero,
+                        });
+                    }
                 }
                 else
                 {
@@ -79,16 +91,28 @@ namespace DebugUtils
                     var maxX = sfsData.GetFloat("maxX");
                     var maxY = sfsData.GetFloat("maxY");
                     var maxZ = sfsData.GetFloat("maxZ");
-                    
-                    _shapeData.Add(shapeId, new ShapeData()
+
+                    if (_shapeData.TryGetValue(shapeId, out var shapeData))
                     {
-                        HasObb = false,
-                        ObbC = Vector3.zero,
-                        ObbH = Vector3.zero,
-                        ObbRotation = Quaternion.identity,
-                        Min = new Vector3(minX, minY, minZ),
-                        Max = new Vector3(maxX, maxY, maxZ),
-                    });
+                        shapeData.HasObb = false;
+                        shapeData.ObbC = Vector3.zero;
+                        shapeData.ObbH = Vector3.zero;
+                        shapeData.ObbRotation = Quaternion.identity;
+                        shapeData.Min = new Vector3(minX, minY, minZ);
+                        shapeData.Max = new Vector3(maxX, maxY, maxZ);
+                    }
+                    else
+                    {
+                        _shapeData.Add(shapeId, new ShapeData()
+                        {
+                            HasObb = false,
+                            ObbC = Vector3.zero,
+                            ObbH = Vector3.zero,
+                            ObbRotation = Quaternion.identity,
+                            Min = new Vector3(minX, minY, minZ),
+                            Max = new Vector3(maxX, maxY, maxZ),
+                        });
+                    }
                 }
             }
         }
@@ -145,7 +169,7 @@ namespace DebugUtils
         }
 
         
-        private struct ShapeData
+        private class ShapeData
         {
             public bool HasObb;
             public Vector3 ObbC;

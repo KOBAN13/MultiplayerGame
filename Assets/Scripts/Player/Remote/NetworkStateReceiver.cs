@@ -72,12 +72,7 @@ namespace Player.Remote
                 var playerType = _sfs.MySelf.Id == userId 
                     ? EPlayerType.Local 
                     : EPlayerType.Remote;
-#if UNITY_EDITOR
-                if (playerType == EPlayerType.Local)
-                {
-                    _sfs.Send(new ExtensionRequest(SFSResponseHelper.COLLISION_DATA, SFSObject.NewInstance(), _sfs.LastJoinedRoom));
-                }
-#endif
+
                 _playerJoinGameService.AddPlayerJoinRequest(new PlayerJoinRequest(position, animationState, userId, playerType));
             }
         }
