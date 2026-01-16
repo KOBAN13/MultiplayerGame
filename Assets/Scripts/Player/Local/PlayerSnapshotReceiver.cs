@@ -14,19 +14,11 @@ namespace Player.Local
             _snapshotsService = snapshotsService;
         }
         
-        public void SetSnapshot(Vector3 position, Vector3 inputDirection, float rotation, float serverTime)
+        public void SetSnapshot(in SnapshotData snapshotData)
         {
-            var snapshot = new SnapshotData
-            {
-                Position = position,
-                Input = inputDirection,
-                Rotation = rotation,
-                ServerTime = serverTime
-            };
+            _snapshotsService.SyncServerTime(snapshotData.ServerTime);
             
-            _snapshotsService.SyncServerTime(serverTime);
-            
-            _snapshotsService.AddSnapshot(ref snapshot);
+            _snapshotsService.AddSnapshot(snapshotData);
         }
     }
 }

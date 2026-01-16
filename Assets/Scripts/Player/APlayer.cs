@@ -1,5 +1,6 @@
 ﻿using System;
 using Db.Interface;
+using Player.Db;
 using Player.Interface;
 using Player.Interface.Local;
 using Services.Interface;
@@ -49,9 +50,9 @@ namespace Player
             // TODO: реализовать переключение анимаций
         }
 
-        public virtual void SetSnapshot(Vector3 position, Vector3 inputDirection, float rotation, float serverTime)
+        public virtual void SetSnapshot(in SnapshotData snapshot)
         {
-            PlayerSnapshotReceiver.SetSnapshot(position, inputDirection, rotation, serverTime);
+            PlayerSnapshotReceiver.SetSnapshot(snapshot);
         }
     }
 }

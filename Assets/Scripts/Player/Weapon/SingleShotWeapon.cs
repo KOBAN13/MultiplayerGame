@@ -1,6 +1,7 @@
 ﻿using Db.Projectile;
 using Helpers;
 using Player.Weapon.Projectile;
+using Services.Interface;
 using Sfs2X;
 using Sfs2X.Core;
 using Sfs2X.Entities.Data;
@@ -21,6 +22,7 @@ namespace Player.Weapon
         
         private SmartFox _sfs;
         private IPoolService _poolService;
+        private ISnapshotsService _snapshotsService;
         private readonly AProjectile _projectile = new BulletProjectile();
         private Vector3 _lastShotRayOrigin;
         private Vector3 _lastShotRayDirection;
@@ -28,10 +30,11 @@ namespace Player.Weapon
         private SingleShotWeaponData SingleShotWeaponData => (SingleShotWeaponData)Data;
 
         [Inject]
-        private void Construct(SmartFox sfs, IPoolService poolService)
+        private void Construct(SmartFox sfs, IPoolService poolService, ISnapshotsService snapshotsService)
         {
             _sfs = sfs;
             _poolService = poolService;
+            _snapshotsService = snapshotsService;
             
             _sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, HandlerRaycast);
         }
@@ -68,9 +71,11 @@ namespace Player.Weapon
             directionArray.AddFloat(direction.x);
             directionArray.AddFloat(direction.y);
             directionArray.AddFloat(direction.z);
-                
+            
             data.PutSFSArray("originVector", originArray);
             data.PutSFSArray("directionVector", directionArray);
+            
+            data.PutInt("snapshotId", _snapshotsService.GetSnapshotId());
             data.PutInt("layerMask", weaponData.LayerMask);
             data.PutFloat("distance", weaponData.DistanceToShot);
                     

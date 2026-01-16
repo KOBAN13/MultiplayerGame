@@ -1,6 +1,7 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Factories.Interface;
+using Player.Db;
 using Player.Interface.Local;
 using Player.Local;
 using Player.Remote;
@@ -60,7 +61,16 @@ namespace Services.Connections
             if (!_remotePlayerRegistry.TryAdd(joinRequest.UserId, player))
                 return;
 
-            player.SetSnapshot(joinRequest.Position, Vector3.zero, 0f, 0f);
+            var firstSnapshot = new SnapshotData()
+            {
+                Position = joinRequest.Position,
+                Input = Vector3.zero,
+                Rotation = 0f,
+                ServerTime = 0f,
+                SnapshotId = 1
+            };
+            
+            player.SetSnapshot(in firstSnapshot);
             player.SetAnimationState(joinRequest.AnimationState);
             
             _cameraFactory.CreateCamera(player.GetCameraTarget()).Forget();
@@ -71,7 +81,16 @@ namespace Services.Connections
             if (!_remotePlayerRegistry.TryAdd(joinRequest.UserId, player))
                 return;
 
-            player.SetSnapshot(joinRequest.Position, Vector3.zero, 0f, 0f);
+            var firstSnapshot = new SnapshotData()
+            {
+                Position = joinRequest.Position,
+                Input = Vector3.zero,
+                Rotation = 0f,
+                ServerTime = 0f,
+                SnapshotId = 1
+            };
+            
+            player.SetSnapshot(in firstSnapshot);
             player.SetAnimationState(joinRequest.AnimationState);
         }
 

@@ -5,7 +5,6 @@ using Player.Db;
 using Player.Interface.Local;
 using Player.Weapon;
 using R3;
-using Sfs2X;
 using UnityEngine;
 using Utils.Enums;
 using VContainer;

@@ -22,7 +22,7 @@ namespace Services
             _snapshotParameters = snapshotParameters;
         }
 
-        public void AddSnapshot(ref SnapshotData snapshot)
+        public void AddSnapshot(in SnapshotData snapshot)
         {
             if (_snapshots.Count > 0)
             {
@@ -117,6 +117,8 @@ namespace Services
 
             return _snapshots[^1].Rotation;
         }
+
+        public int GetSnapshotId() => _snapshots.Count == 0 ? 0 : _snapshots[^1].SnapshotId;
 
         public void SyncServerTime(float serverTime)
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using Helpers;
+using Player.Db;
 using Services.Db;
 using Services.Interface;
 using Sfs2X;
@@ -91,6 +92,7 @@ namespace Player.Remote
             {
                 var playerData = player.GetSFSObject(i);
                 var userId = playerData.GetInt("userId");
+                var snapshotId = playerData.GetInt("snapshotId");
                 var xPosition = playerData.GetFloat("x");
                 var yPosition = playerData.GetFloat("y");
                 var zPosition = playerData.GetFloat("z");
@@ -107,7 +109,16 @@ namespace Player.Remote
                 if (!_remotePlayerRegistry.TryGet(userId, out var remotePlayer))
                     continue;
                 
-                remotePlayer.SetSnapshot(position, direction, rotation, serverTime);
+                var snapshotData = new SnapshotData()
+                {
+                    Position = position,
+                    Input = direction,
+                    Rotation = rotation,
+                    ServerTime = serverTime,
+                    SnapshotId = snapshotId
+                };
+                
+                remotePlayer.SetSnapshot(in snapshotData);
                 remotePlayer.SetAnimationState(animationState);
             }
         }

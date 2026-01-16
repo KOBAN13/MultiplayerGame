@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+﻿using Player.Db;
+using UnityEngine;
 
 namespace Player.Interface.Local
 {
     public interface IPlayerSnapshotReceiver
     {
-        void SetSnapshot(Vector3 position, Vector3 inputDirection, float rotation, float serverTime);
+        void SetSnapshot(in SnapshotData snapshotData);
     }
 }
