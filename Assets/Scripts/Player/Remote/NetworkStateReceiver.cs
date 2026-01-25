@@ -92,7 +92,7 @@ namespace Player.Remote
             {
                 var playerData = player.GetSFSObject(i);
                 var userId = playerData.GetInt("userId");
-                var snapshotId = playerData.GetInt("snapshotId");
+                var snapshotId = playerData.GetLong("snapshotId");
                 var xPosition = playerData.GetFloat("x");
                 var yPosition = playerData.GetFloat("y");
                 var zPosition = playerData.GetFloat("z");
@@ -108,6 +108,8 @@ namespace Player.Remote
                 
                 if (!_remotePlayerRegistry.TryGet(userId, out var remotePlayer))
                     continue;
+                
+                Debug.LogError("SnapshotId: " + snapshotId);
                 
                 var snapshotData = new SnapshotData()
                 {

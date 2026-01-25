@@ -6,6 +6,8 @@ namespace Input
     {
         public Vector3 Movement;
         public Vector2 Look;
+        public Vector3 Origin;
+        public Vector3 Direction;
         public bool Jump;
         public bool Run;
         public bool Aim;

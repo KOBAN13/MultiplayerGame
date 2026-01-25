@@ -8,8 +8,11 @@ namespace Input
         ReadOnlyReactiveProperty<Vector3> Movement { get; }
         ReadOnlyReactiveProperty<bool> Jump { get; }
         ReadOnlyReactiveProperty<bool> Run { get; }
-        public ReadOnlyReactiveProperty<Vector2> Look { get; }
-        public ReadOnlyReactiveProperty<bool> Aim  { get; }
-        public ReadOnlyReactiveProperty<bool> Shoot { get; }
+        ReadOnlyReactiveProperty<Vector2> Look { get; }
+        ReadOnlyReactiveProperty<bool> Aim  { get; }
+        ReadOnlyReactiveProperty<bool> Shoot { get; }
+        
+        Vector3 Origin { get; }
+        Vector3 Direction { get; }
     }
 }

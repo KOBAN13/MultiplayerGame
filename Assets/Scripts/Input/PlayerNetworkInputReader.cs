@@ -23,6 +23,9 @@ namespace Input
         public ReadOnlyReactiveProperty<bool> Aim => _aim;
         public ReadOnlyReactiveProperty<bool> Shoot => _shoot;
         
+        public Vector3 Origin { get; private set; }
+        public Vector3 Direction { get; private set; }
+
         public PlayerNetworkInputReader(PlayerInput playerInput)
         {
             _playerInput = playerInput;
@@ -87,6 +90,18 @@ namespace Input
 
         public void OnShoot(InputAction.CallbackContext context)
         {
+            var screenCenterPoint = new Vector2(Screen.width / 2f, Screen.height / 2f);
+            
+            var main = Camera.main;
+
+            if (main == null) 
+                return;
+            
+            var ray = main.ScreenPointToRay(screenCenterPoint);
+            
+            Origin = ray.origin;
+            Direction = ray.direction;
+            
             switch (context.phase)
             {
                 case InputActionPhase.Started:

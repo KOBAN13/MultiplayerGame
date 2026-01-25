@@ -1,9 +1,7 @@
 ﻿using Db.Projectile;
 using Helpers;
 using Player.Weapon.Projectile;
-using Services.Interface;
 using Sfs2X;
-using Sfs2X.Core;
 using Sfs2X.Entities.Data;
 using Sfs2X.Requests;
 using UnityEngine;
@@ -15,14 +13,10 @@ namespace Player.Weapon
 {
     public class SingleShotWeapon : AWeapon
     {
-        [Header("References")]
-        [SerializeField] private Transform _shotPoint;
-        
         public override EWeaponType WeaponType => EWeaponType.SingleShot;
         
         private SmartFox _sfs;
         private IPoolService _poolService;
-        private ISnapshotsService _snapshotsService;
         private readonly AProjectile _projectile = new BulletProjectile();
         private Vector3 _lastShotRayOrigin;
         private Vector3 _lastShotRayDirection;
@@ -30,84 +24,67 @@ namespace Player.Weapon
         private SingleShotWeaponData SingleShotWeaponData => (SingleShotWeaponData)Data;
 
         [Inject]
-        private void Construct(SmartFox sfs, IPoolService poolService, ISnapshotsService snapshotsService)
+        private void Construct(SmartFox sfs, IPoolService poolService)
         {
             _sfs = sfs;
             _poolService = poolService;
-            _snapshotsService = snapshotsService;
-            
-            _sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, HandlerRaycast);
         }
         
-        protected override void PerformedAttack()
+        protected override void PerformedAttack(ref FireCommand command)
         {
-            Shot(SingleShotWeaponData);
-        }
-        
-        private void Shot(SingleShotWeaponData weaponData)
-        {
-            var screenCenterPoint = new Vector2(Screen.width / 2f, Screen.height / 2f);
+            command.shotData.layerMask = SingleShotWeaponData.LayerMask;
+            command.shotData.distanceToShot = SingleShotWeaponData.DistanceToShot;
             
-            var main = UnityEngine.Camera.main;
+            SendShotToServer(command);
+            SimulateShot(SingleShotWeaponData, command.shotData);
+        }
 
-            if (main == null) 
-                return;
+        private void SendShotToServer(FireCommand command)
+        {
+            var shotData = command.shotData;
             
-            var ray = main.ScreenPointToRay(screenCenterPoint);
-            _lastShotRayOrigin = ray.origin;
-            _lastShotRayDirection = ray.direction;
-                
             var data = SFSObject.NewInstance();
             
-            var direction = ray.direction;
-            var origin = ray.origin;
-                
             var originArray = new SFSArray();
-            originArray.AddFloat(origin.x);
-            originArray.AddFloat(origin.y);
-            originArray.AddFloat(origin.z);
+            originArray.AddFloat(shotData.origin.x);
+            originArray.AddFloat(shotData.origin.y);
+            originArray.AddFloat(shotData.origin.z);
                 
             var directionArray = new SFSArray();
-            directionArray.AddFloat(direction.x);
-            directionArray.AddFloat(direction.y);
-            directionArray.AddFloat(direction.z);
+            directionArray.AddFloat(shotData.direction.x);
+            directionArray.AddFloat(shotData.direction.y);
+            directionArray.AddFloat(shotData.direction.z);
             
             data.PutSFSArray("originVector", originArray);
             data.PutSFSArray("directionVector", directionArray);
             
-            data.PutInt("snapshotId", _snapshotsService.GetSnapshotId());
-            data.PutInt("layerMask", weaponData.LayerMask);
-            data.PutFloat("distance", weaponData.DistanceToShot);
+            data.PutLong("snapshotId", command.snapshotId);
+            data.PutInt("layerMask", shotData.layerMask);
+            data.PutFloat("distance", shotData.distanceToShot);
                     
             _sfs.Send(new ExtensionRequest(SFSResponseHelper.RAYCAST, data, _sfs.LastJoinedRoom));
         }
 
-        private void HandlerRaycast(BaseEvent evt)
+        private void SimulateShot(SingleShotWeaponData weaponData, ShotData shotData)
         {
-            var cmd = (string)evt.Params[SFSResponseHelper.CMD];
+            var distance = weaponData.DistanceToShot;
             
-            if (cmd != SFSResponseHelper.RAYCAST)
-                return;
-
-            var sfsObject = (SFSObject)evt.Params["params"];
-            
-            var hit = sfsObject.GetBool("hit");
-            var distance = sfsObject.ContainsKey("distance")
-                ? sfsObject.GetFloat("distance")
-                : SingleShotWeaponData.DistanceToShot;
-
-            if (hit)
+            if (Physics.Raycast(shotData.origin, 
+                    shotData.direction, 
+                    out var hit,
+                    distance,
+                    weaponData.LayerMask)
+            )
             {
-                var xPoint = sfsObject.GetFloat("xPoint");
-                var yPoint = sfsObject.GetFloat("yPoint");
-                var zPoint = sfsObject.GetFloat("zPoint");
-                
-                var hitPoint = new Vector3(xPoint, yPoint, zPoint);
+                var hitPoint = hit.point;
                 
                 var projectileData = SingleShotWeaponData.ProjectileData;
                     
                 _projectile.InitializeProjectile(projectileData, _poolService);
                 _projectile.Launch(EObjectInPoolName.BulletImpactEffect, hitPoint);
+                
+                _lastShotRayOrigin = shotData.origin;
+                _lastShotRayDirection = shotData.direction;
 
                 Debug.DrawLine(_lastShotRayOrigin, hitPoint, Color.red, 1.0f);
             }

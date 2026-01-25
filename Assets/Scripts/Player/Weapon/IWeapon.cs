@@ -7,7 +7,8 @@ namespace Player.Weapon
     public interface IWeapon
     {
         EWeaponType WeaponType { get; }
-        void Attack();
+        int GetWeaponId();
+        void Attack(ref FireCommand command);
         void Reload();
         AWeaponData GetWeaponData();
         void SetOwner(GameObject owner);

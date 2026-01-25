@@ -37,12 +37,16 @@ namespace Services
                     if (Mathf.Abs(Mathf.DeltaAngle(lastSnapshot.Rotation, snapshot.Rotation)) < ROTATION_EPSILON)
                     {
                         lastSnapshot.ServerTime = snapshot.ServerTime;
+                        lastSnapshot.SnapshotId = snapshot.SnapshotId;
+                        lastSnapshot.Input = snapshot.Input;
                         _snapshots[lastSnapshotIndex] = lastSnapshot;
                         return;
                     }
 
                     lastSnapshot.Rotation = snapshot.Rotation;
                     lastSnapshot.ServerTime = snapshot.ServerTime;
+                    lastSnapshot.SnapshotId = snapshot.SnapshotId;
+                    lastSnapshot.Input = snapshot.Input;
                     _snapshots[lastSnapshotIndex] = lastSnapshot;
                     return;
                 }
@@ -118,10 +122,13 @@ namespace Services
             return _snapshots[^1].Rotation;
         }
 
-        public int GetSnapshotId() => _snapshots.Count == 0 ? 0 : _snapshots[^1].SnapshotId;
+        public long GetSnapshotId() => _snapshots.Count == 0 ? 0 : _snapshots[^1].SnapshotId;
 
         public void SyncServerTime(float serverTime)
         {
+            if (serverTime <= 0f)
+                return;
+
             var offset = Time.time - serverTime;
 
             if (!_hasServerTime)

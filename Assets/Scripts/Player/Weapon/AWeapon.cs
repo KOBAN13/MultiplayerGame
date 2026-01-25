@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using Db.Projectile;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Utils.Enums;
 using VContainer;
 
@@ -8,6 +9,10 @@ namespace Player.Weapon
 {
     public abstract class AWeapon : MonoBehaviour, IWeapon
     {
+        [Header("References")]
+        [SerializeField] protected Transform ShotPoint;
+        [SerializeField] protected int WeaponId;
+        
         public abstract EWeaponType WeaponType { get; }
         
         protected AWeaponData Data;
@@ -39,7 +44,7 @@ namespace Player.Weapon
             _currentProjectileCount = Data.MagazineSize;
         }
 
-        public virtual void Attack()
+        public virtual void Attack(ref FireCommand command)
         {
             if (Time.time < _nextAttackTime || _isReloading) 
                 return;
@@ -50,7 +55,7 @@ namespace Player.Weapon
                 return;
             }
             
-            PerformedAttack();
+            PerformedAttack(ref command);
             
             _nextAttackTime = Time.time + 1f / Data.AttackRate;
             _currentProjectileCount--;
@@ -64,11 +69,13 @@ namespace Player.Weapon
             }
         }
 
+        public int GetWeaponId() => WeaponId;
+
         public AWeaponData GetWeaponData() => Data;
 
         public void SetOwner(GameObject owner) => Owner = owner;
         
-        protected abstract void PerformedAttack();
+        protected abstract void PerformedAttack(ref FireCommand command);
 
         private async UniTaskVoid ReloadAsync()
         {

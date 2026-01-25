@@ -7,7 +7,7 @@ namespace Player.Db
         public Vector3 Position;
         public Vector3 Input;
         public float Rotation;
-        public int SnapshotId;
+        public long SnapshotId;
         public float ServerTime;
     }
 }

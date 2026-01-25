@@ -65,22 +65,28 @@ namespace Player.Local
             _mainCamera = UnityEngine.Camera.main;
             
             _inputSource.AimCommand
-                .Subscribe(isAim =>
-                {
-                    _playerCameraHolder.SetVirtualCamera(isAim
-                        ? EVirtualCameraType.Aim
-                        : EVirtualCameraType.Gameplay);
-                    
-                    if (!isAim)
-                        _yawTarget.transform.localRotation = Quaternion.identity;
-                        
-                })
+                .Subscribe(OnPlayerAim)
                 .AddTo(this);
             
             _inputSource.ShotCommand
                 .Where(isShot => isShot && _lastInputFrame.Aim)
-                .Subscribe(_ => _currentWeapon.Attack())
+                .Subscribe(_ => OnPlayerAttack())
                 .AddTo(this);
+        }
+
+        private void OnPlayerAttack()
+        {
+            var fireCommand = new FireCommand
+            {
+                snapshotId = SnapshotsService.GetSnapshotId(),
+                shotData = new ShotData
+                {
+                    origin = _lastInputFrame.Origin,
+                    direction = _lastInputFrame.Direction,
+                }
+            };
+
+            _currentWeapon.Attack(ref fireCommand);
         }
 
         public void Update()
@@ -101,6 +107,16 @@ namespace Player.Local
             {
                 LocalRotate();
             }
+        }
+        
+        private void OnPlayerAim(bool isAim)
+        {
+            _playerCameraHolder.SetVirtualCamera(isAim
+                ? EVirtualCameraType.Aim
+                : EVirtualCameraType.Gameplay);
+
+            if (!isAim)
+                _yawTarget.transform.localRotation = Quaternion.identity;
         }
 
         private void LocalRotate()

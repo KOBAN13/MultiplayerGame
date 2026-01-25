@@ -29,6 +29,8 @@ namespace Input
                 Run = _playerNetworkInputReader.Run.CurrentValue,
                 Aim = _playerNetworkInputReader.Aim.CurrentValue,
                 Shoot = _playerNetworkInputReader.Shoot.CurrentValue,
+                Origin = _playerNetworkInputReader.Origin,
+                Direction = _playerNetworkInputReader.Direction,
                 Time = Time.time,
                 SequenceId = _sequenceId++
             };

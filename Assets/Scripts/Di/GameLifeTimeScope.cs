@@ -41,7 +41,7 @@ namespace Di
             Register<PlayerJoinGameService>(Lifetime.Singleton);
             Register<PlayerNetworkStateSender>(Lifetime.Singleton); 
             
-            Builder.RegisterFactory<CharacterController,ClientStateProvider>(
+            Builder.RegisterFactory<CharacterController, ClientStateProvider>(
                 characterController => new ClientStateProvider(characterController));
 
             Builder.RegisterFactory<ISnapshotsService, CharacterController, Transform, IPlayerParameters, IPlayerSnapshotMotor>(
