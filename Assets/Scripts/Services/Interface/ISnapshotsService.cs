@@ -10,5 +10,6 @@ namespace Services.Interface
         Vector3 GetInterpolatedPosition();
         float GetInterpolatedRotationDirection();
         long GetSnapshotId();
+        long GetRenderSnapshotId();
     }
 }

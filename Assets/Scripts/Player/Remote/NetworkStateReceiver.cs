@@ -54,7 +54,7 @@ namespace Player.Remote
         {
             var cmd = (string)evt.Params[SFSResponseHelper.CMD];
             
-            if (cmd != SFSResponseHelper.PLAYER_JOIN_ROOM)
+            if (cmd != SFSResponseHelper.PLAYER_JOIN_GAME_ROOM)
                 return;
             
             var data = (SFSObject)evt.Params["params"];
@@ -108,8 +108,6 @@ namespace Player.Remote
                 
                 if (!_remotePlayerRegistry.TryGet(userId, out var remotePlayer))
                     continue;
-                
-                Debug.LogError("SnapshotId: " + snapshotId);
                 
                 var snapshotData = new SnapshotData()
                 {

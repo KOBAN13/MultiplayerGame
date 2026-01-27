@@ -68,26 +68,11 @@ namespace Services
                     return _snapshots[0].Position;
             }
 
-            var serverTime = GetServerTime();
-            var interpolationBackTime = serverTime - _snapshotParameters.InterpolationBackTime;
+            GetInterpolationPair(out var older, out var newer, out var time);
 
-            for (var i = _snapshots.Count - 1; i >= 0; i--)
-            {
-                if (_snapshots[i].ServerTime > interpolationBackTime && i != 0)
-                    continue;
-
-                var older = _snapshots[i];
-                var newer = i < _snapshots.Count - 1 ? _snapshots[i + 1] : older;
-
-                if (Mathf.Approximately(older.ServerTime, newer.ServerTime))
-                    return older.Position;
-
-                var time = Mathf.InverseLerp(older.ServerTime, newer.ServerTime, interpolationBackTime);
-
-                return Vector3.Lerp(older.Position, newer.Position, time);
-            }
-
-            return _snapshots[^1].Position;
+            return Mathf.Approximately(older.ServerTime, newer.ServerTime) 
+                ? older.Position 
+                : Vector3.Lerp(older.Position, newer.Position, time);
         }
         
         public float GetInterpolatedRotationDirection()
@@ -100,29 +85,28 @@ namespace Services
                     return _snapshots[0].Rotation;
             }
 
-            var serverTime = GetServerTime();
-            var interpolationBackTime = serverTime - _snapshotParameters.InterpolationBackTime;
-            
-            for (var i = _snapshots.Count - 1; i >= 0; i--)
-            {
-                if (_snapshots[i].ServerTime > interpolationBackTime && i != 0)
-                    continue;
+            GetInterpolationPair(out var older, out var newer, out var time);
 
-                var older = _snapshots[i];
-                var newer = i < _snapshots.Count - 1 ? _snapshots[i + 1] : older;
-
-                if (Mathf.Approximately(older.ServerTime, newer.ServerTime))
-                    return older.Rotation;
-                
-                var time = Mathf.InverseLerp(older.ServerTime, newer.ServerTime, interpolationBackTime);
-
-                return Mathf.LerpAngle(older.Rotation, newer.Rotation, time);
-            }
-
-            return _snapshots[^1].Rotation;
+            return Mathf.Approximately(older.ServerTime, newer.ServerTime) 
+                ? older.Rotation 
+                : Mathf.LerpAngle(older.Rotation, newer.Rotation, time);
         }
 
         public long GetSnapshotId() => _snapshots.Count == 0 ? 0 : _snapshots[^1].SnapshotId;
+
+        public long GetRenderSnapshotId()
+        {
+            switch (_snapshots.Count)
+            {
+                case 0:
+                    return 0;
+                case 1:
+                    return _snapshots[0].SnapshotId;
+                default:
+                    GetInterpolationPair(out var older, out _, out _);
+                    return older.SnapshotId;
+            }
+        }
 
         public void SyncServerTime(float serverTime)
         {
@@ -147,6 +131,44 @@ namespace Services
                 return 0f;
             
             return Time.time - _serverTimeOffset;
+        }
+
+        private void GetInterpolationPair(out SnapshotData older, out SnapshotData newer, out float time)
+        {
+            older = default;
+            newer = default;
+            time = 0f;
+
+            switch (_snapshots.Count)
+            {
+                case 0:
+                    return;
+                case 1:
+                    older = _snapshots[0];
+                    newer = older;
+                    return;
+            }
+
+            var serverTime = GetServerTime();
+            var interpolationBackTime = serverTime - _snapshotParameters.InterpolationBackTime;
+
+            for (var i = _snapshots.Count - 1; i >= 0; i--)
+            {
+                if (_snapshots[i].ServerTime > interpolationBackTime && i != 0)
+                    continue;
+
+                older = _snapshots[i];
+                newer = i < _snapshots.Count - 1 ? _snapshots[i + 1] : older;
+
+                if (Mathf.Approximately(older.ServerTime, newer.ServerTime))
+                    return;
+
+                time = Mathf.InverseLerp(older.ServerTime, newer.ServerTime, interpolationBackTime);
+                return;
+            }
+
+            older = _snapshots[^1];
+            newer = older;
         }
     }
 }

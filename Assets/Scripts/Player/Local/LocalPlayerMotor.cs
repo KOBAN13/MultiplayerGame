@@ -76,9 +76,11 @@ namespace Player.Local
 
         private void OnPlayerAttack()
         {
+            _lastInputFrame = _inputSource.Read();
+            
             var fireCommand = new FireCommand
             {
-                snapshotId = SnapshotsService.GetSnapshotId(),
+                snapshotId = SnapshotsService.GetRenderSnapshotId(),
                 shotData = new ShotData
                 {
                     origin = _lastInputFrame.Origin,
