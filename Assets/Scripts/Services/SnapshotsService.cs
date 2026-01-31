@@ -11,9 +11,6 @@ namespace Services
         private readonly List<SnapshotData> _snapshots = new();
         private readonly ISnapshotParameters _snapshotParameters;
 
-        private const float POSITION_EPSILON_SQR = 0.0001f;
-        private const float ROTATION_EPSILON = 0.1f;
-
         private bool _hasServerTime;
         private float _serverTimeOffset;
 
@@ -24,33 +21,8 @@ namespace Services
 
         public void AddSnapshot(in SnapshotData snapshot)
         {
-            if (_snapshots.Count > 0)
-            {
-                var lastSnapshotIndex = _snapshots.Count - 1;
-                var lastSnapshot = _snapshots[lastSnapshotIndex];
-                
-                if (snapshot.ServerTime <= lastSnapshot.ServerTime)
-                    return;
-                
-                if ((snapshot.Position - lastSnapshot.Position).sqrMagnitude < POSITION_EPSILON_SQR)
-                {
-                    if (Mathf.Abs(Mathf.DeltaAngle(lastSnapshot.Rotation, snapshot.Rotation)) < ROTATION_EPSILON)
-                    {
-                        lastSnapshot.ServerTime = snapshot.ServerTime;
-                        lastSnapshot.SnapshotId = snapshot.SnapshotId;
-                        lastSnapshot.Input = snapshot.Input;
-                        _snapshots[lastSnapshotIndex] = lastSnapshot;
-                        return;
-                    }
-
-                    lastSnapshot.Rotation = snapshot.Rotation;
-                    lastSnapshot.ServerTime = snapshot.ServerTime;
-                    lastSnapshot.SnapshotId = snapshot.SnapshotId;
-                    lastSnapshot.Input = snapshot.Input;
-                    _snapshots[lastSnapshotIndex] = lastSnapshot;
-                    return;
-                }
-            }
+            if (_snapshots.Count > 0 && snapshot.ServerTime <= _snapshots[^1].ServerTime)
+                return;
 
             _snapshots.Add(snapshot);
 
@@ -92,19 +64,18 @@ namespace Services
                 : Mathf.LerpAngle(older.Rotation, newer.Rotation, time);
         }
 
-        public long GetSnapshotId() => _snapshots.Count == 0 ? 0 : _snapshots[^1].SnapshotId;
-
-        public long GetRenderSnapshotId()
+        public (long snapshotId, byte alpha) GetRenderSnapshotId()
         {
             switch (_snapshots.Count)
             {
                 case 0:
-                    return 0;
+                    return (0, 0);
                 case 1:
-                    return _snapshots[0].SnapshotId;
+                    return (_snapshots[0].SnapshotId, 0);
                 default:
-                    GetInterpolationPair(out var older, out _, out _);
-                    return older.SnapshotId;
+                    GetInterpolationPair(out var older, out var newer, out var time);
+                    var alpha = (byte) Mathf.Clamp(Mathf.RoundToInt(time * 255), 0, 255);
+                    return (older.SnapshotId, alpha);
             }
         }
 

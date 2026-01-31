@@ -57,6 +57,7 @@ namespace Player.Weapon
             
             data.PutSFSArray("originVector", originArray);
             data.PutSFSArray("directionVector", directionArray);
+            data.PutByte("shotAlpha", command.alpha);
             
             data.PutLong("snapshotId", command.snapshotId);
             data.PutInt("layerMask", shotData.layerMask);
