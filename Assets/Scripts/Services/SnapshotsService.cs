@@ -74,8 +74,17 @@ namespace Services
                     return (_snapshots[0].SnapshotId, 0);
                 default:
                     GetInterpolationPair(out var older, out var newer, out var time);
-                    var alpha = (byte) Mathf.Clamp(Mathf.RoundToInt(time * 255), 0, 255);
-                    return (older.SnapshotId, alpha);
+                    float dt = newer.ServerTime - older.ServerTime;
+                    float serverTime = GetServerTime();
+                    float interpBackTime = serverTime - _snapshotParameters.InterpolationBackTime;
+                    
+                    float renderTime = Mathf.Lerp(older.ServerTime, newer.ServerTime, time);
+                    float back = serverTime - renderTime;
+
+                    Debug.Log($"dt={dt:F3}s back={back:F3}s t={time:F3} " +
+                              $"olderId={older.SnapshotId} newerId={newer.SnapshotId} " +
+                              $"serverTime={serverTime:F3} olderTime={older.ServerTime:F3} newerTime={newer.ServerTime:F3}");
+                    return (older.SnapshotId, 0);
             }
         }
 

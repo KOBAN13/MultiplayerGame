@@ -62,6 +62,8 @@ namespace Player.Weapon
             data.PutLong("snapshotId", command.snapshotId);
             data.PutInt("layerMask", shotData.layerMask);
             data.PutFloat("distance", shotData.distanceToShot);
+            
+            Debug.Log(command.alpha);
                     
             _sfs.Send(new ExtensionRequest(SFSResponseHelper.RAYCAST, data, _sfs.LastJoinedRoom));
         }

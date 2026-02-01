@@ -14,6 +14,7 @@ using Services.Connections;
 using Services.Interface;
 using Sfs2X;
 using UnityEngine;
+using Utils;
 using Utils.Pool;
 using VContainer;
 
@@ -29,6 +30,14 @@ namespace Di
             BindInput();
             BindInstaller();
             BindPlayer();
+            BindParrelSyncScripts();
+        }
+
+        private void BindParrelSyncScripts()
+        {
+#if UNITY_EDITOR
+            Register<ParrelSyncRuntime>(Lifetime.Singleton);
+#endif
         }
 
         private void BindPlayer()
