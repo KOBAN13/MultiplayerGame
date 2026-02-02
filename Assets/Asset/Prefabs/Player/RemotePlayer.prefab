@@ -292,7 +292,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5503f35ef3a8149418b9df77fe0f2afd, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5503f35ef3a8149418b9df77fe0f2afd, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1427,4 +1427,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 142972be03fd424ebc91e3b479cf101e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _shotPoint: {fileID: 6252056481128439414}
+  ShotPoint: {fileID: 0}
+  WeaponId: 0

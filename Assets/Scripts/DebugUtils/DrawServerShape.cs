@@ -15,6 +15,9 @@ namespace DebugUtils
     {
         private SmartFox _sfs;
         [OdinSerialize] private Dictionary<string, ShapeData> _shapeData = new();
+        private bool _hasLagCompensationPoint;
+        private Vector3 _lagCompensationPoint;
+        private const float LagCompensationPointRadius = 0.2f;
 
         [Inject]
         private void Construct(SmartFox sfs)
@@ -25,6 +28,24 @@ namespace DebugUtils
         private void Awake()
         {
             _sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnDrawServerShape);
+            _sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnDrawPositionLagCompensation);
+        }
+
+        private void OnDrawPositionLagCompensation(BaseEvent evt)
+        {
+            var cmd = (string)evt.Params[SFSResponseHelper.CMD];
+            
+            if (cmd != SFSResponseHelper.RAYCAST)
+                return;
+            
+            var data = (SFSObject)evt.Params["params"];
+            
+            var positionX = data.GetFloat("testX");
+            var positionY = data.GetFloat("testY");
+            var positionZ = data.GetFloat("testZ");
+
+            _lagCompensationPoint = new Vector3(positionX, positionY, positionZ);
+            _hasLagCompensationPoint = true;
         }
 
         private void OnDrawServerShape(BaseEvent evt)
@@ -119,29 +140,36 @@ namespace DebugUtils
 
         private void OnDrawGizmos()
         {
-            if (_shapeData == null || _shapeData.Count == 0)
+            var originalMatrix = Gizmos.matrix;
+            if (_shapeData != null && _shapeData.Count > 0)
             {
-                return;
+                Gizmos.color = Color.cyan;
+
+                foreach (var shape in _shapeData.Values)
+                {
+                    if (shape.HasObb)
+                    {
+                        var rotation = SafeQuaternion(shape.ObbRotation);
+                        Gizmos.matrix = Matrix4x4.TRS(shape.ObbC, rotation, Vector3.one);
+                        Gizmos.DrawWireCube(Vector3.zero, shape.ObbH * 2f);
+                    }
+                    else
+                    {
+                        var center = (shape.Min + shape.Max) * 0.5f;
+                        var size = shape.Max - shape.Min;
+                        Gizmos.matrix = Matrix4x4.identity;
+                        Gizmos.DrawWireCube(center, size);
+                    }
+                }
             }
 
-            var originalMatrix = Gizmos.matrix;
-            Gizmos.color = Color.cyan;
-
-            foreach (var shape in _shapeData.Values)
+            if (_hasLagCompensationPoint)
             {
-                if (shape.HasObb)
-                {
-                    var rotation = SafeQuaternion(shape.ObbRotation);
-                    Gizmos.matrix = Matrix4x4.TRS(shape.ObbC, rotation, Vector3.one);
-                    Gizmos.DrawWireCube(Vector3.zero, shape.ObbH * 2f);
-                }
-                else
-                {
-                    var center = (shape.Min + shape.Max) * 0.5f;
-                    var size = shape.Max - shape.Min;
-                    Gizmos.matrix = Matrix4x4.identity;
-                    Gizmos.DrawWireCube(center, size);
-                }
+                Gizmos.matrix = Matrix4x4.identity;
+                Gizmos.color = Color.red;
+                Gizmos.DrawSphere(_lagCompensationPoint, LagCompensationPointRadius);
+
+                Debug.Break();
             }
 
             Gizmos.matrix = originalMatrix;
