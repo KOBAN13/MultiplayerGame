@@ -17,7 +17,6 @@ namespace DebugUtils
         [OdinSerialize] private Dictionary<string, ShapeData> _shapeData = new();
         private bool _hasLagCompensationPoint;
         private Vector3 _lagCompensationPoint;
-        private const float LagCompensationPointRadius = 0.2f;
 
         [Inject]
         private void Construct(SmartFox sfs)
@@ -46,6 +45,8 @@ namespace DebugUtils
 
             _lagCompensationPoint = new Vector3(positionX, positionY, positionZ);
             _hasLagCompensationPoint = true;
+            
+            Debug.Break();
         }
 
         private void OnDrawServerShape(BaseEvent evt)
@@ -167,9 +168,7 @@ namespace DebugUtils
             {
                 Gizmos.matrix = Matrix4x4.identity;
                 Gizmos.color = Color.red;
-                Gizmos.DrawSphere(_lagCompensationPoint, LagCompensationPointRadius);
-
-                Debug.Break();
+                Gizmos.DrawSphere(_lagCompensationPoint, 0.2f);
             }
 
             Gizmos.matrix = originalMatrix;

@@ -9,6 +9,6 @@ namespace Services.Interface
         void AddSnapshot(in SnapshotData snapshot);
         Vector3 GetInterpolatedPosition();
         float GetInterpolatedRotationDirection();
-        (long snapshotId, byte alpha) GetRenderSnapshotId();
+        (long snapshotId, byte alpha, Vector3 position) GetRenderSnapshotId();
     }
 }

@@ -9,6 +9,7 @@ using Services.SceneManagement;
 using Sfs2X;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using Utils;
 using VContainer;
 
 namespace Di
@@ -25,6 +26,14 @@ namespace Di
             RegisterConfigs();
             RegisterFactories();
             RegisterServices();
+            BindParrelSyncScripts();
+        }
+        
+        private void BindParrelSyncScripts()
+        {
+#if UNITY_EDITOR
+            Register<ParrelSyncRuntime>(Lifetime.Singleton);
+#endif
         }
 
         private void RegisterConfigs()

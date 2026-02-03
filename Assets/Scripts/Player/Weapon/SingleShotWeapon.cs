@@ -1,4 +1,5 @@
-﻿using Db.Projectile;
+﻿using System;
+using Db.Projectile;
 using Helpers;
 using Player.Weapon.Projectile;
 using Sfs2X;
@@ -20,7 +21,8 @@ namespace Player.Weapon
         private readonly AProjectile _projectile = new BulletProjectile();
         private Vector3 _lastShotRayOrigin;
         private Vector3 _lastShotRayDirection;
-        
+        private Vector3 _positionPlayerInShoot;
+
         private SingleShotWeaponData SingleShotWeaponData => (SingleShotWeaponData)Data;
 
         [Inject]
@@ -36,7 +38,7 @@ namespace Player.Weapon
             command.shotData.distanceToShot = SingleShotWeaponData.DistanceToShot;
             
             SendShotToServer(command);
-            SimulateShot(SingleShotWeaponData, command.shotData);
+            SimulateShot(SingleShotWeaponData, command.shotData, command);
         }
 
         private void SendShotToServer(FireCommand command)
@@ -62,13 +64,11 @@ namespace Player.Weapon
             data.PutLong("snapshotId", command.snapshotId);
             data.PutInt("layerMask", shotData.layerMask);
             data.PutFloat("distance", shotData.distanceToShot);
-            
-            Debug.Log(command.alpha);
                     
             _sfs.Send(new ExtensionRequest(SFSResponseHelper.RAYCAST, data, _sfs.LastJoinedRoom));
         }
 
-        private void SimulateShot(SingleShotWeaponData weaponData, ShotData shotData)
+        private void SimulateShot(SingleShotWeaponData weaponData, ShotData shotData, FireCommand command)
         {
             var distance = weaponData.DistanceToShot;
             
@@ -82,19 +82,31 @@ namespace Player.Weapon
                 var hitPoint = hit.point;
                 
                 var projectileData = SingleShotWeaponData.ProjectileData;
+
+                hit.collider.TryGetComponent(out APlayer player);
                     
                 _projectile.InitializeProjectile(projectileData, _poolService);
                 _projectile.Launch(EObjectInPoolName.BulletImpactEffect, hitPoint);
                 
                 _lastShotRayOrigin = shotData.origin;
                 _lastShotRayDirection = shotData.direction;
+                _positionPlayerInShoot = player.transform.position;
 
                 Debug.DrawLine(_lastShotRayOrigin, hitPoint, Color.red, 1.0f);
+                Debug.LogError("Snapshot: " + command.snapshotId);
+                Debug.LogError(command.position);
             }
             else
             {
                 Debug.DrawLine(_lastShotRayOrigin, _lastShotRayOrigin + _lastShotRayDirection * distance, Color.yellow, 1.0f);
             }
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.matrix = Matrix4x4.identity;
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawSphere(_positionPlayerInShoot, 0.2f);
         }
     }
 }

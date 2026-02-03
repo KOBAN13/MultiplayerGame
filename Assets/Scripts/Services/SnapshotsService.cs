@@ -64,18 +64,18 @@ namespace Services
                 : Mathf.LerpAngle(older.Rotation, newer.Rotation, time);
         }
 
-        public (long snapshotId, byte alpha) GetRenderSnapshotId()
+        public (long snapshotId, byte alpha, Vector3 position) GetRenderSnapshotId()
         {
             switch (_snapshots.Count)
             {
                 case 0:
-                    return (0, 0);
+                    return (0, 0, Vector3.zero);
                 case 1:
-                    return (_snapshots[0].SnapshotId, 0);
+                    return (_snapshots[0].SnapshotId, 0, Vector3.zero);
                 default:
                     GetInterpolationPair(out var older, out var newer, out var time);
                     var alpha = (byte) Mathf.Clamp(Mathf.RoundToInt(time * 255f), 0, 255);
-                    return (older.SnapshotId, alpha);
+                    return (older.SnapshotId, alpha, older.Position);
             }
         }
 

@@ -30,14 +30,6 @@ namespace Di
             BindInput();
             BindInstaller();
             BindPlayer();
-            BindParrelSyncScripts();
-        }
-
-        private void BindParrelSyncScripts()
-        {
-#if UNITY_EDITOR
-            Register<ParrelSyncRuntime>(Lifetime.Singleton);
-#endif
         }
 
         private void BindPlayer()

@@ -5,6 +5,9 @@ using Player.Db;
 using Player.Interface.Local;
 using Player.Weapon;
 using R3;
+using Services.Connections;
+using Services.Interface;
+using Sfs2X;
 using UnityEngine;
 using Utils.Enums;
 using VContainer;
@@ -30,6 +33,9 @@ namespace Player.Local
         private float _targetYaw;
         private float _targetPitch;
         private UnityEngine.Camera _mainCamera;
+        
+        private IRemotePlayerRegistry _playerRegistry;
+        private SmartFox _smartFox;
 
         private const float THRESHOLD = 0.01f;
 
@@ -39,13 +45,18 @@ namespace Player.Local
             IRotationCameraParameters rotationCameraParameters,
             Func<CharacterController, ClientStateProvider> clientStateProviderFactory,
             IPlayerCameraHolder playerCameraHolder,
-            IPlayerNetworkStateSender playerNetworkStateSender
+            IPlayerNetworkStateSender playerNetworkStateSender,
+            IRemotePlayerRegistry playerRegistry,
+            SmartFox smartFox
         )
         {
+            _playerRegistry = playerRegistry;
+            
             _playerNetworkStateSender = playerNetworkStateSender;
             _inputSource = inputSource;
             _rotationCameraParameters = rotationCameraParameters;
             _playerCameraHolder = playerCameraHolder;
+            _smartFox = smartFox;
             
             _clientStateProvider = clientStateProviderFactory(CharacterController);
         }
@@ -79,10 +90,25 @@ namespace Player.Local
             _lastInputFrame = _inputSource.Read();
 
             var render = SnapshotsService.GetRenderSnapshotId();
+
+            var room = _smartFox.LastJoinedRoom;
+
+            int id = 0;
+
+            foreach (var user in room.PlayerList)
+            {
+                if (!user.IsItMe)
+                    id = user.Id;
+            }
+
+            _playerRegistry.TryGet(id, out var player);
+
+            var aboba = player.SnapshotsService.GetRenderSnapshotId();
             
             var fireCommand = new FireCommand
             {
                 snapshotId = render.snapshotId,
+                position = aboba.position,
                 alpha = render.alpha,
                 shotData = new ShotData
                 {

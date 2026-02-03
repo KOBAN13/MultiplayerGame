@@ -7,6 +7,7 @@ using UI.Base;
 using UI.Helpers;
 using UI.Utils;
 using UI.View;
+using Utils;
 using VContainer;
 
 namespace UI.ViewModel
@@ -24,6 +25,9 @@ namespace UI.ViewModel
         
         [Inject] 
         private SceneLoader _sceneLoader;
+        
+        [Inject]
+        private ParrelSyncRuntime _parrelSyncRuntime;
         
         [AutoBind]
         public readonly RefTypeViewModelBinder<ReactiveCommand> SignInButtonViewBinder = new ();
@@ -83,10 +87,7 @@ namespace UI.ViewModel
         
         private void AutoLogin(Unit unit)
         {
-            var login = "Daniil";
-            var password = "giftrola05";
-            
-            _loginClientService.Login(login, password);
+            _loginClientService.Login(_parrelSyncRuntime.GetLogin(), _parrelSyncRuntime.GetPassword());
         }
 
         private void OnUserNameChanged(string userName)

@@ -14,7 +14,7 @@ namespace Player
         [SerializeField] protected CharacterController CharacterController;
         [SerializeField] protected Animator Animator;
         
-        protected ISnapshotsService SnapshotsService;
+        public ISnapshotsService SnapshotsService;
         protected IPlayerSnapshotMotor SnapshotMotor;
         protected IPlayerSnapshotReceiver PlayerSnapshotReceiver;
         protected IPlayerParameters PlayerParameters;

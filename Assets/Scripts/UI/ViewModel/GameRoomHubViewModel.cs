@@ -21,17 +21,19 @@ namespace UI.ViewModel
         public readonly ViewModelBinder<string> UserNameBinder = new();
         public readonly RefTypeViewModelBinder<ReactiveCommand> CreateRoomButtonBinder = new();
         public readonly RefTypeViewModelBinder<ReactiveCommand> LogoutButtonBinder = new();
+        public readonly RefTypeViewModelBinder<ReactiveCommand> AutoLobbyBinder = new();
         public readonly ReactiveCommand<GameObject> SetParentObject = new();
 
         public override void Initialize()
         {
             SetParentObject.Subscribe(InitUI).AddTo(Disposable);
             
-            Bind(UserNameBinder, CreateRoomButtonBinder, LogoutButtonBinder);
+            Bind(UserNameBinder, CreateRoomButtonBinder, LogoutButtonBinder, AutoLobbyBinder);
             UserNameBinder.Value = _loginClientService.UserName.CurrentValue;
 
             CreateRoomButtonBinder.Value.Subscribe(_ => OnCreateRoom()).AddTo(Disposable);
             LogoutButtonBinder.Value.Subscribe(_ => OnLogout()).AddTo(Disposable);
+            AutoLobbyBinder.Value.Subscribe(_ => OnCreateLobby()).AddTo(Disposable);
             
             _gameHubService.Rooms.ObserveAdd().Subscribe(kvp => OnRoomAdded(kvp.Value)).AddTo(Disposable);
             _gameHubService.Rooms.ObserveRemove().Subscribe(kvp => OnRoomRemoved(kvp.Value)).AddTo(Disposable);
@@ -44,6 +46,10 @@ namespace UI.ViewModel
         }
 
         private void OnCreateRoom() => _screenService.OpenSync<CreateRoomScreen>();
+        private void OnCreateLobby()
+        {
+            _gameHubService.CreateRoom("Aboba", 3, false, "");
+        }
 
         private void OnLogout()
         {

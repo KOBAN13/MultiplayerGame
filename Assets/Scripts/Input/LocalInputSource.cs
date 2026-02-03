@@ -15,7 +15,7 @@ namespace Input
         private int _sequenceId;
         
         private float _oscillationStartTime;
-        private const float OscillationIntervalSeconds = 1f;
+        private const float OscillationIntervalSeconds = 3f;
         
         public ReactiveCommand<bool> AimCommand { get; private set; } = new();
         public ReactiveCommand<bool> ShotCommand { get; private set; } = new();
