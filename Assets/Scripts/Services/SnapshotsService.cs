@@ -79,6 +79,27 @@ namespace Services
             }
         }
 
+        public bool TryGetInterpolationSnapshots(out SnapshotData older, out SnapshotData newer, out byte alpha)
+        {
+            older = default;
+            newer = default;
+            alpha = 0;
+
+            switch (_snapshots.Count)
+            {
+                case 0:
+                    return false;
+                case 1:
+                    older = _snapshots[0];
+                    newer = older;
+                    return true;
+                default:
+                    GetInterpolationPair(out older, out newer, out var time);
+                    alpha = (byte)Mathf.Clamp(Mathf.RoundToInt(time * 255f), 0, 255);
+                    return true;
+            }
+        }
+
         public void SyncServerTime(float serverTime)
         {
             if (serverTime <= 0f)

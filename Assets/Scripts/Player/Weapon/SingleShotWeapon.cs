@@ -90,11 +90,9 @@ namespace Player.Weapon
                 
                 _lastShotRayOrigin = shotData.origin;
                 _lastShotRayDirection = shotData.direction;
-                _positionPlayerInShoot = player.transform.position;
+                _positionPlayerInShoot = command.position;
 
                 Debug.DrawLine(_lastShotRayOrigin, hitPoint, Color.red, 1.0f);
-                Debug.LogError("Snapshot: " + command.snapshotId);
-                Debug.LogError(command.position);
             }
             else
             {

@@ -46,6 +46,8 @@ namespace DebugUtils
             _lagCompensationPoint = new Vector3(positionX, positionY, positionZ);
             _hasLagCompensationPoint = true;
             
+            Debug.LogError("Interpolated position: "  + _lagCompensationPoint);
+            
             Debug.Break();
         }
 

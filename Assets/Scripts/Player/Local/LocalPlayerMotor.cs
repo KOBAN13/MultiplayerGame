@@ -104,12 +104,19 @@ namespace Player.Local
             _playerRegistry.TryGet(id, out var player);
 
             var aboba = player.SnapshotsService.GetRenderSnapshotId();
+
+            if (player.SnapshotsService.TryGetInterpolationSnapshots(out var older, out var newer, out var alpha))
+            {
+                var t = alpha / 255f;
+                var interpolatedPosition = Vector3.Lerp(older.Position, newer.Position, t);
+                Debug.Log($"[AttackDebug] remoteId={id} older={older.SnapshotId} newer={newer.SnapshotId} alpha={alpha} interpolatePos={interpolatedPosition} snappos={aboba.position} posInWorld={player.transform.position} serverTime={older.ServerTime}");
+            }
             
             var fireCommand = new FireCommand
             {
                 snapshotId = render.snapshotId,
-                position = aboba.position,
                 alpha = render.alpha,
+                position = aboba.position,
                 shotData = new ShotData
                 {
                     origin = _lastInputFrame.Origin,

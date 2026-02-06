@@ -52,7 +52,9 @@ namespace Pool
 
         private static void OnDestroyItem(GameListItem item)
         {
-            if (item == null) return;
+            if (item == null) 
+                return;
+            
             if (item.gameObject != null)
                 UnityEngine.Object.Destroy(item.gameObject);
         }
