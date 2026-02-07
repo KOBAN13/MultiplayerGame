@@ -5,7 +5,6 @@ using Player.Db;
 using Player.Interface.Local;
 using Player.Weapon;
 using R3;
-using Services.Connections;
 using Services.Interface;
 using Sfs2X;
 using UnityEngine;
@@ -43,10 +42,10 @@ namespace Player.Local
         public void Construct(
             IInputSource inputSource,
             IRotationCameraParameters rotationCameraParameters,
-            Func<CharacterController, ClientStateProvider> clientStateProviderFactory,
             IPlayerCameraHolder playerCameraHolder,
             IPlayerNetworkStateSender playerNetworkStateSender,
             IRemotePlayerRegistry playerRegistry,
+            IClientStateProvider clientStateProvider,
             SmartFox smartFox
         )
         {
@@ -56,9 +55,8 @@ namespace Player.Local
             _inputSource = inputSource;
             _rotationCameraParameters = rotationCameraParameters;
             _playerCameraHolder = playerCameraHolder;
+            _clientStateProvider = clientStateProvider;
             _smartFox = smartFox;
-            
-            _clientStateProvider = clientStateProviderFactory(CharacterController);
         }
         
         public Transform GetTransform()

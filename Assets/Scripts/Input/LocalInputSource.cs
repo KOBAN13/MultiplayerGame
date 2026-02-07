@@ -9,7 +9,6 @@ namespace Input
     public class LocalInputSource : IInputSource, IDisposable, IInitializable
     {
         private readonly IPlayerNetworkInputReader _playerNetworkInputReader;
-        private readonly ParrelSyncRuntime _parrelSyncRuntime;
         private readonly CompositeDisposable  _disposables = new();
         private readonly bool _forceLeftMovement;
         private int _sequenceId;
@@ -23,8 +22,7 @@ namespace Input
         public LocalInputSource(IPlayerNetworkInputReader playerNetworkInputReader, ParrelSyncRuntime parrelSyncRuntime)
         {
             _playerNetworkInputReader = playerNetworkInputReader;
-            _parrelSyncRuntime = parrelSyncRuntime;
-            _forceLeftMovement = _parrelSyncRuntime.IsAutoLeftClone();
+            _forceLeftMovement = parrelSyncRuntime.IsAutoLeftClone();
         }
         
         public InputFrame Read()

@@ -8,13 +8,10 @@ using Player.Interface.Local;
 using Player.Local;
 using Player.Remote;
 using Player.Shared;
-using Player.Weapon.Projectile;
 using Services;
 using Services.Connections;
 using Services.Interface;
-using Sfs2X;
 using UnityEngine;
-using Utils;
 using Utils.Pool;
 using VContainer;
 
@@ -41,15 +38,12 @@ namespace Di
             Register<PlayerSpawnService>(Lifetime.Singleton);
             Register<PlayerJoinGameService>(Lifetime.Singleton);
             Register<PlayerNetworkStateSender>(Lifetime.Singleton); 
+            Register<ClientStateProvider>(Lifetime.Singleton);
             
-            Builder.RegisterFactory<CharacterController, ClientStateProvider>(
-                characterController => new ClientStateProvider(characterController));
-
-            Builder.RegisterFactory<ISnapshotsService, CharacterController, Transform, IPlayerParameters, IPlayerSnapshotMotor>(
-                (snapshotsService, characterController, playerTransform, playerParameters) =>
+            Builder.RegisterFactory<ISnapshotsService, Transform, IPlayerParameters, IPlayerSnapshotMotor>(
+                (snapshotsService, playerTransform, playerParameters) =>
                     new SnapshotCharacterMotor(
                         snapshotsService,
-                        characterController,
                         playerTransform, 
                         playerParameters));
 
@@ -60,6 +54,7 @@ namespace Di
         private void BindNetwork()
         {
             Register<NetworkStateReceiver>(Lifetime.Singleton);
+            Register<ServerTimeService>(Lifetime.Singleton);
             Register<SnapshotsService>(Lifetime.Transient);
         }
 

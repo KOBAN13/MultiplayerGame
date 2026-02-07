@@ -11,7 +11,6 @@ namespace Player
 {
     public abstract class APlayer : MonoBehaviour
     {
-        [SerializeField] protected CharacterController CharacterController;
         [SerializeField] protected Animator Animator;
         
         public ISnapshotsService SnapshotsService;
@@ -19,14 +18,14 @@ namespace Player
         protected IPlayerSnapshotReceiver PlayerSnapshotReceiver;
         protected IPlayerParameters PlayerParameters;
         
-        private Func<ISnapshotsService, CharacterController, Transform, IPlayerParameters, IPlayerSnapshotMotor> _snapshotMotorFactory;
+        private Func<ISnapshotsService, Transform, IPlayerParameters, IPlayerSnapshotMotor> _snapshotMotorFactory;
         private Func<ISnapshotsService, IPlayerSnapshotReceiver> _playerSnapshotReceiverFactory;
 
         [Inject]
         private void Construct(
             ISnapshotsService snapshotsService, 
             IPlayerParameters playerParameters,
-            Func<ISnapshotsService, CharacterController, Transform, IPlayerParameters, IPlayerSnapshotMotor> snapshotMotorFactory,
+            Func<ISnapshotsService, Transform, IPlayerParameters, IPlayerSnapshotMotor> snapshotMotorFactory,
             Func<ISnapshotsService, IPlayerSnapshotReceiver> playerSnapshotReceiverFactory
         )
         {
@@ -38,7 +37,6 @@ namespace Player
 
             SnapshotMotor = _snapshotMotorFactory(
                 SnapshotsService,
-                CharacterController,
                 transform, 
                 playerParameters);
 

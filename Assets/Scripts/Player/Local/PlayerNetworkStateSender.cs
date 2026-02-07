@@ -31,7 +31,6 @@ namespace Player.Local
         public void SendServerPlayerInput(ClientStateFrame stateFrame)
         {
             var data = SFSObject.NewInstance();
-            data.PutBool("isOnGround", stateFrame.IsGrounded);
             data.PutFloat("eulerAngleY", stateFrame.RotationY);
             data.PutFloat("aimDirectionX", stateFrame.AimDirection.x);
             data.PutFloat("aimDirectionY", stateFrame.AimDirection.y);

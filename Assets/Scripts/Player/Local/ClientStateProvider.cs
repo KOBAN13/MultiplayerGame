@@ -7,16 +7,9 @@ namespace Player.Local
 {
     public class ClientStateProvider : IClientStateProvider
     {
-        private readonly CharacterController _characterController;
-
         private float _rotationCameraY;
         private Vector3 _aimDirection;
         private float _aimPitch;
-
-        public ClientStateProvider(CharacterController characterController)
-        {
-            _characterController = characterController;
-        }
 
         public void Write(float rotationCameraY, Vector3 aimDirection, float aimPitch)
         {
@@ -29,7 +22,6 @@ namespace Player.Local
         {
             return new ClientStateFrame()
             {
-                IsGrounded = _characterController.isGrounded,
                 RotationY = _rotationCameraY,
                 AimDirection = _aimDirection,
                 AimPitch = _aimPitch,

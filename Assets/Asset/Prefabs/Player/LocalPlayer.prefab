@@ -133,8 +133,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1274604797249147770}
-  - component: {fileID: 3331900049285055897}
   - component: {fileID: 283713545885773939}
+  - component: {fileID: 7001152894877146476}
   m_Layer: 7
   m_Name: LocalPlayer
   m_TagString: Untagged
@@ -160,8 +160,25 @@ Transform:
   - {fileID: 481357721493712596}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!143 &3331900049285055897
-CharacterController:
+--- !u!114 &283713545885773939
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7152420423582035163}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8ba99f5d92844798fc4f22dc7d69c18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CharacterController: {fileID: 0}
+  Animator: {fileID: 6636690418272243136}
+  _cameraTarget: {fileID: 2662657865831511742}
+  _yawTarget: {fileID: 481357721493712596}
+  _currentWeapon: {fileID: 4528788046502173804}
+--- !u!136 &7001152894877146476
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -175,33 +192,14 @@ CharacterController:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Height: 3.5
+  serializedVersion: 2
   m_Radius: 0.5
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
+  m_Height: 3.5
+  m_Direction: 1
   m_Center: {x: 0, y: 1.62, z: 0}
---- !u!114 &283713545885773939
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7152420423582035163}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c8ba99f5d92844798fc4f22dc7d69c18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  CharacterController: {fileID: 3331900049285055897}
-  Animator: {fileID: 6636690418272243136}
-  _cameraTarget: {fileID: 2662657865831511742}
-  _yawTarget: {fileID: 481357721493712596}
-  _currentWeapon: {fileID: 4528788046502173804}
 --- !u!1 &8318155460134127011
 GameObject:
   m_ObjectHideFlags: 0

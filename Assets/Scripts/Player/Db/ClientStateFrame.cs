@@ -6,7 +6,6 @@ namespace Player.Db
     {
         public Vector3 AimDirection;
         public float AimPitch;
-        public bool IsGrounded;
         public float RotationY;
         public float Time;
         public int SequenceId;

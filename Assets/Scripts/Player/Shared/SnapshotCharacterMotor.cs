@@ -1,4 +1,3 @@
-using Db;
 using Db.Interface;
 using Player.Interface;
 using Services.Interface;
@@ -9,19 +8,16 @@ namespace Player.Shared
     public class SnapshotCharacterMotor : IPlayerSnapshotMotor
     {
         private readonly ISnapshotsService _snapshotsService;
-        private readonly CharacterController _characterController;
         private readonly Transform _transform;
         private readonly IPlayerParameters _playerParameters;
         private float _rotationVelocity;
 
         public SnapshotCharacterMotor(
             ISnapshotsService snapshotsService,
-            CharacterController characterController,
             Transform transform, 
             IPlayerParameters playerParameters)
         {
             _snapshotsService = snapshotsService;
-            _characterController = characterController;
             _transform = transform;
             _playerParameters = playerParameters;
         }
@@ -35,15 +31,11 @@ namespace Player.Shared
         private void Move()
         {
             var position = _snapshotsService.GetInterpolatedPosition();
-            var direction = (position - _transform.position) * (_playerParameters.SmoothSpeed * Time.deltaTime);
-            _characterController.Move(direction);
+            _transform.position =  position;
         }
 
         private void Rotate(bool isAimRotation)
         {
-            if (!_characterController.isGrounded)
-                return;
-
             var yaw = _snapshotsService.GetInterpolatedRotationDirection();
 
             var rotation = Mathf.SmoothDampAngle(

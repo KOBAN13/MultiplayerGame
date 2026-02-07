@@ -11,12 +11,12 @@ namespace Services
         private readonly List<SnapshotData> _snapshots = new();
         private readonly ISnapshotParameters _snapshotParameters;
 
-        private bool _hasServerTime;
-        private float _serverTimeOffset;
+        private readonly IServerTimeService _serverTimeService;
 
-        public SnapshotsService(ISnapshotParameters snapshotParameters)
+        public SnapshotsService(ISnapshotParameters snapshotParameters, IServerTimeService serverTimeService)
         {
             _snapshotParameters = snapshotParameters;
+            _serverTimeService = serverTimeService;
         }
 
         public void AddSnapshot(in SnapshotData snapshot)
@@ -102,27 +102,12 @@ namespace Services
 
         public void SyncServerTime(float serverTime)
         {
-            if (serverTime <= 0f)
-                return;
-
-            var offset = Time.time - serverTime;
-
-            if (!_hasServerTime)
-            {
-                _serverTimeOffset = offset;
-                _hasServerTime = true;
-                return;
-            }
-            
-            _serverTimeOffset = Mathf.Lerp(_serverTimeOffset, offset, 0.1f);
+            _serverTimeService.SyncServerTime(serverTime);
         }
         
         private float GetServerTime()
         {
-            if (!_hasServerTime)
-                return 0f;
-            
-            return Time.time - _serverTimeOffset;
+            return _serverTimeService.GetServerTime();
         }
 
         private void GetInterpolationPair(out SnapshotData older, out SnapshotData newer, out float time)
