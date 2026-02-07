@@ -107,7 +107,7 @@ namespace Player.Local
             {
                 var t = alpha / 255f;
                 var interpolatedPosition = Vector3.Lerp(older.Position, newer.Position, t);
-                Debug.Log($"[AttackDebug] remoteId={id} older={older.SnapshotId} newer={newer.SnapshotId} alpha={alpha} interpolatePos={interpolatedPosition} snappos={aboba.position} posInWorld={player.transform.position} serverTime={older.ServerTime}");
+                Debug.Log($"[AttackDebug] remoteId={id} older={older.SnapshotId} newer={newer.SnapshotId} alpha={alpha} interpolatePos={interpolatedPosition} snappos={aboba.position} posInWorld={player.RootTransform.position} serverTime={older.ServerTime}");
             }
             
             var fireCommand = new FireCommand

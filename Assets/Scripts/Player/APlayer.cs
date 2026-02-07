@@ -12,6 +12,7 @@ namespace Player
     public abstract class APlayer : MonoBehaviour
     {
         [SerializeField] protected Animator Animator;
+        [SerializeField] public Transform RootTransform;
         
         public ISnapshotsService SnapshotsService;
         protected IPlayerSnapshotMotor SnapshotMotor;
@@ -37,7 +38,7 @@ namespace Player
 
             SnapshotMotor = _snapshotMotorFactory(
                 SnapshotsService,
-                transform, 
+                RootTransform, 
                 playerParameters);
 
             PlayerSnapshotReceiver = _playerSnapshotReceiverFactory(SnapshotsService);

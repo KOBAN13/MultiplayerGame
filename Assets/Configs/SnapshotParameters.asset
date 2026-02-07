@@ -12,5 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5a5e66a19634bbd9f4a6c81c7fbf84d, type: 3}
   m_Name: SnapshotParameters
   m_EditorClassIdentifier: 
-  <MaxBufferSize>k__BackingField: 40
-  <InterpolationBackTime>k__BackingField: 0.1
+  <MaxBufferSize>k__BackingField: 60
+  <InterpolationBackTime>k__BackingField: 0.12
+  <UseAdaptiveBackTime>k__BackingField: 1
+  <AdaptiveBackTimeMin>k__BackingField: 0.1
+  <AdaptiveBackTimeMax>k__BackingField: 0.18
+  <JitterMultiplier>k__BackingField: 2
+  <JitterSmoothing>k__BackingField: 0.1
+  <DebugLogInterval>k__BackingField: 1
+  <EnableInterpolationDebug>k__BackingField: 1

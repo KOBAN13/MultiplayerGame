@@ -43,24 +43,21 @@ namespace Factories
             var loadRemotePrefab = _loaderService.
                 LoadResourcesUsingReference(remotePrefabRef)
                 .ContinueWith(playerInstance =>
-            {
-                if (!playerInstance.resources.TryGetComponent(out RemotePlayer view))
-                    throw new Exception("Failed to load player");
+                {
+                    var view = playerInstance.resources.GetComponentInChildren<RemotePlayer>();
 
-                _remotePlayerPrefab = view;
-                return playerInstance;
-            });
+                    _remotePlayerPrefab = view;
+                    return playerInstance;
+                });
 
             var loadLocalPrefab = _loaderService
                 .LoadResourcesUsingReference(localPrefabRef)
                 .ContinueWith(playerInstance =>
-            {
-                if (!playerInstance.resources.TryGetComponent(out LocalPlayerMotor view))
-                    throw new Exception("Failed to load player");
-
-                _localPlayerMotorPrefab = view;
-                return playerInstance;
-            });
+                {
+                    var view = playerInstance.resources.GetComponentInChildren<LocalPlayerMotor>();
+                    _localPlayerMotorPrefab = view;
+                    return playerInstance;
+                });
             
             _loadTask = UniTask.WhenAll(loadRemotePrefab, loadLocalPrefab);
         }

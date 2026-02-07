@@ -12,6 +12,11 @@ namespace Services
         private readonly ISnapshotParameters _snapshotParameters;
 
         private readonly IServerTimeService _serverTimeService;
+        private float _smoothedJitter;
+        private float _lastArrivalTime;
+        private float _lastServerTime;
+        private bool _hasTiming;
+        private float _lastDebugTime;
 
         public SnapshotsService(ISnapshotParameters snapshotParameters, IServerTimeService serverTimeService)
         {
@@ -24,6 +29,7 @@ namespace Services
             if (_snapshots.Count > 0 && snapshot.ServerTime <= _snapshots[^1].ServerTime)
                 return;
 
+            UpdateTiming(in snapshot);
             _snapshots.Add(snapshot);
 
             if (_snapshots.Count > _snapshotParameters.MaxBufferSize)
@@ -127,7 +133,8 @@ namespace Services
             }
 
             var serverTime = GetServerTime();
-            var interpolationBackTime = serverTime - _snapshotParameters.InterpolationBackTime;
+            var backTime = GetInterpolationBackTime();
+            var interpolationBackTime = serverTime - backTime;
 
             for (var i = _snapshots.Count - 1; i >= 0; i--)
             {
@@ -141,11 +148,85 @@ namespace Services
                     return;
 
                 time = Mathf.InverseLerp(older.ServerTime, newer.ServerTime, interpolationBackTime);
+                TryLogDebug(serverTime, backTime, older, newer, time);
                 return;
             }
 
             older = _snapshots[^1];
             newer = older;
+        }
+
+        private void UpdateTiming(in SnapshotData snapshot)
+        {
+            var arrivalTime = Time.time;
+
+            if (!_hasTiming)
+            {
+                _lastArrivalTime = arrivalTime;
+                _lastServerTime = snapshot.ServerTime;
+                _hasTiming = true;
+                return;
+            }
+
+            var serverDelta = snapshot.ServerTime - _lastServerTime;
+            var arrivalDelta = arrivalTime - _lastArrivalTime;
+
+            if (serverDelta > 0f && arrivalDelta > 0f)
+            {
+                var diff = Mathf.Abs(arrivalDelta - serverDelta);
+                var smoothing = GetJitterSmoothing();
+                _smoothedJitter = Mathf.Lerp(_smoothedJitter, diff, smoothing);
+            }
+
+            _lastArrivalTime = arrivalTime;
+            _lastServerTime = snapshot.ServerTime;
+        }
+
+        private float GetInterpolationBackTime()
+        {
+            var baseBackTime = _snapshotParameters.InterpolationBackTime;
+
+            if (!_snapshotParameters.UseAdaptiveBackTime)
+                return baseBackTime;
+
+            var min = _snapshotParameters.AdaptiveBackTimeMin > 0f
+                ? _snapshotParameters.AdaptiveBackTimeMin
+                : baseBackTime;
+
+            var max = _snapshotParameters.AdaptiveBackTimeMax > 0f
+                ? _snapshotParameters.AdaptiveBackTimeMax
+                : baseBackTime + 0.2f;
+
+            var multiplier = _snapshotParameters.JitterMultiplier > 0f
+                ? _snapshotParameters.JitterMultiplier
+                : 2f;
+
+            var adaptive = baseBackTime + _smoothedJitter * multiplier;
+            return Mathf.Clamp(adaptive, min, max);
+        }
+
+        private float GetJitterSmoothing()
+        {
+            if (_snapshotParameters.JitterSmoothing > 0f && _snapshotParameters.JitterSmoothing <= 1f)
+                return _snapshotParameters.JitterSmoothing;
+
+            return 0.1f;
+        }
+
+        private void TryLogDebug(float serverTime, float backTime, SnapshotData older, SnapshotData newer, float t)
+        {
+            if (!_snapshotParameters.EnableInterpolationDebug)
+                return;
+
+            var interval = _snapshotParameters.DebugLogInterval > 0f ? _snapshotParameters.DebugLogInterval : 1f;
+            if (Time.time - _lastDebugTime < interval)
+                return;
+
+            _lastDebugTime = Time.time;
+            Debug.Log(
+                $"[InterpolationDebug] count={_snapshots.Count} serverTime={serverTime:F3} backTime={backTime:F3} " +
+                $"older={older.SnapshotId}:{older.ServerTime:F3} newer={newer.SnapshotId}:{newer.ServerTime:F3} " +
+                $"t={t:F3} jitter={_smoothedJitter:F3}");
         }
     }
 }
