@@ -70,39 +70,18 @@ namespace Services
                 : Mathf.LerpAngle(older.Rotation, newer.Rotation, time);
         }
 
-        public (long snapshotId, byte alpha, Vector3 position) GetRenderSnapshotId()
+        public (long snapshotId, byte alpha) GetRenderSnapshotId()
         {
             switch (_snapshots.Count)
             {
                 case 0:
-                    return (0, 0, Vector3.zero);
+                    return (0, 0);
                 case 1:
-                    return (_snapshots[0].SnapshotId, 0, Vector3.zero);
+                    return (_snapshots[0].SnapshotId, 0);
                 default:
                     GetInterpolationPair(out var older, out var newer, out var time);
                     var alpha = (byte) Mathf.Clamp(Mathf.RoundToInt(time * 255f), 0, 255);
-                    return (older.SnapshotId, alpha, older.Position);
-            }
-        }
-
-        public bool TryGetInterpolationSnapshots(out SnapshotData older, out SnapshotData newer, out byte alpha)
-        {
-            older = default;
-            newer = default;
-            alpha = 0;
-
-            switch (_snapshots.Count)
-            {
-                case 0:
-                    return false;
-                case 1:
-                    older = _snapshots[0];
-                    newer = older;
-                    return true;
-                default:
-                    GetInterpolationPair(out older, out newer, out var time);
-                    alpha = (byte)Mathf.Clamp(Mathf.RoundToInt(time * 255f), 0, 255);
-                    return true;
+                    return (older.SnapshotId, alpha);
             }
         }
 
@@ -223,6 +202,7 @@ namespace Services
                 return;
 
             _lastDebugTime = Time.time;
+            
             Debug.Log(
                 $"[InterpolationDebug] count={_snapshots.Count} serverTime={serverTime:F3} backTime={backTime:F3} " +
                 $"older={older.SnapshotId}:{older.ServerTime:F3} newer={newer.SnapshotId}:{newer.ServerTime:F3} " +

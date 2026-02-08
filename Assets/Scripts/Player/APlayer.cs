@@ -14,7 +14,7 @@ namespace Player
         [SerializeField] protected Animator Animator;
         [SerializeField] public Transform RootTransform;
         
-        public ISnapshotsService SnapshotsService;
+        protected ISnapshotsService SnapshotsService;
         protected IPlayerSnapshotMotor SnapshotMotor;
         protected IPlayerSnapshotReceiver PlayerSnapshotReceiver;
         protected IPlayerParameters PlayerParameters;

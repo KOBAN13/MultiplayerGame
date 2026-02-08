@@ -71,7 +71,7 @@ namespace Player.Weapon
         private void SimulateShot(SingleShotWeaponData weaponData, ShotData shotData, FireCommand command)
         {
             var distance = weaponData.DistanceToShot;
-            
+
             if (Physics.Raycast(shotData.origin, 
                     shotData.direction, 
                     out var hit,
@@ -82,11 +82,11 @@ namespace Player.Weapon
                 var hitPoint = hit.point;
                 
                 var projectileData = SingleShotWeaponData.ProjectileData;
-
-                hit.collider.TryGetComponent(out APlayer player);
                     
                 _projectile.InitializeProjectile(projectileData, _poolService);
                 _projectile.Launch(EObjectInPoolName.BulletImpactEffect, hitPoint);
+                
+                Debug.LogError("Hit name: " + hit.collider.name);
                 
                 _lastShotRayOrigin = shotData.origin;
                 _lastShotRayDirection = shotData.direction;

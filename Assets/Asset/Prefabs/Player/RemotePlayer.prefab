@@ -102,7 +102,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4438595230631595140}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Offset
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -136,7 +136,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2727283764638856046}
   - component: {fileID: 1325366753790880102}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ServerRoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -275,7 +275,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4581746200053470398}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: VisualRoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}

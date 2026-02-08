@@ -1,12 +1,9 @@
-﻿using System;
-using Db.Interface;
+﻿using Db.Interface;
 using Input;
 using Player.Db;
 using Player.Interface.Local;
 using Player.Weapon;
 using R3;
-using Services.Interface;
-using Sfs2X;
 using UnityEngine;
 using Utils.Enums;
 using VContainer;
@@ -32,9 +29,6 @@ namespace Player.Local
         private float _targetYaw;
         private float _targetPitch;
         private UnityEngine.Camera _mainCamera;
-        
-        private IRemotePlayerRegistry _playerRegistry;
-        private SmartFox _smartFox;
 
         private const float THRESHOLD = 0.01f;
 
@@ -44,19 +38,14 @@ namespace Player.Local
             IRotationCameraParameters rotationCameraParameters,
             IPlayerCameraHolder playerCameraHolder,
             IPlayerNetworkStateSender playerNetworkStateSender,
-            IRemotePlayerRegistry playerRegistry,
-            IClientStateProvider clientStateProvider,
-            SmartFox smartFox
+            IClientStateProvider clientStateProvider
         )
         {
-            _playerRegistry = playerRegistry;
-            
             _playerNetworkStateSender = playerNetworkStateSender;
             _inputSource = inputSource;
             _rotationCameraParameters = rotationCameraParameters;
             _playerCameraHolder = playerCameraHolder;
             _clientStateProvider = clientStateProvider;
-            _smartFox = smartFox;
         }
         
         public Transform GetTransform()
@@ -88,33 +77,11 @@ namespace Player.Local
             _lastInputFrame = _inputSource.Read();
 
             var render = SnapshotsService.GetRenderSnapshotId();
-
-            var room = _smartFox.LastJoinedRoom;
-
-            int id = 0;
-
-            foreach (var user in room.PlayerList)
-            {
-                if (!user.IsItMe)
-                    id = user.Id;
-            }
-
-            _playerRegistry.TryGet(id, out var player);
-
-            var aboba = player.SnapshotsService.GetRenderSnapshotId();
-
-            if (player.SnapshotsService.TryGetInterpolationSnapshots(out var older, out var newer, out var alpha))
-            {
-                var t = alpha / 255f;
-                var interpolatedPosition = Vector3.Lerp(older.Position, newer.Position, t);
-                Debug.Log($"[AttackDebug] remoteId={id} older={older.SnapshotId} newer={newer.SnapshotId} alpha={alpha} interpolatePos={interpolatedPosition} snappos={aboba.position} posInWorld={player.RootTransform.position} serverTime={older.ServerTime}");
-            }
             
             var fireCommand = new FireCommand
             {
                 snapshotId = render.snapshotId,
                 alpha = render.alpha,
-                position = aboba.position,
                 shotData = new ShotData
                 {
                     origin = _lastInputFrame.Origin,

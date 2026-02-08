@@ -13,10 +13,8 @@ namespace DebugUtils
     #if UNITY_EDITOR
     public class DrawServerShape : SerializedMonoBehaviour
     {
-        private SmartFox _sfs;
         [OdinSerialize] private Dictionary<string, ShapeData> _shapeData = new();
-        private bool _hasLagCompensationPoint;
-        private Vector3 _lagCompensationPoint;
+        private SmartFox _sfs;
 
         [Inject]
         private void Construct(SmartFox sfs)
@@ -27,28 +25,6 @@ namespace DebugUtils
         private void Awake()
         {
             _sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnDrawServerShape);
-            _sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnDrawPositionLagCompensation);
-        }
-
-        private void OnDrawPositionLagCompensation(BaseEvent evt)
-        {
-            var cmd = (string)evt.Params[SFSResponseHelper.CMD];
-            
-            if (cmd != SFSResponseHelper.RAYCAST)
-                return;
-            
-            var data = (SFSObject)evt.Params["params"];
-            
-            var positionX = data.GetFloat("testX");
-            var positionY = data.GetFloat("testY");
-            var positionZ = data.GetFloat("testZ");
-
-            _lagCompensationPoint = new Vector3(positionX, positionY, positionZ);
-            _hasLagCompensationPoint = true;
-            
-            Debug.LogError("Interpolated position: "  + _lagCompensationPoint);
-            
-            Debug.Break();
         }
 
         private void OnDrawServerShape(BaseEvent evt)
@@ -164,13 +140,6 @@ namespace DebugUtils
                         Gizmos.DrawWireCube(center, size);
                     }
                 }
-            }
-
-            if (_hasLagCompensationPoint)
-            {
-                Gizmos.matrix = Matrix4x4.identity;
-                Gizmos.color = Color.red;
-                Gizmos.DrawSphere(_lagCompensationPoint, 0.2f);
             }
 
             Gizmos.matrix = originalMatrix;

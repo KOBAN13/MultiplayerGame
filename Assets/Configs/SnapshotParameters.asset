@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SnapshotParameters
   m_EditorClassIdentifier: 
   <MaxBufferSize>k__BackingField: 60
-  <InterpolationBackTime>k__BackingField: 0.12
+  <InterpolationBackTime>k__BackingField: 0.15
   <UseAdaptiveBackTime>k__BackingField: 1
   <AdaptiveBackTimeMin>k__BackingField: 0.1
   <AdaptiveBackTimeMax>k__BackingField: 0.18
