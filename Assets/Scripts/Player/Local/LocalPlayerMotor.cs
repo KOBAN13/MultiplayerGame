@@ -4,6 +4,8 @@ using Player.Db;
 using Player.Interface.Local;
 using Player.Weapon;
 using R3;
+using Services.Interface;
+using Services.Prediction;
 using UnityEngine;
 using Utils.Enums;
 using VContainer;
@@ -22,6 +24,7 @@ namespace Player.Local
         private IPlayerNetworkStateSender _playerNetworkStateSender;
         private IRotationCameraParameters _rotationCameraParameters;
         private IPlayerCameraHolder _playerCameraHolder;
+        private IPreconditionStorageService _preconditionStorage;
         
         private readonly RaycastHit[] _hits = new RaycastHit[1];
         private InputFrame _lastInputFrame;
@@ -39,7 +42,8 @@ namespace Player.Local
             IRotationCameraParameters rotationCameraParameters,
             IPlayerCameraHolder playerCameraHolder,
             IPlayerNetworkStateSender playerNetworkStateSender,
-            IClientStateProvider clientStateProvider
+            IClientStateProvider clientStateProvider,
+            PreconditionStorageService preconditionStorage
         )
         {
             _playerNetworkStateSender = playerNetworkStateSender;
@@ -47,6 +51,7 @@ namespace Player.Local
             _rotationCameraParameters = rotationCameraParameters;
             _playerCameraHolder = playerCameraHolder;
             _clientStateProvider = clientStateProvider;
+            _preconditionStorage = preconditionStorage;
         }
         
         public Transform GetTransform()

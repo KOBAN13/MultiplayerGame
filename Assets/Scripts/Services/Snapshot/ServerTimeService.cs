@@ -1,7 +1,7 @@
-using UnityEngine;
 using Services.Interface;
+using UnityEngine;
 
-namespace Services
+namespace Services.Snapshot
 {
     public class ServerTimeService : IServerTimeService
     {

@@ -80,6 +80,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - config
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6b1f17c755ba96c4bbacef4de9911873
+    m_Address: Assets/Configs/PredictionParameters.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7d46842bb1b583741ba01007f64944c8
     m_Address: Assets/Prefabs/Screens/LoadingScreen.prefab
     m_ReadOnly: 0

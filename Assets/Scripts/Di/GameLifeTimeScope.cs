@@ -11,6 +11,7 @@ using Player.Shared;
 using Services;
 using Services.Connections;
 using Services.Interface;
+using Services.Snapshot;
 using UnityEngine;
 using Utils.Pool;
 using VContainer;

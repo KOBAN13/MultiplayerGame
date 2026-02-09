@@ -177,6 +177,7 @@ MonoBehaviour:
   _cameraTarget: {fileID: 2662657865831511742}
   _yawTarget: {fileID: 481357721493712596}
   _currentWeapon: {fileID: 4528788046502173804}
+  _characterController: {fileID: 0}
 --- !u!143 &7226808999603200774
 CharacterController:
   m_ObjectHideFlags: 0
@@ -343,7 +344,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8355776026296062750, guid: 5503f35ef3a8149418b9df77fe0f2afd, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.4
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8248424538913257337, guid: 5503f35ef3a8149418b9df77fe0f2afd, type: 3}
       propertyPath: m_Layer
