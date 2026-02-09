@@ -15,7 +15,7 @@ MonoBehaviour:
   m_DefaultGroup: ca3a1faeb5a70e74c8085193a6bba460
   m_currentHash:
     serializedVersion: 2
-    Hash: 6d222c26df0de35f1fe331b0126f389d
+    Hash: 9f7d01fdb0c2eb782d6c507317aa9eaa
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 0
   m_CatalogRequestsTimeout: 0
@@ -33,6 +33,7 @@ MonoBehaviour:
   m_UniqueBundleIds: 0
   m_EnableJsonCatalog: 0
   m_NonRecursiveBuilding: 1
+  m_AllowNestedBundleFolders: 0
   m_CCDEnabled: 0
   m_maxConcurrentWebRequests: 3
   m_UseUWRForLocalBundles: 0

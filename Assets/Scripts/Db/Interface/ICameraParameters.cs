@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Player.Camera;
+using Db.Players;
 using Utils.Enums;
 
 namespace Db.Interface

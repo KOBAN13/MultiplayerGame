@@ -40,6 +40,12 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2263d452b9ae62345919a0ab4540e2ba
+    m_Address: Assets/Configs/RemotePlayerParameters.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 2c49a6448fe096040bc408d1b535c75e
     m_Address: Assets/Configs/PlayerParameters.asset
     m_ReadOnly: 0

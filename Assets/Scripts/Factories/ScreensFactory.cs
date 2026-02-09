@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Cysharp.Threading.Tasks;
 using Db;
+using Db.AddressablesData;
 using GameCore.Factories;
 using Services.SceneManagement;
 using UI.Base;

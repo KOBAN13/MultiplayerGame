@@ -9,17 +9,17 @@ namespace Player.Shared
     {
         private readonly ISnapshotsService _snapshotsService;
         private readonly Transform _transform;
-        private readonly IPlayerParameters _playerParameters;
+        private readonly IRemotePlayerParameters _remotePlayerParameters;
         private float _rotationVelocity;
 
         public SnapshotCharacterMotor(
             ISnapshotsService snapshotsService,
             Transform transform, 
-            IPlayerParameters playerParameters)
+            IRemotePlayerParameters remotePlayerParameters)
         {
             _snapshotsService = snapshotsService;
             _transform = transform;
-            _playerParameters = playerParameters;
+            _remotePlayerParameters = remotePlayerParameters;
         }
 
         public void Tick(bool isAim)
@@ -42,7 +42,7 @@ namespace Player.Shared
                 _transform.eulerAngles.y,
                 yaw,
                 ref _rotationVelocity,
-                _playerParameters.RotationSmoothTime
+                _remotePlayerParameters.RotationSmoothTime
             );
 
             if (!isAimRotation)

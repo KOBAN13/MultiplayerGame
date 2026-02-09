@@ -2,6 +2,7 @@
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Db;
+using Db.AddressablesData;
 using Factories;
 using UI.View;
 using UnityEngine;

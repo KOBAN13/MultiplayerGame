@@ -1,6 +1,6 @@
 ﻿using Sfs2X.Entities;
 
-namespace Db
+namespace Db.Server
 {
     public class RoomData
     {

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f072146bc5794f3183d7c7f5269cbe49, type: 3}
-  m_Name: PlayerParameters
+  m_Name: LocalPlayerParameters
   m_EditorClassIdentifier: 
   <SmoothSpeed>k__BackingField: 12
   <RotationSmoothTime>k__BackingField: 0.12

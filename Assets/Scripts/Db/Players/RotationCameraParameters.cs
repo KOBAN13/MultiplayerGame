@@ -1,7 +1,7 @@
 ﻿using Db.Interface;
 using UnityEngine;
 
-namespace Db
+namespace Db.Players
 {
     [CreateAssetMenu(fileName = "RotationCameraParameters", menuName = "Db/RotationCameraParameters")]
     public class RotationCameraParameters : ScriptableObject, IRotationCameraParameters

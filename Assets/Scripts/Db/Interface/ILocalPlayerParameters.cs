@@ -1,8 +1,7 @@
 ﻿namespace Db.Interface
 {
-    public interface IPlayerParameters
+    public interface ILocalPlayerParameters
     {
-        float SmoothSpeed { get; }
         float RotationSmoothTime { get; }
     }
 }

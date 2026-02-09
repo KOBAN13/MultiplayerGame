@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using Db.Dictionary;
 using Db.Interface;
-using Player.Camera;
 using UnityEngine;
 using Utils.Enums;
 
-namespace Db
+namespace Db.Players
 {
     [CreateAssetMenu(fileName = "CameraParameters", menuName = "Db/CameraParameters")]
     public class CameraParameters : ScriptableObject, ICameraParameters

@@ -15,6 +15,7 @@ namespace Player.Local
         [SerializeField] private Transform _cameraTarget;
         [SerializeField] private Transform _yawTarget;
         [SerializeField] private AWeapon _currentWeapon;
+        [SerializeField] private CharacterController _characterController;
         
         private IInputSource _inputSource;
         private IClientStateProvider _clientStateProvider;
@@ -99,7 +100,7 @@ namespace Player.Local
             _lastClientStateFrame = _clientStateProvider.Read(_lastInputFrame);
             _playerNetworkStateSender.SendServerPlayerState(_lastInputFrame);
             _playerNetworkStateSender.SendServerPlayerInput(_lastClientStateFrame);
-            SnapshotMotor.Tick(_lastInputFrame.Aim); 
+            //SnapshotMotor.Tick(_lastInputFrame.Aim); 
         }
 
         public void LateUpdate()

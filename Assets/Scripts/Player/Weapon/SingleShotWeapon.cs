@@ -86,8 +86,6 @@ namespace Player.Weapon
                 _projectile.InitializeProjectile(projectileData, _poolService);
                 _projectile.Launch(EObjectInPoolName.BulletImpactEffect, hitPoint);
                 
-                Debug.LogError("Hit name: " + hit.collider.name);
-                
                 _lastShotRayOrigin = shotData.origin;
                 _lastShotRayDirection = shotData.direction;
                 _positionPlayerInShoot = command.position;

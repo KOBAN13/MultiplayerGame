@@ -2,7 +2,7 @@
 using UnityEngine;
 using Utils.Enums;
 
-namespace Db
+namespace Db.Server
 {
     [Serializable]
     public class CollisionShapeData

@@ -40,7 +40,7 @@ namespace Di
             Register<PlayerNetworkStateSender>(Lifetime.Singleton); 
             Register<ClientStateProvider>(Lifetime.Singleton);
             
-            Builder.RegisterFactory<ISnapshotsService, Transform, IPlayerParameters, IPlayerSnapshotMotor>(
+            Builder.RegisterFactory<ISnapshotsService, Transform, IRemotePlayerParameters, IPlayerSnapshotMotor>(
                 (snapshotsService, playerTransform, playerParameters) =>
                     new SnapshotCharacterMotor(
                         snapshotsService,

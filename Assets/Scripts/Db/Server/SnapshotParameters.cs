@@ -1,7 +1,7 @@
 ﻿using Db.Interface;
 using UnityEngine;
 
-namespace Db
+namespace Db.Server
 {
     [CreateAssetMenu(fileName = "SnapshotParameters", menuName = "Db/SnapshotParameters")]
     public class SnapshotParameters : ScriptableObject, ISnapshotParameters

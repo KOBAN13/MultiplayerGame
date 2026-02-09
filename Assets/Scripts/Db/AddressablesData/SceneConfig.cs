@@ -4,7 +4,7 @@ using UI.Base;
 using UnityEngine;
 using Utils;
 
-namespace Db
+namespace Db.AddressablesData
 {
     [CreateAssetMenu(fileName = "SceneConfig", menuName = "Db/SceneConfig")]
     public class ScreensData : SerializedScriptableObject

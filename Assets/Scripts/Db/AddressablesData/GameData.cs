@@ -5,7 +5,7 @@ using Player.Remote;
 using UnityEngine;
 using Utils;
 
-namespace Db
+namespace Db.AddressablesData
 {
     [CreateAssetMenu(fileName = "GameData", menuName = "Db/GameData")]
     public class GameData : ScriptableObject, IGameData

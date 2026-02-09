@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Db
+namespace Db.Players
 {
     [Serializable]
     public class PlayerCamerasParameters

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Db
+namespace Db.AnimationData
 {
     [CreateAssetMenu(fileName = "FadeButtonAnimationData", menuName = "Db/FadeButtonAnimationData")]
     public class FadeButtonAnimationData : ScriptableObject

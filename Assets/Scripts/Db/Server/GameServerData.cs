@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Db
+namespace Db.Server
 {
     [Serializable]
     public class GameServerData

@@ -1,4 +1,5 @@
 ﻿using Db;
+using Db.AnimationData;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;

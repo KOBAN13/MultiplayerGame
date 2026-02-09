@@ -1,5 +1,4 @@
 ﻿using System;
-using Db.Interface;
 using Player.Db;
 using Player.Interface;
 using Player.Interface.Local;
@@ -12,36 +11,19 @@ namespace Player
     public abstract class APlayer : MonoBehaviour
     {
         [SerializeField] protected Animator Animator;
-        [SerializeField] public Transform RootTransform;
+        [SerializeField] protected Transform RootTransform;
         
         protected ISnapshotsService SnapshotsService;
-        protected IPlayerSnapshotMotor SnapshotMotor;
         protected IPlayerSnapshotReceiver PlayerSnapshotReceiver;
-        protected IPlayerParameters PlayerParameters;
-        
-        private Func<ISnapshotsService, Transform, IPlayerParameters, IPlayerSnapshotMotor> _snapshotMotorFactory;
-        private Func<ISnapshotsService, IPlayerSnapshotReceiver> _playerSnapshotReceiverFactory;
 
         [Inject]
         private void Construct(
             ISnapshotsService snapshotsService, 
-            IPlayerParameters playerParameters,
-            Func<ISnapshotsService, Transform, IPlayerParameters, IPlayerSnapshotMotor> snapshotMotorFactory,
             Func<ISnapshotsService, IPlayerSnapshotReceiver> playerSnapshotReceiverFactory
         )
         {
             SnapshotsService = snapshotsService;
-            PlayerParameters = playerParameters;
-
-            _snapshotMotorFactory = snapshotMotorFactory;
-            _playerSnapshotReceiverFactory = playerSnapshotReceiverFactory;
-
-            SnapshotMotor = _snapshotMotorFactory(
-                SnapshotsService,
-                RootTransform, 
-                playerParameters);
-
-            PlayerSnapshotReceiver = _playerSnapshotReceiverFactory(SnapshotsService);
+            PlayerSnapshotReceiver = playerSnapshotReceiverFactory(SnapshotsService);
         }
         
         public virtual void SetAnimationState(string state)
