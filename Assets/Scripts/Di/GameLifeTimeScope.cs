@@ -6,11 +6,13 @@ using Player.Camera;
 using Player.Interface;
 using Player.Interface.Local;
 using Player.Local;
+using Player.Prediction;
 using Player.Remote;
 using Player.Shared;
 using Services;
 using Services.Connections;
 using Services.Interface;
+using Services.Prediction;
 using Services.Snapshot;
 using UnityEngine;
 using Utils.Pool;
@@ -40,6 +42,9 @@ namespace Di
             Register<PlayerJoinGameService>(Lifetime.Singleton);
             Register<PlayerNetworkStateSender>(Lifetime.Singleton); 
             Register<ClientStateProvider>(Lifetime.Singleton);
+            Register<PredictionSender>(Lifetime.Singleton);
+            Register<PredictionStateProvider>(Lifetime.Singleton);
+            Register<PredictionBuffer>(Lifetime.Singleton);
             
             Builder.RegisterFactory<ISnapshotsService, Transform, IRemotePlayerParameters, IPlayerSnapshotMotor>(
                 (snapshotsService, playerTransform, playerParameters) =>
@@ -74,6 +79,7 @@ namespace Di
         private void BindService()
         {
             Register<PoolService>(Lifetime.Singleton);
+            Register<PreconditionStorageService>(Lifetime.Singleton);
         }
     }
 }

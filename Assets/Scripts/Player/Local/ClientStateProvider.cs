@@ -25,8 +25,6 @@ namespace Player.Local
                 RotationY = _rotationCameraY,
                 AimDirection = _aimDirection,
                 AimPitch = _aimPitch,
-                Time = inputFrame.Time,
-                SequenceId = inputFrame.SequenceId,
             };
         }
     }

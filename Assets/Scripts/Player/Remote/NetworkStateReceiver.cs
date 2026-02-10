@@ -93,6 +93,7 @@ namespace Player.Remote
                 var playerData = player.GetSFSObject(i);
                 var userId = playerData.GetInt("userId");
                 var snapshotId = playerData.GetLong("snapshotId");
+                var lastProcessedInputSequence = playerData.GetLong("lastProcessedInputSequence");
                 var xPosition = playerData.GetFloat("x");
                 var yPosition = playerData.GetFloat("y");
                 var zPosition = playerData.GetFloat("z");
@@ -115,7 +116,8 @@ namespace Player.Remote
                     Input = direction,
                     Rotation = rotation,
                     ServerTime = serverTime,
-                    SnapshotId = snapshotId
+                    SnapshotId = snapshotId,
+                    LastProcessedInputSequence = lastProcessedInputSequence
                 };
                 
                 remotePlayer.SetSnapshot(in snapshotData);

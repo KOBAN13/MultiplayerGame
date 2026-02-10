@@ -4,8 +4,7 @@ namespace Player.Db
 {
     public struct PredictionStateFrame
     {
-        public long InputTick;
-        public long ServerTick;
+        public ulong InputTick;
         
         public Vector3 Movement;
         public Vector2 Look;
@@ -14,6 +13,8 @@ namespace Player.Db
         public bool Jump;
         public bool Run;
         public bool Aim;
-        public bool Shoot;
+        public Vector3 AimDirection;
+        public float AimPitch;
+        public float RotationY;
     }
 }

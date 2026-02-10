@@ -7,5 +7,6 @@ namespace Db.Server
     public class PredictionParameters : ScriptableObject, IPredictionParameters
     {
         [field: SerializeField] public int MaxBufferSize { get; private set; }
+        [field: SerializeField] public int CountGenerateStateInSeconds { get; private set; }
     }
 }

@@ -11,8 +11,5 @@ namespace Input
         public bool Jump;
         public bool Run;
         public bool Aim;
-        public bool Shoot;
-        public float Time;
-        public int SequenceId;
     }
 }

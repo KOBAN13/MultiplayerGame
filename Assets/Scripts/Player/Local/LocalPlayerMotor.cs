@@ -4,8 +4,6 @@ using Player.Db;
 using Player.Interface.Local;
 using Player.Weapon;
 using R3;
-using Services.Interface;
-using Services.Prediction;
 using UnityEngine;
 using Utils.Enums;
 using VContainer;
@@ -24,7 +22,8 @@ namespace Player.Local
         private IPlayerNetworkStateSender _playerNetworkStateSender;
         private IRotationCameraParameters _rotationCameraParameters;
         private IPlayerCameraHolder _playerCameraHolder;
-        private IPreconditionStorageService _preconditionStorage;
+        private IPredictionStateProvider _predictionStateProvider;
+        private IPredictionBuffer _predictionBuffer;
         
         private readonly RaycastHit[] _hits = new RaycastHit[1];
         private InputFrame _lastInputFrame;
@@ -43,7 +42,8 @@ namespace Player.Local
             IPlayerCameraHolder playerCameraHolder,
             IPlayerNetworkStateSender playerNetworkStateSender,
             IClientStateProvider clientStateProvider,
-            PreconditionStorageService preconditionStorage
+            IPredictionStateProvider predictionStateProvider,
+            IPredictionBuffer predictionBuffer
         )
         {
             _playerNetworkStateSender = playerNetworkStateSender;
@@ -51,7 +51,8 @@ namespace Player.Local
             _rotationCameraParameters = rotationCameraParameters;
             _playerCameraHolder = playerCameraHolder;
             _clientStateProvider = clientStateProvider;
-            _preconditionStorage = preconditionStorage;
+            _predictionStateProvider = predictionStateProvider;
+            _predictionBuffer = predictionBuffer;
         }
         
         public Transform GetTransform()
@@ -103,6 +104,7 @@ namespace Player.Local
             _clientStateProvider.Write(_mainCamera.transform.rotation.eulerAngles.y, _aimDirection, _targetPitch);
             _lastInputFrame = _inputSource.Read();
             _lastClientStateFrame = _clientStateProvider.Read(_lastInputFrame);
+            _predictionBuffer.Enqueue(_predictionStateProvider.Read(_lastInputFrame, _lastClientStateFrame));
             _playerNetworkStateSender.SendServerPlayerState(_lastInputFrame);
             _playerNetworkStateSender.SendServerPlayerInput(_lastClientStateFrame);
             //SnapshotMotor.Tick(_lastInputFrame.Aim); 
