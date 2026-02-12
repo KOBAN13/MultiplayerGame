@@ -6,7 +6,7 @@ namespace Player.Prediction
 {
     public class PredictionStateProvider : IPredictionStateProvider
     {
-        private ulong _inputTick;
+        private long _inputTick;
         
         public PredictionStateFrame Read(InputFrame inputFrame, ClientStateFrame clientStateFrame)
         {

@@ -4,7 +4,7 @@ namespace Player.Db
 {
     public struct PredictionStateFrame
     {
-        public ulong InputTick;
+        public long InputTick;
         
         public Vector3 Movement;
         public Vector2 Look;

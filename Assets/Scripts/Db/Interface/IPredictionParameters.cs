@@ -3,6 +3,7 @@
     public interface IPredictionParameters
     {
         int MaxBufferSize { get; }
-        int CountGenerateStateInSeconds { get; }
+        int CountGenerateStateSendToServer { get; }
+        int CountGenerateStateLocalSimulation { get; }
     }
 }

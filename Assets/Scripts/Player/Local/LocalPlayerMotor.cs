@@ -1,4 +1,5 @@
-﻿using Db.Interface;
+﻿using System;
+using Db.Interface;
 using Input;
 using Player.Db;
 using Player.Interface.Local;
@@ -24,10 +25,12 @@ namespace Player.Local
         private IPlayerCameraHolder _playerCameraHolder;
         private IPredictionStateProvider _predictionStateProvider;
         private IPredictionBuffer _predictionBuffer;
+        private IPredictionParameters _predictionParameters;
         
         private readonly RaycastHit[] _hits = new RaycastHit[1];
         private InputFrame _lastInputFrame;
         private ClientStateFrame _lastClientStateFrame;
+        private PredictionStateFrame _lastPredictionStateFrame;
         private Vector3 _aimDirection;
         private float _targetYaw;
         private float _targetPitch;
@@ -43,7 +46,8 @@ namespace Player.Local
             IPlayerNetworkStateSender playerNetworkStateSender,
             IClientStateProvider clientStateProvider,
             IPredictionStateProvider predictionStateProvider,
-            IPredictionBuffer predictionBuffer
+            IPredictionBuffer predictionBuffer,
+            IPredictionParameters predictionParameters
         )
         {
             _playerNetworkStateSender = playerNetworkStateSender;
@@ -53,6 +57,7 @@ namespace Player.Local
             _clientStateProvider = clientStateProvider;
             _predictionStateProvider = predictionStateProvider;
             _predictionBuffer = predictionBuffer;
+            _predictionParameters = predictionParameters;
         }
         
         public Transform GetTransform()
@@ -76,6 +81,13 @@ namespace Player.Local
             _inputSource.ShotCommand
                 .Where(isShot => isShot && _lastInputFrame.Aim)
                 .Subscribe(_ => OnPlayerAttack())
+                .AddTo(this);
+            
+            var period = TimeSpan.FromSeconds(1f / _predictionParameters.CountGenerateStateLocalSimulation);
+            var time = 1f / _predictionParameters.CountGenerateStateLocalSimulation;
+            
+            Observable.Interval(period)
+                .Subscribe(_ => CharacterMove(time))
                 .AddTo(this);
         }
 
@@ -104,12 +116,10 @@ namespace Player.Local
             _clientStateProvider.Write(_mainCamera.transform.rotation.eulerAngles.y, _aimDirection, _targetPitch);
             _lastInputFrame = _inputSource.Read();
             _lastClientStateFrame = _clientStateProvider.Read(_lastInputFrame);
-            _predictionBuffer.Enqueue(_predictionStateProvider.Read(_lastInputFrame, _lastClientStateFrame));
             _playerNetworkStateSender.SendServerPlayerState(_lastInputFrame);
             _playerNetworkStateSender.SendServerPlayerInput(_lastClientStateFrame);
-            //SnapshotMotor.Tick(_lastInputFrame.Aim); 
         }
-
+        
         public void LateUpdate()
         {
             _cameraTarget.rotation = RotateCamera(_lastInputFrame.Look);
@@ -118,6 +128,36 @@ namespace Player.Local
             {
                 LocalRotate();
             }
+        }
+
+        private void CharacterMove(float time)
+        {
+            _lastPredictionStateFrame = _predictionStateProvider.Read(_lastInputFrame, _lastClientStateFrame);
+            _predictionBuffer.Enqueue(_lastPredictionStateFrame);
+            
+            var targetSpeed = _lastPredictionStateFrame.Run ? 8f : 4f;
+
+            var inputDirection = new Vector3(_lastPredictionStateFrame.Movement.x, 0f, _lastPredictionStateFrame.Movement.z);
+            
+            if (inputDirection.sqrMagnitude < 0.0001f)
+                return;
+
+            var inputMagnitude = Mathf.Clamp01(inputDirection.magnitude);
+            var cameraRotation = Quaternion.Euler(0f, _lastPredictionStateFrame.RotationY, 0f);
+            var moveDirection = (cameraRotation * inputDirection).normalized;
+
+            if (!_lastPredictionStateFrame.Aim)
+            {
+                var targetRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
+                transform.rotation = Quaternion.Slerp(
+                    transform.rotation,
+                    targetRotation,
+                    time * _rotationCameraParameters.RotateSpeed);
+            }
+            
+            var direction = moveDirection * (targetSpeed * inputMagnitude * time);
+            
+            _characterController.Move(direction);
         }
         
         private void OnPlayerAim(bool isAim)

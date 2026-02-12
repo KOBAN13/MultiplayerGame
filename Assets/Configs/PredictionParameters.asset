@@ -13,3 +13,5 @@ MonoBehaviour:
   m_Name: PredictionParameters
   m_EditorClassIdentifier: 
   <MaxBufferSize>k__BackingField: 60
+  <CountGenerateStateSendToServer>k__BackingField: 30
+  <CountGenerateStateLocalSimulation>k__BackingField: 60
