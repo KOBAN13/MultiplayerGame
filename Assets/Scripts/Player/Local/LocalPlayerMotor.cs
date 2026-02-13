@@ -90,8 +90,9 @@ namespace Player.Local
                 .Subscribe(_ => OnPlayerAttack())
                 .AddTo(this);
             
-            var period = TimeSpan.FromSeconds(1f / _predictionParameters.CountGenerateStateLocalSimulation);
-            var time = 1f / _predictionParameters.CountGenerateStateLocalSimulation;
+            var localSimulationRate = Math.Max(1, _predictionParameters.CountGenerateStateLocalSimulation);
+            var period = TimeSpan.FromSeconds(1f / localSimulationRate);
+            var time = 1f / localSimulationRate;
             
             Observable.Interval(period)
                 .Subscribe(_ => CharacterMove(time))
