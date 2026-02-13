@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Helpers;
 using Player.Db;
 using Services.Db;
@@ -18,18 +19,20 @@ namespace Player.Remote
         private readonly SmartFox _sfs;
         private readonly IPlayerJoinGameService _playerJoinGameService;
         private readonly IRemotePlayerRegistry _remotePlayerRegistry;
+        private readonly IPreconditionStorageService _preconditionStorage;
         
         private const string ROOM_GROUP_NAME = "Game";
         
         public NetworkStateReceiver(
             SmartFox sfs,
             IPlayerJoinGameService playerJoinGameService,
-            IRemotePlayerRegistry remotePlayerRegistry
-        )
+            IRemotePlayerRegistry remotePlayerRegistry, 
+            IPreconditionStorageService preconditionStorage)
         {
             _sfs = sfs;
             _playerJoinGameService = playerJoinGameService;
             _remotePlayerRegistry = remotePlayerRegistry;
+            _preconditionStorage = preconditionStorage;
         }
         
         public void Initialize()
@@ -40,8 +43,6 @@ namespace Player.Remote
             _sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnPlayerEnterGame);
             
             _sfs.Send(new SubscribeRoomGroupRequest(ROOM_GROUP_NAME));
-            
-            _sfs.Send(new ExtensionRequest(SFSEvent.EXTENSION_RESPONSE, SFSObjectLite.NewInstance(), _sfs.LastJoinedRoom));
         }
         
         public void Dispose()

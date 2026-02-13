@@ -113,13 +113,12 @@ namespace Player.Prediction
 
                 inputs.AddSFSObject(input);
             }
-
-            data.PutInt("count", frames.Count);
+            
             data.PutLong("startTick", frames[0].InputTick);
             data.PutLong("endTick", frames[^1].InputTick);
             data.PutSFSArray("inputs", inputs);
 
-            _sfs.Send(new ExtensionRequest(SFSResponseHelper.PLAYER_PRECONDITION_STATE_BATCH, data, _sfs.LastJoinedRoom));
+            _sfs.Send(new ExtensionRequest(SFSResponseHelper.PLAYER_PRECONDITION_STATE, data, _sfs.LastJoinedRoom));
         }
 
         public void Dispose()

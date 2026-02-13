@@ -177,7 +177,7 @@ MonoBehaviour:
   _cameraTarget: {fileID: 2662657865831511742}
   _yawTarget: {fileID: 481357721493712596}
   _currentWeapon: {fileID: 4528788046502173804}
-  _characterController: {fileID: 0}
+  _characterController: {fileID: 7226808999603200774}
 --- !u!143 &7226808999603200774
 CharacterController:
   m_ObjectHideFlags: 0

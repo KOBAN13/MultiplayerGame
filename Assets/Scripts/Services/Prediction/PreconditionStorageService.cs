@@ -8,7 +8,7 @@ namespace Services.Prediction
 {
     public class PreconditionStorageService : IPreconditionStorageService
     {
-        private readonly List<PredictionStateFrame> _pendingFrames = new();
+        public List<PredictionStateFrame> _pendingFrames { get; } = new List<PredictionStateFrame>();
         
         private readonly IPredictionParameters  _predictionParameters;
 

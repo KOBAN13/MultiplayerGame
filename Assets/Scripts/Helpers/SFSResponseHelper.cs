@@ -28,7 +28,6 @@
         
         public const string PLAYER_CLIENT_STATE = "playerClientState";
         public const string PLAYER_PRECONDITION_STATE = "playerPreconditionState";
-        public const string PLAYER_PRECONDITION_STATE_BATCH = "playerPreconditionStateBatch";
         
         public const string PLAYER_SERVER_STATE = "playerServerState";
         public const string PLAYER_JOIN_GAME_ROOM = "playerJoinGameRoom";

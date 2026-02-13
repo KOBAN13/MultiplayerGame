@@ -17,6 +17,10 @@ namespace Player.Local
         [SerializeField] private Transform _yawTarget;
         [SerializeField] private AWeapon _currentWeapon;
         [SerializeField] private CharacterController _characterController;
+        [SerializeField] private float _jumpVelocity = 5f;
+        [SerializeField] private float _gravity = -9.81f;
+        [SerializeField] private float _maxJumpHeight = 2f;
+        [SerializeField] private float _stepThresholdSqr = 1f;
         
         private IInputSource _inputSource;
         private IClientStateProvider _clientStateProvider;
@@ -35,6 +39,9 @@ namespace Player.Local
         private float _targetYaw;
         private float _targetPitch;
         private UnityEngine.Camera _mainCamera;
+        private Vector3 _targetDirection = Vector3.forward;
+        private float _verticalVelocity;
+        private bool _isOnGround = true;
 
         private const float THRESHOLD = 0.01f;
 
@@ -116,8 +123,8 @@ namespace Player.Local
             _clientStateProvider.Write(_mainCamera.transform.rotation.eulerAngles.y, _aimDirection, _targetPitch);
             _lastInputFrame = _inputSource.Read();
             _lastClientStateFrame = _clientStateProvider.Read(_lastInputFrame);
-            _playerNetworkStateSender.SendServerPlayerState(_lastInputFrame);
-            _playerNetworkStateSender.SendServerPlayerInput(_lastClientStateFrame);
+            //_playerNetworkStateSender.SendServerPlayerState(_lastInputFrame);
+            //_playerNetworkStateSender.SendServerPlayerInput(_lastClientStateFrame);
         }
         
         public void LateUpdate()
@@ -139,25 +146,70 @@ namespace Player.Local
 
             var inputDirection = new Vector3(_lastPredictionStateFrame.Movement.x, 0f, _lastPredictionStateFrame.Movement.z);
             
-            if (inputDirection.sqrMagnitude < 0.0001f)
+            if (inputDirection.sqrMagnitude <= 0f)
+                targetSpeed = 0f;
+
+            var basePosition = transform.position;
+            var baseX = basePosition.x;
+            var baseY = basePosition.y;
+            var baseZ = basePosition.z;
+
+            if (inputDirection.sqrMagnitude > 0f)
+            {
+                var rotation = Mathf.Atan2(_lastPredictionStateFrame.Movement.x, _lastPredictionStateFrame.Movement.z) * Mathf.Rad2Deg
+                               + _lastPredictionStateFrame.RotationY;
+                
+                var targetRotation = Quaternion.Euler(0f, rotation, 0f);
+                _targetDirection = targetRotation * Vector3.forward;
+                transform.rotation = targetRotation;
+            }
+
+            var dx = _targetDirection.x * targetSpeed * time;
+            var dz = _targetDirection.z * targetSpeed * time;
+            var stepSqr = dx * dx + dz * dz;
+
+            if (stepSqr > _stepThresholdSqr)
                 return;
 
-            var inputMagnitude = Mathf.Clamp01(inputDirection.magnitude);
-            var cameraRotation = Quaternion.Euler(0f, _lastPredictionStateFrame.RotationY, 0f);
-            var moveDirection = (cameraRotation * inputDirection).normalized;
+            var targetX = baseX + dx;
+            var targetZ = baseZ + dz;
 
-            if (!_lastPredictionStateFrame.Aim)
+            if (_lastPredictionStateFrame.Jump)
             {
-                var targetRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
-                transform.rotation = Quaternion.Slerp(
-                    transform.rotation,
-                    targetRotation,
-                    time * _rotationCameraParameters.RotateSpeed);
+                if (_isOnGround)
+                {
+                    _verticalVelocity = _jumpVelocity;
+                    _isOnGround = false;
+                }
             }
-            
-            var direction = moveDirection * (targetSpeed * inputMagnitude * time);
-            
-            _characterController.Move(direction);
+
+            _verticalVelocity += _gravity * time;
+            var targetY = baseY + _verticalVelocity * time;
+
+            if (targetY > _maxJumpHeight)
+            {
+                targetY = _maxJumpHeight;
+                _verticalVelocity = 0f;
+            }
+
+            if (targetY <= 0f)
+            {
+                targetY = 0f;
+                _verticalVelocity = 0f;
+                _isOnGround = true;
+            }
+            else
+            {
+                _isOnGround = false;
+            }
+
+            var targetPosition = new Vector3(targetX, targetY, targetZ);
+            var move = targetPosition - basePosition;
+
+            if (_characterController != null)
+                _characterController.Move(move);
+            else
+                transform.position = targetPosition;
         }
         
         private void OnPlayerAim(bool isAim)
