@@ -1,29 +1,30 @@
 ﻿using System.Collections.Generic;
 using Db.Interface;
-using Player.Db;
+using Input;
 using Player.Interface.Local;
 
 namespace Player.Prediction
 {
-    public class PredictionBuffer : IPredictionBuffer
+    public class InputFrameBuffer : IInputFrameBuffer
     {
-        private readonly Queue<PredictionStateFrame> _buffer = new();
+        private readonly Queue<InputFrame> _buffer = new();
+        
         private readonly IPredictionParameters _predictionParameters;
 
-        public PredictionBuffer(IPredictionParameters predictionParameters)
+        public InputFrameBuffer(IPredictionParameters predictionParameters)
         {
             _predictionParameters = predictionParameters;
         }
 
         public int Count => _buffer.Count;
 
-        public void Enqueue(in PredictionStateFrame predictionStateFrame)
+        public void Enqueue(in InputFrame predictionStateFrame)
         {
             _buffer.Enqueue(predictionStateFrame);
             Trim();
         }
 
-        public bool TryDequeue(out PredictionStateFrame predictionStateFrame)
+        public bool TryDequeue(out InputFrame predictionStateFrame)
         {
             if (_buffer.Count == 0)
             {

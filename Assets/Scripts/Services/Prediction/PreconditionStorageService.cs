@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using Db.Interface;
+using Input;
 using Player.Db;
 using Services.Interface;
+using UnityEngine;
 
 namespace Services.Prediction
 {
     public class PreconditionStorageService : IPreconditionStorageService
     {
-        public List<PredictionStateFrame> _pendingFrames { get; } = new List<PredictionStateFrame>();
+        private readonly Dictionary<long, PredictionStateFrame> _pendingFrames = new();
+        private readonly Dictionary<long, InputFrame> _inputFrames = new();
         
         private readonly IPredictionParameters  _predictionParameters;
 
@@ -19,26 +22,42 @@ namespace Services.Prediction
         
         public void AddPrecondition(in PredictionStateFrame predictionStateFrame)
         {
-            _pendingFrames.Add(predictionStateFrame);
+            _pendingFrames.Add(predictionStateFrame.InputTick, predictionStateFrame);
 
             if (_pendingFrames.Count > _predictionParameters.MaxBufferSize)
-                _pendingFrames.RemoveAt(0);
+                _pendingFrames.Remove(0);
         }
 
-        public int CopyLast(int maxCount, List<PredictionStateFrame> destination)
+        public void AddInputFrame(in InputFrame inputFrame)
+        {
+            _inputFrames.Add(inputFrame.InputTick, inputFrame);
+            
+            if (_inputFrames.Count > _predictionParameters.MaxBufferSize)
+                _inputFrames.Remove(0);
+        }
+
+        public int CopyLast(int maxCount, List<InputFrame> destination)
         {
             destination.Clear();
 
-            if (maxCount <= 0 || _pendingFrames.Count == 0)
+            if (maxCount <= 0 || _inputFrames.Count == 0)
                 return 0;
 
-            var count = Math.Min(maxCount, _pendingFrames.Count);
-            var startIndex = _pendingFrames.Count - count;
+            var count = Math.Min(maxCount, _inputFrames.Count);
+            var startIndex = _inputFrames.Count - count;
 
-            for (var i = startIndex; i < _pendingFrames.Count; i++)
-                destination.Add(_pendingFrames[i]);
+            for (var i = startIndex; i < _inputFrames.Count; i++)
+                destination.Add(_inputFrames[i]);
 
             return count;
+        }
+
+        public void Reconciliation(Vector3 position, long lastProcessedInputSequence)
+        {
+            var isValidKey = _pendingFrames.TryGetValue(lastProcessedInputSequence, out var predictionStateFrame);
+            
+            if (isValidKey)
+                Debug.LogError($"Position in server: {position}. Last processed input sequence: {predictionStateFrame.Position} and predictionId: {predictionStateFrame.InputTick}");
         }
     }
 }

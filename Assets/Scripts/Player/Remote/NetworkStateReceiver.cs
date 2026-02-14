@@ -102,6 +102,7 @@ namespace Player.Remote
                 var rotation = playerData.GetFloat("rotation");
                 var xDirection = playerData.GetFloat("horizontal");
                 var zDirection = playerData.GetFloat("vertical");
+                var isGrounded = playerData.GetBool("isGrounded");
                 
                 var animationState = playerData.GetUtfString("animationState");
                 
@@ -123,6 +124,8 @@ namespace Player.Remote
                 
                 remotePlayer.SetSnapshot(in snapshotData);
                 remotePlayer.SetAnimationState(animationState);
+                
+                _preconditionStorage.Reconciliation(snapshotData.Position, snapshotData.LastProcessedInputSequence);
             }
         }
         

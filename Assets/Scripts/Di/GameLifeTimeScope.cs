@@ -41,10 +41,9 @@ namespace Di
             Register<PlayerSpawnService>(Lifetime.Singleton);
             Register<PlayerJoinGameService>(Lifetime.Singleton);
             Register<PlayerNetworkStateSender>(Lifetime.Singleton); 
-            Register<ClientStateProvider>(Lifetime.Singleton);
-            Register<PredictionSender>(Lifetime.Singleton);
+            Register<InputFrameSender>(Lifetime.Singleton);
             Register<PredictionStateProvider>(Lifetime.Singleton);
-            Register<PredictionBuffer>(Lifetime.Singleton);
+            Register<InputFrameBuffer>(Lifetime.Singleton);
             
             Builder.RegisterFactory<ISnapshotsService, Transform, IRemotePlayerParameters, IPlayerSnapshotMotor>(
                 (snapshotsService, playerTransform, playerParameters) =>

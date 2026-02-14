@@ -23,17 +23,15 @@ namespace Player.Local
         [SerializeField] private float _stepThresholdSqr = 1f;
         
         private IInputSource _inputSource;
-        private IClientStateProvider _clientStateProvider;
         private IPlayerNetworkStateSender _playerNetworkStateSender;
         private IRotationCameraParameters _rotationCameraParameters;
         private IPlayerCameraHolder _playerCameraHolder;
         private IPredictionStateProvider _predictionStateProvider;
-        private IPredictionBuffer _predictionBuffer;
+        private IInputFrameBuffer _inputFrameBuffer;
         private IPredictionParameters _predictionParameters;
         
         private readonly RaycastHit[] _hits = new RaycastHit[1];
         private InputFrame _lastInputFrame;
-        private ClientStateFrame _lastClientStateFrame;
         private PredictionStateFrame _lastPredictionStateFrame;
         private Vector3 _aimDirection;
         private float _targetYaw;
@@ -51,9 +49,8 @@ namespace Player.Local
             IRotationCameraParameters rotationCameraParameters,
             IPlayerCameraHolder playerCameraHolder,
             IPlayerNetworkStateSender playerNetworkStateSender,
-            IClientStateProvider clientStateProvider,
             IPredictionStateProvider predictionStateProvider,
-            IPredictionBuffer predictionBuffer,
+            IInputFrameBuffer inputFrameBuffer,
             IPredictionParameters predictionParameters
         )
         {
@@ -61,9 +58,8 @@ namespace Player.Local
             _inputSource = inputSource;
             _rotationCameraParameters = rotationCameraParameters;
             _playerCameraHolder = playerCameraHolder;
-            _clientStateProvider = clientStateProvider;
             _predictionStateProvider = predictionStateProvider;
-            _predictionBuffer = predictionBuffer;
+            _inputFrameBuffer = inputFrameBuffer;
             _predictionParameters = predictionParameters;
         }
         
@@ -118,15 +114,6 @@ namespace Player.Local
 
             _currentWeapon.Attack(ref fireCommand);
         }
-
-        public void Update()
-        {
-            _clientStateProvider.Write(_mainCamera.transform.rotation.eulerAngles.y, _aimDirection, _targetPitch);
-            _lastInputFrame = _inputSource.Read();
-            _lastClientStateFrame = _clientStateProvider.Read(_lastInputFrame);
-            //_playerNetworkStateSender.SendServerPlayerState(_lastInputFrame);
-            //_playerNetworkStateSender.SendServerPlayerInput(_lastClientStateFrame);
-        }
         
         public void LateUpdate()
         {
@@ -140,8 +127,10 @@ namespace Player.Local
 
         private void CharacterMove(float time)
         {
-            _lastPredictionStateFrame = _predictionStateProvider.Read(_lastInputFrame, _lastClientStateFrame);
-            _predictionBuffer.Enqueue(_lastPredictionStateFrame);
+            _lastInputFrame = _inputSource.Read();
+            
+            _inputFrameBuffer.Enqueue(_lastInputFrame);
+            
             
             var targetSpeed = _lastPredictionStateFrame.Run ? 8f : 4f;
 
@@ -206,11 +195,10 @@ namespace Player.Local
 
             var targetPosition = new Vector3(targetX, targetY, targetZ);
             var move = targetPosition - basePosition;
-
-            if (_characterController != null)
-                _characterController.Move(move);
-            else
-                transform.position = targetPosition;
+            
+            _characterController.Move(move);
+            
+            _lastPredictionStateFrame = _predictionStateProvider.Read(_lastInputFrame, _lastClientStateFrame, transform.position);
         }
         
         private void OnPlayerAim(bool isAim)

@@ -5,16 +5,11 @@ namespace Player.Db
     public struct PredictionStateFrame
     {
         public long InputTick;
-        
-        public Vector3 Movement;
-        public Vector2 Look;
-        public Vector3 Origin;
-        public Vector3 Direction;
-        public bool Jump;
-        public bool Run;
-        public bool Aim;
-        public Vector3 AimDirection;
-        public float AimPitch;
-        public float RotationY;
+
+        public Vector3 Velocity;
+        public Vector3 Position;
+        public float Rotation;
+        public bool IsGrounded;
+        public string AnimationState;
     }
 }

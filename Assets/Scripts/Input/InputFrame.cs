@@ -4,12 +4,14 @@ namespace Input
 {
     public struct InputFrame
     {
+        public long InputTick;
+        
         public Vector3 Movement;
-        public Vector2 Look;
-        public Vector3 Origin;
-        public Vector3 Direction;
+        public Vector3 AimDirection;
         public bool Jump;
         public bool Run;
         public bool Aim;
+        public float AimPitch;
+        public float RotationY;
     }
 }

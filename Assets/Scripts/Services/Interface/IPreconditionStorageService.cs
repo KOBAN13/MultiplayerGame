@@ -1,13 +1,15 @@
 ﻿using System.Collections.Generic;
+using Input;
 using Player.Db;
+using UnityEngine;
 
 namespace Services.Interface
 {
     public interface IPreconditionStorageService
     {
-        List<PredictionStateFrame> _pendingFrames { get; }
-        
+        void Reconciliation(Vector3 position, long lastProcessedInputSequence);
         void AddPrecondition(in PredictionStateFrame predictionStateFrame);
-        int CopyLast(int maxCount, List<PredictionStateFrame> destination);
+        void AddInputFrame(in InputFrame inputFrame);
+        int CopyLast(int maxCount, List<InputFrame> destination);
     }
 }

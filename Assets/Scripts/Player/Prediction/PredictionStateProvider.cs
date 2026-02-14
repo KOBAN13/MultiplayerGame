@@ -1,6 +1,6 @@
-﻿using Input;
-using Player.Db;
+﻿using Player.Db;
 using Player.Interface.Local;
+using UnityEngine;
 
 namespace Player.Prediction
 {
@@ -8,7 +8,7 @@ namespace Player.Prediction
     {
         private long _inputTick;
         
-        public PredictionStateFrame Read(InputFrame inputFrame, ClientStateFrame clientStateFrame)
+        public PredictionStateFrame Read(Vector3 position)
         {
             if (_inputTick == long.MaxValue)
                 _inputTick = 0;
@@ -18,17 +18,9 @@ namespace Player.Prediction
             return new PredictionStateFrame()
             {
                 InputTick = _inputTick,
-                Movement = inputFrame.Movement,
-                Look = inputFrame.Look,
-                Origin = inputFrame.Origin,
-                Direction = inputFrame.Direction,
-                Aim = inputFrame.Aim,
-                Jump = inputFrame.Jump,
-                Run = inputFrame.Run,
-                AimDirection = clientStateFrame.AimDirection,
-                AimPitch = clientStateFrame.AimPitch,
-                RotationY = clientStateFrame.RotationY,
+                Position = position,
             };
+            
         }
     }
 }

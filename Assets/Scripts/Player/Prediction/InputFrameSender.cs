@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Db.Interface;
 using Helpers;
-using Player.Db;
+using Input;
 using Player.Interface.Local;
 using R3;
 using Services.Interface;
@@ -13,26 +13,26 @@ using VContainer.Unity;
 
 namespace Player.Prediction
 {
-    public class PredictionSender : IInitializable, IDisposable
+    public class InputFrameSender : IInitializable, IDisposable
     {
         private readonly IPredictionParameters _predictionParameters;
-        private readonly IPredictionBuffer _predictionBuffer;
+        private readonly IInputFrameBuffer _inputFrameBuffer;
         private readonly IPreconditionStorageService _preconditionStorage;
         private readonly SmartFox _sfs;
         
-        private readonly List<PredictionStateFrame> _batchFrames = new();
+        private readonly List<InputFrame> _batchFrames = new();
         private readonly CompositeDisposable _disposable = new ();
         private long _networkInputTick;
 
-        public PredictionSender(
+        public InputFrameSender(
             IPredictionParameters predictionParameters,
-            IPredictionBuffer predictionBuffer,
+            IInputFrameBuffer inputFrameBuffer,
             IPreconditionStorageService preconditionStorage, 
             SmartFox sfs
         )
         {
             _predictionParameters = predictionParameters;
-            _predictionBuffer = predictionBuffer;
+            _inputFrameBuffer = inputFrameBuffer;
             _preconditionStorage = preconditionStorage;
             _sfs = sfs;
         }
@@ -63,16 +63,16 @@ namespace Player.Prediction
         {
             var hasFrames = false;
 
-            while (_predictionBuffer.TryDequeue(out var predictionStateFrame))
+            while (_inputFrameBuffer.TryDequeue(out var predictionStateFrame))
             {
                 hasFrames = true;
-                _preconditionStorage.AddPrecondition(in predictionStateFrame);
+                _preconditionStorage.AddInputFrame(in predictionStateFrame);
             }
 
             return hasFrames;
         }
 
-        private void SendBatch(List<PredictionStateFrame> frames)
+        private void SendBatch(List<InputFrame> frames)
         {
             var data = SFSObject.NewInstance();
             var inputs = new SFSArray();
