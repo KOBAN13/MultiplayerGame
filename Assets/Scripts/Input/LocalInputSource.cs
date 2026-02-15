@@ -11,7 +11,7 @@ namespace Input
         private readonly IPlayerNetworkInputReader _playerNetworkInputReader;
         private readonly CompositeDisposable  _disposables = new();
         private readonly bool _forceLeftMovement;
-        private int _sequenceId;
+        private long _inputTick;
         
         private float _oscillationStartTime;
         private const float OscillationIntervalSeconds = 3f;
@@ -25,8 +25,13 @@ namespace Input
             _forceLeftMovement = parrelSyncRuntime.IsAutoLeftClone();
         }
         
-        public InputFrame Read()
+        public InputFrame ReadInputFrame(float rotationCameraY, Vector3 aimDirection, float aimPitch)
         {
+            if (_inputTick == long.MaxValue)
+                _inputTick = 0;
+            
+            _inputTick++;
+            
             var movement = _playerNetworkInputReader.Movement.CurrentValue;
             
             if (_forceLeftMovement)
@@ -39,10 +44,21 @@ namespace Input
             return new InputFrame
             {
                 Movement = movement,
-                Look = _playerNetworkInputReader.Look.CurrentValue,
+                AimDirection = aimDirection,
+                AimPitch = aimPitch,
+                RotationY = rotationCameraY,
+                InputTick = _inputTick,
                 Jump = _playerNetworkInputReader.Jump.CurrentValue,
                 Run = _playerNetworkInputReader.Run.CurrentValue,
                 Aim = _playerNetworkInputReader.Aim.CurrentValue,
+            };
+        }
+
+        public WeaponInputFrame ReadWeaponInput()
+        {
+            return new WeaponInputFrame()
+            {
+                Look = _playerNetworkInputReader.Look.CurrentValue,
                 Origin = _playerNetworkInputReader.Origin,
                 Direction = _playerNetworkInputReader.Direction,
             };

@@ -1,4 +1,5 @@
 using R3;
+using UnityEngine;
 
 namespace Input
 {
@@ -6,6 +7,7 @@ namespace Input
     {
         ReactiveCommand<bool> AimCommand { get; }
         ReactiveCommand<bool> ShotCommand { get; }
-        InputFrame Read();
+        InputFrame ReadInputFrame(float rotationCameraY, Vector3 aimDirection, float aimPitch);
+        WeaponInputFrame ReadWeaponInput();
     }
 }

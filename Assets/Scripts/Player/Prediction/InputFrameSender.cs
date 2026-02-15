@@ -22,7 +22,6 @@ namespace Player.Prediction
         
         private readonly List<InputFrame> _batchFrames = new();
         private readonly CompositeDisposable _disposable = new ();
-        private long _networkInputTick;
 
         public InputFrameSender(
             IPredictionParameters predictionParameters,
@@ -50,36 +49,40 @@ namespace Player.Prediction
 
         private void TickSend()
         {
-            if (!DrainNewFrames())
+            var newFramesCount = DrainNewFrames();
+            
+            if (newFramesCount == 0)
                 return;
 
-            if (_preconditionStorage.CopyLast(1, _batchFrames) == 0)
+            if (_preconditionStorage.CopyLast(newFramesCount, _batchFrames) == 0)
                 return;
 
             SendBatch(_batchFrames);
         }
 
-        private bool DrainNewFrames()
+        private int DrainNewFrames()
         {
-            var hasFrames = false;
+            var count = 0;
 
             while (_inputFrameBuffer.TryDequeue(out var predictionStateFrame))
             {
-                hasFrames = true;
+                count++;
                 _preconditionStorage.AddInputFrame(in predictionStateFrame);
             }
 
-            return hasFrames;
+            return count;
         }
 
         private void SendBatch(List<InputFrame> frames)
         {
+            if (frames.Count == 0 || _sfs.LastJoinedRoom == null)
+                return;
+            
             var data = SFSObject.NewInstance();
             var inputs = new SFSArray();
 
             foreach (var frame in frames)
             {
-                var inputTick = GetNextInputTick();
                 var input = SFSObject.NewInstance();
                 input.PutFloat("horizontal", frame.Movement.x);
                 input.PutFloat("vertical", frame.Movement.z);
@@ -90,26 +93,16 @@ namespace Player.Prediction
                 input.PutFloat("aimDirectionY", frame.AimDirection.y);
                 input.PutFloat("aimDirectionZ", frame.AimDirection.z);
                 input.PutFloat("aimPitch", frame.AimPitch);
-                input.PutLong("inputTick", inputTick);
+                input.PutLong("inputTick", frame.InputTick);
 
                 inputs.AddSFSObject(input);
             }
 
-            var startTick = _networkInputTick - frames.Count + 1;
-            data.PutLong("startTick", startTick);
-            data.PutLong("endTick", _networkInputTick);
+            data.PutLong("startTick", frames[0].InputTick);
+            data.PutLong("endTick", frames[^1].InputTick);
             data.PutSFSArray("inputs", inputs);
 
             _sfs.Send(new ExtensionRequest(SFSResponseHelper.PLAYER_PRECONDITION_STATE, data, _sfs.LastJoinedRoom));
-        }
-
-        private long GetNextInputTick()
-        {
-            if (_networkInputTick == long.MaxValue)
-                _networkInputTick = 0;
-
-            _networkInputTick++;
-            return _networkInputTick;
         }
 
         public void Dispose()

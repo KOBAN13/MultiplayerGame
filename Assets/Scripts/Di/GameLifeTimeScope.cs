@@ -40,7 +40,6 @@ namespace Di
             Register<RemotePlayerRegistry>(Lifetime.Singleton);
             Register<PlayerSpawnService>(Lifetime.Singleton);
             Register<PlayerJoinGameService>(Lifetime.Singleton);
-            Register<PlayerNetworkStateSender>(Lifetime.Singleton); 
             Register<InputFrameSender>(Lifetime.Singleton);
             Register<PredictionStateProvider>(Lifetime.Singleton);
             Register<InputFrameBuffer>(Lifetime.Singleton);

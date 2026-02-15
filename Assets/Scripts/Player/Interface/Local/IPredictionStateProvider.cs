@@ -1,11 +1,11 @@
-﻿using Input;
-using Player.Db;
+﻿using Player.Db;
 using UnityEngine;
 
 namespace Player.Interface.Local
 {
     public interface IPredictionStateProvider
     {
-        PredictionStateFrame Read(Vector3 position);
+        void Write(Vector3 position, bool isGrounded, float rotation, string animationState, long inputTick);
+        PredictionStateFrame Read();
     }
 }

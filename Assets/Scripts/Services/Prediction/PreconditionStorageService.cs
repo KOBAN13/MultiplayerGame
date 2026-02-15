@@ -10,8 +10,8 @@ namespace Services.Prediction
 {
     public class PreconditionStorageService : IPreconditionStorageService
     {
-        private readonly Dictionary<long, PredictionStateFrame> _pendingFrames = new();
-        private readonly Dictionary<long, InputFrame> _inputFrames = new();
+        private readonly List<PredictionStateFrame> _pendingFrames = new();
+        private readonly List<InputFrame> _inputFrames = new();
         
         private readonly IPredictionParameters  _predictionParameters;
 
@@ -22,18 +22,18 @@ namespace Services.Prediction
         
         public void AddPrecondition(in PredictionStateFrame predictionStateFrame)
         {
-            _pendingFrames.Add(predictionStateFrame.InputTick, predictionStateFrame);
+            _pendingFrames.Add(predictionStateFrame);
 
             if (_pendingFrames.Count > _predictionParameters.MaxBufferSize)
-                _pendingFrames.Remove(0);
+                _pendingFrames.RemoveAt(0);
         }
 
         public void AddInputFrame(in InputFrame inputFrame)
         {
-            _inputFrames.Add(inputFrame.InputTick, inputFrame);
+            _inputFrames.Add(inputFrame);
             
             if (_inputFrames.Count > _predictionParameters.MaxBufferSize)
-                _inputFrames.Remove(0);
+                _inputFrames.RemoveAt(0);
         }
 
         public int CopyLast(int maxCount, List<InputFrame> destination)
@@ -54,10 +54,18 @@ namespace Services.Prediction
 
         public void Reconciliation(Vector3 position, long lastProcessedInputSequence)
         {
-            var isValidKey = _pendingFrames.TryGetValue(lastProcessedInputSequence, out var predictionStateFrame);
-            
-            if (isValidKey)
-                Debug.LogError($"Position in server: {position}. Last processed input sequence: {predictionStateFrame.Position} and predictionId: {predictionStateFrame.InputTick}");
+            for (var i = _pendingFrames.Count - 1; i >= 0; i--)
+            {
+                var predictionStateFrame = _pendingFrames[i];
+                
+                if (predictionStateFrame.InputTick != lastProcessedInputSequence)
+                    continue;
+                
+                Debug.LogError(
+                    $"Position in server: {position}. Last processed input sequence: {predictionStateFrame.Position} and predictionId: {predictionStateFrame.InputTick}");
+                
+                return;
+            }
         }
     }
 }

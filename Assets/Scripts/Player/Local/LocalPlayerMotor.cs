@@ -1,10 +1,10 @@
 ﻿using System;
 using Db.Interface;
 using Input;
-using Player.Db;
 using Player.Interface.Local;
 using Player.Weapon;
 using R3;
+using Services.Interface;
 using UnityEngine;
 using Utils.Enums;
 using VContainer;
@@ -23,16 +23,16 @@ namespace Player.Local
         [SerializeField] private float _stepThresholdSqr = 1f;
         
         private IInputSource _inputSource;
-        private IPlayerNetworkStateSender _playerNetworkStateSender;
         private IRotationCameraParameters _rotationCameraParameters;
         private IPlayerCameraHolder _playerCameraHolder;
         private IPredictionStateProvider _predictionStateProvider;
         private IInputFrameBuffer _inputFrameBuffer;
         private IPredictionParameters _predictionParameters;
+        private IPreconditionStorageService _preconditionStorage;
         
         private readonly RaycastHit[] _hits = new RaycastHit[1];
         private InputFrame _lastInputFrame;
-        private PredictionStateFrame _lastPredictionStateFrame;
+        private WeaponInputFrame _lastWeaponInputFrame;
         private Vector3 _aimDirection;
         private float _targetYaw;
         private float _targetPitch;
@@ -48,19 +48,19 @@ namespace Player.Local
             IInputSource inputSource,
             IRotationCameraParameters rotationCameraParameters,
             IPlayerCameraHolder playerCameraHolder,
-            IPlayerNetworkStateSender playerNetworkStateSender,
             IPredictionStateProvider predictionStateProvider,
             IInputFrameBuffer inputFrameBuffer,
-            IPredictionParameters predictionParameters
+            IPredictionParameters predictionParameters,
+            IPreconditionStorageService preconditionStorage
         )
         {
-            _playerNetworkStateSender = playerNetworkStateSender;
             _inputSource = inputSource;
             _rotationCameraParameters = rotationCameraParameters;
             _playerCameraHolder = playerCameraHolder;
             _predictionStateProvider = predictionStateProvider;
             _inputFrameBuffer = inputFrameBuffer;
             _predictionParameters = predictionParameters;
+            _preconditionStorage = preconditionStorage;
         }
         
         public Transform GetTransform()
@@ -97,7 +97,7 @@ namespace Player.Local
 
         private void OnPlayerAttack()
         {
-            _lastInputFrame = _inputSource.Read();
+            _lastWeaponInputFrame = _inputSource.ReadWeaponInput();
 
             var render = SnapshotsService.GetRenderSnapshotId();
             
@@ -107,17 +107,22 @@ namespace Player.Local
                 alpha = render.alpha,
                 shotData = new ShotData
                 {
-                    origin = _lastInputFrame.Origin,
-                    direction = _lastInputFrame.Direction,
+                    origin = _lastWeaponInputFrame.Origin,
+                    direction = _lastWeaponInputFrame.Direction,
                 }
             };
 
             _currentWeapon.Attack(ref fireCommand);
         }
+
+        public void Update()
+        {
+            _lastWeaponInputFrame = _inputSource.ReadWeaponInput();
+        }
         
         public void LateUpdate()
         {
-            _cameraTarget.rotation = RotateCamera(_lastInputFrame.Look);
+            _cameraTarget.rotation = RotateCamera(_lastWeaponInputFrame.Look);
             
             if (_lastInputFrame.Aim)
             {
@@ -127,14 +132,13 @@ namespace Player.Local
 
         private void CharacterMove(float time)
         {
-            _lastInputFrame = _inputSource.Read();
+            _lastInputFrame = _inputSource.ReadInputFrame(_mainCamera.transform.rotation.eulerAngles.y, _aimDirection, _targetPitch);
             
             _inputFrameBuffer.Enqueue(_lastInputFrame);
             
-            
-            var targetSpeed = _lastPredictionStateFrame.Run ? 8f : 4f;
+            var targetSpeed = _lastInputFrame.Run ? 8f : 4f;
 
-            var inputDirection = new Vector3(_lastPredictionStateFrame.Movement.x, 0f, _lastPredictionStateFrame.Movement.z);
+            var inputDirection = new Vector3(_lastInputFrame.Movement.x, 0f, _lastInputFrame.Movement.z);
             
             if (inputDirection.sqrMagnitude <= 0f)
                 targetSpeed = 0f;
@@ -146,8 +150,8 @@ namespace Player.Local
 
             if (inputDirection.sqrMagnitude > 0f)
             {
-                var rotation = Mathf.Atan2(_lastPredictionStateFrame.Movement.x, _lastPredictionStateFrame.Movement.z) * Mathf.Rad2Deg
-                               + _lastPredictionStateFrame.RotationY;
+                var rotation = Mathf.Atan2(_lastInputFrame.Movement.x, _lastInputFrame.Movement.z) * Mathf.Rad2Deg
+                               + _lastInputFrame.RotationY;
                 
                 var targetRotation = Quaternion.Euler(0f, rotation, 0f);
                 _targetDirection = targetRotation * Vector3.forward;
@@ -164,7 +168,7 @@ namespace Player.Local
             var targetX = baseX + dx;
             var targetZ = baseZ + dz;
 
-            if (_lastPredictionStateFrame.Jump)
+            if (_lastInputFrame.Jump)
             {
                 if (_isOnGround)
                 {
@@ -197,8 +201,17 @@ namespace Player.Local
             var move = targetPosition - basePosition;
             
             _characterController.Move(move);
+
+            _predictionStateProvider.Write(
+                transform.position, 
+                _isOnGround,
+                _mainCamera.transform.rotation.eulerAngles.y, 
+                "Idle", 
+                _lastInputFrame.InputTick
+            );
             
-            _lastPredictionStateFrame = _predictionStateProvider.Read(_lastInputFrame, _lastClientStateFrame, transform.position);
+            var lastPreconditionState = _predictionStateProvider.Read();
+            _preconditionStorage.AddPrecondition(in lastPreconditionState);
         }
         
         private void OnPlayerAim(bool isAim)
