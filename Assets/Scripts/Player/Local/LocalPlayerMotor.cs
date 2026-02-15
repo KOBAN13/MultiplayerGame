@@ -4,7 +4,6 @@ using Input;
 using Player.Interface.Local;
 using Player.Weapon;
 using R3;
-using Services.Interface;
 using UnityEngine;
 using Utils.Enums;
 using VContainer;
@@ -25,10 +24,8 @@ namespace Player.Local
         private IInputSource _inputSource;
         private IRotationCameraParameters _rotationCameraParameters;
         private IPlayerCameraHolder _playerCameraHolder;
-        private IPredictionStateProvider _predictionStateProvider;
-        private IInputFrameBuffer _inputFrameBuffer;
+        private IInputFrameSyncService _inputFrameSyncService;
         private IPredictionParameters _predictionParameters;
-        private IPreconditionStorageService _preconditionStorage;
         
         private readonly RaycastHit[] _hits = new RaycastHit[1];
         private InputFrame _lastInputFrame;
@@ -48,19 +45,15 @@ namespace Player.Local
             IInputSource inputSource,
             IRotationCameraParameters rotationCameraParameters,
             IPlayerCameraHolder playerCameraHolder,
-            IPredictionStateProvider predictionStateProvider,
-            IInputFrameBuffer inputFrameBuffer,
-            IPredictionParameters predictionParameters,
-            IPreconditionStorageService preconditionStorage
+            IInputFrameSyncService inputFrameSyncService,
+            IPredictionParameters predictionParameters
         )
         {
             _inputSource = inputSource;
             _rotationCameraParameters = rotationCameraParameters;
             _playerCameraHolder = playerCameraHolder;
-            _predictionStateProvider = predictionStateProvider;
-            _inputFrameBuffer = inputFrameBuffer;
+            _inputFrameSyncService = inputFrameSyncService;
             _predictionParameters = predictionParameters;
-            _preconditionStorage = preconditionStorage;
         }
         
         public Transform GetTransform()
@@ -89,6 +82,7 @@ namespace Player.Local
             var localSimulationRate = Math.Max(1, _predictionParameters.CountGenerateStateLocalSimulation);
             var period = TimeSpan.FromSeconds(1f / localSimulationRate);
             var time = 1f / localSimulationRate;
+            _inputFrameSyncService.Reset();
             
             Observable.Interval(period)
                 .Subscribe(_ => CharacterMove(time))
@@ -133,8 +127,6 @@ namespace Player.Local
         private void CharacterMove(float time)
         {
             _lastInputFrame = _inputSource.ReadInputFrame(_mainCamera.transform.rotation.eulerAngles.y, _aimDirection, _targetPitch);
-            
-            _inputFrameBuffer.Enqueue(_lastInputFrame);
             
             var targetSpeed = _lastInputFrame.Run ? 8f : 4f;
 
@@ -201,17 +193,14 @@ namespace Player.Local
             var move = targetPosition - basePosition;
             
             _characterController.Move(move);
-
-            _predictionStateProvider.Write(
-                transform.position, 
-                _isOnGround,
-                _mainCamera.transform.rotation.eulerAngles.y, 
-                "Idle", 
-                _lastInputFrame.InputTick
-            );
             
-            var lastPreconditionState = _predictionStateProvider.Read();
-            _preconditionStorage.AddPrecondition(in lastPreconditionState);
+            _inputFrameSyncService.CaptureAndQueue(
+                in _lastInputFrame,
+                time,
+                transform.position,
+                _isOnGround,
+                _mainCamera.transform.rotation.eulerAngles.y,
+                "Idle");
         }
         
         private void OnPlayerAim(bool isAim)

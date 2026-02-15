@@ -11,7 +11,6 @@ namespace Input
         private readonly IPlayerNetworkInputReader _playerNetworkInputReader;
         private readonly CompositeDisposable  _disposables = new();
         private readonly bool _forceLeftMovement;
-        private long _inputTick;
         
         private float _oscillationStartTime;
         private const float OscillationIntervalSeconds = 3f;
@@ -27,11 +26,6 @@ namespace Input
         
         public InputFrame ReadInputFrame(float rotationCameraY, Vector3 aimDirection, float aimPitch)
         {
-            if (_inputTick == long.MaxValue)
-                _inputTick = 0;
-            
-            _inputTick++;
-            
             var movement = _playerNetworkInputReader.Movement.CurrentValue;
             
             if (_forceLeftMovement)
@@ -47,7 +41,6 @@ namespace Input
                 AimDirection = aimDirection,
                 AimPitch = aimPitch,
                 RotationY = rotationCameraY,
-                InputTick = _inputTick,
                 Jump = _playerNetworkInputReader.Jump.CurrentValue,
                 Run = _playerNetworkInputReader.Run.CurrentValue,
                 Aim = _playerNetworkInputReader.Aim.CurrentValue,

@@ -43,6 +43,7 @@ namespace Di
             Register<InputFrameSender>(Lifetime.Singleton);
             Register<PredictionStateProvider>(Lifetime.Singleton);
             Register<InputFrameBuffer>(Lifetime.Singleton);
+            Register<InputFrameSyncService>(Lifetime.Transient);
             
             Builder.RegisterFactory<ISnapshotsService, Transform, IRemotePlayerParameters, IPlayerSnapshotMotor>(
                 (snapshotsService, playerTransform, playerParameters) =>
