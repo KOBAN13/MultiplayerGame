@@ -4,7 +4,6 @@ using Db.Interface;
 using Input;
 using Player.Db;
 using Services.Interface;
-using UnityEngine;
 
 namespace Services.Prediction
 {
@@ -19,10 +18,42 @@ namespace Services.Prediction
         {
             _predictionParameters = predictionParameters;
         }
+
+        public bool TryFindPreconditionState(out PredictionStateFrame predictionStateFrame, long lastProcessedInputSequence)
+        {
+            for (var i = _pendingFrames.Count - 1; i >= 0; i--)
+            {
+                predictionStateFrame = _pendingFrames[i];
+                
+                if (predictionStateFrame.InputTick != lastProcessedInputSequence)
+                    continue;
+                
+                return true;
+            }
+            
+            predictionStateFrame = default;
+            return false;
+        }
+
+        public void ClearOldCommands(long lastProcessedInputSequence)
+        {
+            if (lastProcessedInputSequence <= 0)
+                return;
+            
+            _pendingFrames.RemoveAll(frame => frame.InputTick <= lastProcessedInputSequence);
+            _inputFrames.RemoveAll(frame => frame.InputTick <= lastProcessedInputSequence);
+        }
         
         public void AddPrecondition(in PredictionStateFrame predictionStateFrame)
         {
-            _pendingFrames.Add(predictionStateFrame);
+            var inputTick = predictionStateFrame.InputTick;
+            
+            var index = _pendingFrames.FindIndex(frame => frame.InputTick == inputTick);
+
+            if (index >= 0)
+                _pendingFrames[index] = predictionStateFrame;
+            else
+                _pendingFrames.Add(predictionStateFrame);
 
             if (_pendingFrames.Count > _predictionParameters.MaxBufferSize)
                 _pendingFrames.RemoveAt(0);
@@ -52,20 +83,22 @@ namespace Services.Prediction
             return count;
         }
 
-        public void Reconciliation(Vector3 position, long lastProcessedInputSequence)
+        public int CopyAfterTick(long inputTickExclusive, List<InputFrame> destination)
         {
-            for (var i = _pendingFrames.Count - 1; i >= 0; i--)
+            destination.Clear();
+
+            if (_inputFrames.Count == 0)
+                return 0;
+
+            foreach (var inputFrame in _inputFrames)
             {
-                var predictionStateFrame = _pendingFrames[i];
-                
-                if (predictionStateFrame.InputTick != lastProcessedInputSequence)
+                if (inputFrame.InputTick <= inputTickExclusive)
                     continue;
-                
-                Debug.LogError(
-                    $"Position in server: {position}. Last processed input sequence: {predictionStateFrame.Position} and predictionId: {predictionStateFrame.InputTick}");
-                
-                return;
+
+                destination.Add(inputFrame);
             }
+
+            return destination.Count;
         }
     }
 }

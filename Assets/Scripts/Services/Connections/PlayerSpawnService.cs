@@ -66,6 +66,8 @@ namespace Services.Connections
                 Position = joinRequest.Position,
                 Input = Vector3.zero,
                 Rotation = 0f,
+                IsGrounded = true,
+                AnimationState = joinRequest.AnimationState,
                 ServerTime = 0f,
                 SnapshotId = 1
             };
@@ -86,6 +88,8 @@ namespace Services.Connections
                 Position = joinRequest.Position,
                 Input = Vector3.zero,
                 Rotation = 0f,
+                IsGrounded = true,
+                AnimationState = joinRequest.AnimationState,
                 ServerTime = 0f,
                 SnapshotId = 1
             };

@@ -44,6 +44,8 @@ namespace Player.Prediction
             in InputFrame inputFrame,
             float deltaTime,
             Vector3 position,
+            Vector3 velocity,
+            Vector3 moveDirection,
             bool isGrounded,
             float rotationY,
             string animationState)
@@ -58,9 +60,12 @@ namespace Player.Prediction
             var networkInputFrame = inputFrame;
             networkInputFrame.InputTick = GetNextInputTick();
             _inputFrameBuffer.Enqueue(in networkInputFrame);
+            _preconditionStorage.AddInputFrame(in networkInputFrame);
 
             _predictionStateProvider.Write(
                 position,
+                velocity,
+                moveDirection,
                 isGrounded,
                 rotationY,
                 animationState,

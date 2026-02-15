@@ -7,6 +7,8 @@ namespace Player.Db
         public long InputTick;
         
         public Vector3 Position;
+        public Vector3 Velocity;
+        public Vector3 MoveDirection;
         public float Rotation;
         public bool IsGrounded;
         public string AnimationState;

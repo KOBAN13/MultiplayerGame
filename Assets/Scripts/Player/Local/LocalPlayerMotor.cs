@@ -1,6 +1,7 @@
 ﻿using System;
 using Db.Interface;
 using Input;
+using Player.Db;
 using Player.Interface.Local;
 using Player.Weapon;
 using R3;
@@ -127,80 +128,142 @@ namespace Player.Local
         private void CharacterMove(float time)
         {
             _lastInputFrame = _inputSource.ReadInputFrame(_mainCamera.transform.rotation.eulerAngles.y, _aimDirection, _targetPitch);
+
+            var currentState = BuildPredictedState(0, "Idle");
+            var predictedState = SimulatePredicted(in currentState, in _lastInputFrame, time);
             
-            var targetSpeed = _lastInputFrame.Run ? 8f : 4f;
-
-            var inputDirection = new Vector3(_lastInputFrame.Movement.x, 0f, _lastInputFrame.Movement.z);
-            
-            if (inputDirection.sqrMagnitude <= 0f)
-                targetSpeed = 0f;
-
-            var basePosition = transform.position;
-            var baseX = basePosition.x;
-            var baseY = basePosition.y;
-            var baseZ = basePosition.z;
-
-            if (inputDirection.sqrMagnitude > 0f)
-            {
-                var rotation = Mathf.Atan2(_lastInputFrame.Movement.x, _lastInputFrame.Movement.z) * Mathf.Rad2Deg
-                               + _lastInputFrame.RotationY;
-                
-                var targetRotation = Quaternion.Euler(0f, rotation, 0f);
-                _targetDirection = targetRotation * Vector3.forward;
-                transform.rotation = targetRotation;
-            }
-
-            var dx = _targetDirection.x * targetSpeed * time;
-            var dz = _targetDirection.z * targetSpeed * time;
-            var stepSqr = dx * dx + dz * dz;
-
-            if (stepSqr > _stepThresholdSqr)
-                return;
-
-            var targetX = baseX + dx;
-            var targetZ = baseZ + dz;
-
-            if (_lastInputFrame.Jump)
-            {
-                if (_isOnGround)
-                {
-                    _verticalVelocity = _jumpVelocity;
-                    _isOnGround = false;
-                }
-            }
-
-            _verticalVelocity += _gravity * time;
-            var targetY = baseY + _verticalVelocity * time;
-
-            if (targetY > _maxJumpHeight)
-            {
-                targetY = _maxJumpHeight;
-                _verticalVelocity = 0f;
-            }
-
-            if (targetY <= 0f)
-            {
-                targetY = 0f;
-                _verticalVelocity = 0f;
-                _isOnGround = true;
-            }
-            else
-            {
-                _isOnGround = false;
-            }
-
-            var targetPosition = new Vector3(targetX, targetY, targetZ);
-            var move = targetPosition - basePosition;
-            
-            _characterController.Move(move);
+            ApplyPredictedState(in predictedState, useCharacterControllerMove: true);
             
             _inputFrameSyncService.CaptureAndQueue(
                 in _lastInputFrame,
                 time,
                 transform.position,
+                new Vector3(0f, _verticalVelocity, 0f),
+                _targetDirection,
                 _isOnGround,
                 _mainCamera.transform.rotation.eulerAngles.y,
                 "Idle");
+        }
+
+        public PredictionStateFrame SimulatePredicted(
+            in PredictionStateFrame currentState,
+            in InputFrame inputFrame,
+            float deltaTime)
+        {
+            var nextState = currentState;
+            nextState.InputTick = inputFrame.InputTick;
+
+            var targetSpeed = inputFrame.Run ? 8f : 4f;
+            var inputDirection = new Vector3(inputFrame.Movement.x, 0f, inputFrame.Movement.z);
+
+            if (inputDirection.sqrMagnitude <= 0f)
+                targetSpeed = 0f;
+
+            var targetDirection = currentState.MoveDirection.sqrMagnitude > 0f
+                ? currentState.MoveDirection.normalized
+                : Vector3.forward;
+
+            if (inputDirection.sqrMagnitude > 0f)
+            {
+                var rotation = Mathf.Atan2(inputFrame.Movement.x, inputFrame.Movement.z) * Mathf.Rad2Deg
+                               + inputFrame.RotationY;
+                nextState.Rotation = rotation;
+
+                var targetRotation = Quaternion.Euler(0f, rotation, 0f);
+                targetDirection = targetRotation * Vector3.forward;
+            }
+
+            var dx = targetDirection.x * targetSpeed * deltaTime;
+            var dz = targetDirection.z * targetSpeed * deltaTime;
+            var stepSqr = dx * dx + dz * dz;
+            nextState.MoveDirection = targetDirection;
+
+            if (stepSqr > _stepThresholdSqr)
+                return nextState;
+
+            var verticalVelocity = currentState.Velocity.y;
+            var isOnGround = currentState.IsGrounded;
+
+            if (inputFrame.Jump && isOnGround)
+            {
+                verticalVelocity = _jumpVelocity;
+                isOnGround = false;
+            }
+
+            var targetPosition = currentState.Position;
+            targetPosition.x += dx;
+            targetPosition.z += dz;
+
+            verticalVelocity += _gravity * deltaTime;
+            targetPosition.y += verticalVelocity * deltaTime;
+
+            if (targetPosition.y > _maxJumpHeight)
+            {
+                targetPosition.y = _maxJumpHeight;
+                verticalVelocity = 0f;
+            }
+
+            if (targetPosition.y <= 0f)
+            {
+                targetPosition.y = 0f;
+                verticalVelocity = 0f;
+                isOnGround = true;
+            }
+            else
+            {
+                isOnGround = false;
+            }
+
+            nextState.Position = targetPosition;
+            nextState.Velocity = new Vector3(0f, verticalVelocity, 0f);
+            nextState.IsGrounded = isOnGround;
+
+            if (string.IsNullOrEmpty(nextState.AnimationState))
+                nextState.AnimationState = "Idle";
+
+            return nextState;
+        }
+
+        public void ApplyPredictedState(in PredictionStateFrame state, bool useCharacterControllerMove)
+        {
+            _verticalVelocity = state.Velocity.y;
+            _isOnGround = state.IsGrounded;
+            _targetDirection = state.MoveDirection.sqrMagnitude > 0f
+                ? state.MoveDirection.normalized
+                : Vector3.forward;
+
+            transform.rotation = Quaternion.Euler(0f, state.Rotation, 0f);
+
+            if (useCharacterControllerMove)
+            {
+                var move = state.Position - transform.position;
+                _characterController.Move(move);
+                return;
+            }
+
+            var wasEnabled = _characterController.enabled;
+
+            if (wasEnabled)
+                _characterController.enabled = false;
+
+            transform.position = state.Position;
+
+            if (wasEnabled)
+                _characterController.enabled = true;
+        }
+
+        private PredictionStateFrame BuildPredictedState(long inputTick, string animationState)
+        {
+            return new PredictionStateFrame()
+            {
+                InputTick = inputTick,
+                Position = transform.position,
+                Velocity = new Vector3(0f, _verticalVelocity, 0f),
+                MoveDirection = _targetDirection.sqrMagnitude > 0f ? _targetDirection.normalized : Vector3.forward,
+                Rotation = transform.rotation.eulerAngles.y,
+                IsGrounded = _isOnGround,
+                AnimationState = animationState
+            };
         }
         
         private void OnPlayerAim(bool isAim)

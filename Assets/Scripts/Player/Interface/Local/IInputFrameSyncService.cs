@@ -10,6 +10,8 @@ namespace Player.Interface.Local
             in InputFrame inputFrame,
             float deltaTime,
             Vector3 position,
+            Vector3 velocity,
+            Vector3 moveDirection,
             bool isGrounded,
             float rotationY,
             string animationState);

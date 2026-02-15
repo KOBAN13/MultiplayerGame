@@ -19,7 +19,7 @@ namespace Player.Remote
         private readonly SmartFox _sfs;
         private readonly IPlayerJoinGameService _playerJoinGameService;
         private readonly IRemotePlayerRegistry _remotePlayerRegistry;
-        private readonly IPreconditionStorageService _preconditionStorage;
+        private readonly IReconciliationService _reconciliationService;
         
         private const string ROOM_GROUP_NAME = "Game";
         
@@ -27,12 +27,13 @@ namespace Player.Remote
             SmartFox sfs,
             IPlayerJoinGameService playerJoinGameService,
             IRemotePlayerRegistry remotePlayerRegistry, 
-            IPreconditionStorageService preconditionStorage)
+            IReconciliationService reconciliationService
+        )
         {
             _sfs = sfs;
             _playerJoinGameService = playerJoinGameService;
             _remotePlayerRegistry = remotePlayerRegistry;
-            _preconditionStorage = preconditionStorage;
+            _reconciliationService = reconciliationService;
         }
         
         public void Initialize()
@@ -117,6 +118,8 @@ namespace Player.Remote
                     Position = position,
                     Input = direction,
                     Rotation = rotation,
+                    IsGrounded = isGrounded,
+                    AnimationState = animationState,
                     ServerTime = serverTime,
                     SnapshotId = snapshotId,
                     LastProcessedInputSequence = lastProcessedInputSequence
@@ -125,7 +128,7 @@ namespace Player.Remote
                 remotePlayer.SetSnapshot(in snapshotData);
                 remotePlayer.SetAnimationState(animationState);
                 
-                _preconditionStorage.Reconciliation(snapshotData.Position, snapshotData.LastProcessedInputSequence);
+                _reconciliationService.Reconciliation(remotePlayer, snapshotData.Position, snapshotData);
             }
         }
         

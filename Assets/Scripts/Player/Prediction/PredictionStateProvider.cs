@@ -7,14 +7,25 @@ namespace Player.Prediction
     public class PredictionStateProvider : IPredictionStateProvider
     {
         private Vector3 _position;
+        private Vector3 _velocity;
+        private Vector3 _moveDirection;
         private float _rotation;
         private bool _isGrounded;
         private string _animationState;
         private long _inputTick;
 
-        public void Write(Vector3 position, bool isGrounded, float rotation, string animationState, long inputTick)
+        public void Write(
+            Vector3 position,
+            Vector3 velocity,
+            Vector3 moveDirection,
+            bool isGrounded,
+            float rotation,
+            string animationState,
+            long inputTick)
         {
             _position = position;
+            _velocity = velocity;
+            _moveDirection = moveDirection;
             _rotation = rotation;
             _isGrounded = isGrounded;
             _animationState = animationState;
@@ -27,6 +38,8 @@ namespace Player.Prediction
             {
                 InputTick = _inputTick,
                 Position = _position,
+                Velocity = _velocity,
+                MoveDirection = _moveDirection,
                 IsGrounded = _isGrounded,
                 AnimationState = _animationState,
                 Rotation = _rotation

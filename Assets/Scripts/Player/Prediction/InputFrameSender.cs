@@ -67,7 +67,6 @@ namespace Player.Prediction
             while (_inputFrameBuffer.TryDequeue(out var predictionStateFrame))
             {
                 count++;
-                _preconditionStorage.AddInputFrame(in predictionStateFrame);
             }
 
             return count;
