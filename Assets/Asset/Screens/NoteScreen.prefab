@@ -1003,25 +1003,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _discriptionTextViewBinder:
+    <AutoBindId>k__BackingField:
+      _generatedGuid: 6f340f01977944bba727b894317fa40e
     ViewModelBinder:
       <AutoBindId>k__BackingField:
         _generatedGuid: 6f340f01977944bba727b894317fa40e
-    <AutoBindId>k__BackingField:
-      _generatedGuid: 6f340f01977944bba727b894317fa40e
     _testText: {fileID: 250790265362579691}
   _titleTextViewBinder:
+    <AutoBindId>k__BackingField:
+      _generatedGuid: c1f0f18231fa4db899ce402d2072282e
     ViewModelBinder:
       <AutoBindId>k__BackingField:
         _generatedGuid: c1f0f18231fa4db899ce402d2072282e
-    <AutoBindId>k__BackingField:
-      _generatedGuid: c1f0f18231fa4db899ce402d2072282e
     _testText: {fileID: 2117881719554798915}
   _buttonViewBinder:
+    <AutoBindId>k__BackingField:
+      _generatedGuid: 2993ac83ab13477b9b12a4f0ab63918d
     ViewModelBinder:
       <AutoBindId>k__BackingField:
         _generatedGuid: 2993ac83ab13477b9b12a4f0ab63918d
-    <AutoBindId>k__BackingField:
-      _generatedGuid: 2993ac83ab13477b9b12a4f0ab63918d
     _button: {fileID: 8155381092525280884}
 --- !u!1 &7990536603556975209
 GameObject:

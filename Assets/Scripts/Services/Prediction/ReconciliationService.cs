@@ -12,7 +12,9 @@ namespace Services.Prediction
 {
     public class ReconciliationService : IReconciliationService
     {
-        private const float POSITION_ERROR_THRESHOLD = 0.2f;
+        private const float LITE_POSITION_ERROR_THRESHOLD = 0.2f;
+        private const float MIDDLE_POSITION_ERROR_THRESHOLD = 2f;
+        private const float MAX_POSITION_ERROR_THRESHOLD = 10f;
 
         private readonly IPreconditionStorageService _preconditionStorage;
         private readonly IPredictionParameters _predictionParameters;
@@ -42,7 +44,7 @@ namespace Services.Prediction
             var posErrors = position - preconditionState.Position;
             var magnitudeErrors = posErrors.magnitude;
 
-            if (magnitudeErrors <= POSITION_ERROR_THRESHOLD)
+            if (magnitudeErrors <= LITE_POSITION_ERROR_THRESHOLD)
             {
                 _preconditionStorage.ClearOldCommands(snapshotData.LastProcessedInputSequence);
                 return;

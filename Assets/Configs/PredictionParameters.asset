@@ -12,6 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0d2ed7f3aca40e1aa300007ea57afef, type: 3}
   m_Name: PredictionParameters
   m_EditorClassIdentifier: 
+  <SmallError>k__BackingField: 0.15
+  <MediumError>k__BackingField: 0.75
+  <LargeError>k__BackingField: 2
+  <VisualHalfLife>k__BackingField: 0.08
+  <MediumMoveGain>k__BackingField: 0.6
   <MaxBufferSize>k__BackingField: 60
   <CountGenerateStateSendToServer>k__BackingField: 30
   <CountGenerateStateLocalSimulation>k__BackingField: 60

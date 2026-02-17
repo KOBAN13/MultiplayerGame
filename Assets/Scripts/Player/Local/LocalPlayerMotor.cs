@@ -15,23 +15,22 @@ namespace Player.Local
     {
         [SerializeField] private Transform _cameraTarget;
         [SerializeField] private Transform _yawTarget;
+        [SerializeField] private Transform _visualRoot;
         [SerializeField] private AWeapon _currentWeapon;
         [SerializeField] private CharacterController _characterController;
-        [SerializeField] private float _jumpVelocity = 5f;
-        [SerializeField] private float _gravity = -9.81f;
-        [SerializeField] private float _maxJumpHeight = 2f;
-        [SerializeField] private float _stepThresholdSqr = 1f;
         
         private IInputSource _inputSource;
         private IRotationCameraParameters _rotationCameraParameters;
         private IPlayerCameraHolder _playerCameraHolder;
         private IInputFrameSyncService _inputFrameSyncService;
         private IPredictionParameters _predictionParameters;
+        private ILocalPlayerParameters _localPlayerParameters;
         
         private readonly RaycastHit[] _hits = new RaycastHit[1];
         private InputFrame _lastInputFrame;
         private WeaponInputFrame _lastWeaponInputFrame;
         private Vector3 _aimDirection;
+        private Vector3 _visualCorrector;
         private float _targetYaw;
         private float _targetPitch;
         private UnityEngine.Camera _mainCamera;
@@ -47,7 +46,8 @@ namespace Player.Local
             IRotationCameraParameters rotationCameraParameters,
             IPlayerCameraHolder playerCameraHolder,
             IInputFrameSyncService inputFrameSyncService,
-            IPredictionParameters predictionParameters
+            IPredictionParameters predictionParameters,
+            ILocalPlayerParameters localPlayerParameters
         )
         {
             _inputSource = inputSource;
@@ -55,6 +55,7 @@ namespace Player.Local
             _playerCameraHolder = playerCameraHolder;
             _inputFrameSyncService = inputFrameSyncService;
             _predictionParameters = predictionParameters;
+            _localPlayerParameters = localPlayerParameters;
         }
         
         public Transform GetTransform()
@@ -65,6 +66,42 @@ namespace Player.Local
         public Transform GetCameraTarget()
         {
             return _cameraTarget;
+        }
+
+        public void AddVisualCorrection(Vector3 offset)
+        {
+            _visualCorrector += offset;
+        }
+
+        public void UpdateVisualSmoothing(float dt, float halfLife)
+        {
+            var factor = Mathf.Pow(0.5f, dt / Mathf.Max(0.0001f, halfLife));
+            
+            _visualCorrector *= factor;
+            
+            _visualRoot.position = _visualCorrector;
+        }
+
+        public bool TryHardMove(Vector3 delta)
+        {
+            var before = transform.position;
+            _characterController.Move(delta);
+            var after = transform.position;
+            
+            return (after - before).sqrMagnitude >= (delta.sqrMagnitude * 0.25f);
+        }
+
+        public void TeleportUnsafe(Vector3 position)
+        {
+            var wasEnabled = _characterController.enabled;
+
+            if (wasEnabled)
+                _characterController.enabled = false;
+
+            transform.position = position;
+
+            if (wasEnabled)
+                _characterController.enabled = true;
         }
 
         public void OnEnable()
@@ -82,7 +119,7 @@ namespace Player.Local
             
             var localSimulationRate = Math.Max(1, _predictionParameters.CountGenerateStateLocalSimulation);
             var period = TimeSpan.FromSeconds(1f / localSimulationRate);
-            var time = 1f / localSimulationRate;
+            var time = 0.033f; //TEST
             _inputFrameSyncService.Reset();
             
             Observable.Interval(period)
@@ -153,7 +190,7 @@ namespace Player.Local
             var nextState = currentState;
             nextState.InputTick = inputFrame.InputTick;
 
-            var targetSpeed = inputFrame.Run ? 8f : 4f;
+            var targetSpeed = inputFrame.Run ? _localPlayerParameters.SpeedRun : _localPlayerParameters.SpeedWalk;
             var inputDirection = new Vector3(inputFrame.Movement.x, 0f, inputFrame.Movement.z);
 
             if (inputDirection.sqrMagnitude <= 0f)
@@ -167,6 +204,7 @@ namespace Player.Local
             {
                 var rotation = Mathf.Atan2(inputFrame.Movement.x, inputFrame.Movement.z) * Mathf.Rad2Deg
                                + inputFrame.RotationY;
+                
                 nextState.Rotation = rotation;
 
                 var targetRotation = Quaternion.Euler(0f, rotation, 0f);
@@ -175,18 +213,15 @@ namespace Player.Local
 
             var dx = targetDirection.x * targetSpeed * deltaTime;
             var dz = targetDirection.z * targetSpeed * deltaTime;
-            var stepSqr = dx * dx + dz * dz;
+            
             nextState.MoveDirection = targetDirection;
-
-            if (stepSqr > _stepThresholdSqr)
-                return nextState;
 
             var verticalVelocity = currentState.Velocity.y;
             var isOnGround = currentState.IsGrounded;
 
             if (inputFrame.Jump && isOnGround)
             {
-                verticalVelocity = _jumpVelocity;
+                verticalVelocity = _localPlayerParameters.JumpVelocity;
                 isOnGround = false;
             }
 
@@ -194,14 +229,8 @@ namespace Player.Local
             targetPosition.x += dx;
             targetPosition.z += dz;
 
-            verticalVelocity += _gravity * deltaTime;
+            verticalVelocity += _localPlayerParameters.Gravity * deltaTime;
             targetPosition.y += verticalVelocity * deltaTime;
-
-            if (targetPosition.y > _maxJumpHeight)
-            {
-                targetPosition.y = _maxJumpHeight;
-                verticalVelocity = 0f;
-            }
 
             if (targetPosition.y <= 0f)
             {
@@ -224,32 +253,20 @@ namespace Player.Local
             return nextState;
         }
 
-        public void ApplyPredictedState(in PredictionStateFrame state, bool useCharacterControllerMove)
+        public void ApplyPredictedState(in PredictionStateFrame state)
         {
             _verticalVelocity = state.Velocity.y;
+            
             _isOnGround = state.IsGrounded;
+            
             _targetDirection = state.MoveDirection.sqrMagnitude > 0f
                 ? state.MoveDirection.normalized
                 : Vector3.forward;
 
             transform.rotation = Quaternion.Euler(0f, state.Rotation, 0f);
-
-            if (useCharacterControllerMove)
-            {
-                var move = state.Position - transform.position;
-                _characterController.Move(move);
-                return;
-            }
-
-            var wasEnabled = _characterController.enabled;
-
-            if (wasEnabled)
-                _characterController.enabled = false;
-
-            transform.position = state.Position;
-
-            if (wasEnabled)
-                _characterController.enabled = true;
+            
+            var move = state.Position - transform.position;
+            _characterController.Move(move);
         }
 
         private PredictionStateFrame BuildPredictedState(long inputTick, string animationState)

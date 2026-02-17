@@ -12,5 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f072146bc5794f3183d7c7f5269cbe49, type: 3}
   m_Name: LocalPlayerParameters
   m_EditorClassIdentifier: 
-  <SmoothSpeed>k__BackingField: 12
   <RotationSmoothTime>k__BackingField: 0.12
+  <JumpVelocity>k__BackingField: 8
+  <Gravity>k__BackingField: -9.81
+  <SpeedWalk>k__BackingField: 4
+  <SpeedRun>k__BackingField: 8

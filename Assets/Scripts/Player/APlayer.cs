@@ -1,6 +1,5 @@
 ﻿using System;
 using Player.Db;
-using Player.Interface;
 using Player.Interface.Local;
 using Services.Interface;
 using UnityEngine;
@@ -11,7 +10,6 @@ namespace Player
     public abstract class APlayer : MonoBehaviour
     {
         [SerializeField] protected Animator Animator;
-        [SerializeField] protected Transform RootTransform;
         
         protected ISnapshotsService SnapshotsService;
         protected IPlayerSnapshotReceiver PlayerSnapshotReceiver;

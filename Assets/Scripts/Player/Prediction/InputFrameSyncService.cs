@@ -61,7 +61,7 @@ namespace Player.Prediction
             networkInputFrame.InputTick = GetNextInputTick();
             _inputFrameBuffer.Enqueue(in networkInputFrame);
             _preconditionStorage.AddInputFrame(in networkInputFrame);
-
+            
             _predictionStateProvider.Write(
                 position,
                 velocity,

@@ -10,6 +10,7 @@ namespace Player.Remote
     public class RemotePlayer : APlayer
     {
         [SerializeField] private Transform _visualRoot;
+        [SerializeField] private Transform _physicalRoot;
 
         private Vector3 _visualVelocity;
         private Vector3 _visualWorldPos;
@@ -29,14 +30,14 @@ namespace Player.Remote
             
             _snapshotMotor = snapshotMotorFactory(
                 SnapshotsService,
-                RootTransform, 
+                _physicalRoot, 
                 _remotePlayerParameters);
         }
 
         private void Awake()
         {
-            _visualLocalOffset = RootTransform.InverseTransformPoint(_visualRoot.position);
-            _visualRotationOffset = Quaternion.Inverse(RootTransform.rotation) * _visualRoot.rotation;
+            _visualLocalOffset = _physicalRoot.InverseTransformPoint(_visualRoot.position);
+            _visualRotationOffset = Quaternion.Inverse(_physicalRoot.rotation) * _visualRoot.rotation;
             _visualWorldPos = _visualRoot.position;
             _visualWorldRot = _visualRoot.rotation;
         }
@@ -48,7 +49,7 @@ namespace Player.Remote
 
         private void LateUpdate()
         {
-            var targetPosition = RootTransform.TransformPoint(_visualLocalOffset);
+            var targetPosition = _physicalRoot.TransformPoint(_visualLocalOffset);
             var toTarget = targetPosition - _visualWorldPos;
 
             var visualSnapDistance = _remotePlayerParameters.VisualSnapDistance;
@@ -72,7 +73,7 @@ namespace Player.Remote
 
             _visualWorldRot = Quaternion.Slerp(
                 _visualWorldRot,
-                RootTransform.rotation * _visualRotationOffset,
+                _physicalRoot.rotation * _visualRotationOffset,
                 Time.deltaTime * visualRotationLerpSpeed);
 
             _visualRoot.position = _visualWorldPos;
