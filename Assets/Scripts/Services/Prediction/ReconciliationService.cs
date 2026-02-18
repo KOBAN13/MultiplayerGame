@@ -13,8 +13,6 @@ namespace Services.Prediction
     public class ReconciliationService : IReconciliationService
     {
         private const float LITE_POSITION_ERROR_THRESHOLD = 0.2f;
-        private const float MIDDLE_POSITION_ERROR_THRESHOLD = 2f;
-        private const float MAX_POSITION_ERROR_THRESHOLD = 10f;
 
         private readonly IPreconditionStorageService _preconditionStorage;
         private readonly IPredictionParameters _predictionParameters;
@@ -41,10 +39,9 @@ namespace Services.Prediction
                 return;
             }
 
-            var posErrors = position - preconditionState.Position;
-            var magnitudeErrors = posErrors.magnitude;
+            var posErrorAtN  = (position - preconditionState.Position).magnitude;
 
-            if (magnitudeErrors <= LITE_POSITION_ERROR_THRESHOLD)
+            if (posErrorAtN <= LITE_POSITION_ERROR_THRESHOLD)
             {
                 _preconditionStorage.ClearOldCommands(snapshotData.LastProcessedInputSequence);
                 return;
@@ -64,8 +61,55 @@ namespace Services.Prediction
                 _preconditionStorage.AddPrecondition(in predictedState);
             }
 
-            localPlayerMotor.ApplyPredictedState(in predictedState, useCharacterControllerMove: false);
+            ApplyHybridCorrection(localPlayerMotor, predictedState.Position);
+            
+            localPlayerMotor.ApplyPredictedState(in predictedState, false);
             _preconditionStorage.ClearOldCommands(snapshotData.LastProcessedInputSequence);
+        }
+
+        private void ApplyHybridCorrection(LocalPlayerMotor motor, Vector3 predictedPosition)
+        {
+            var currentPos = motor.GetTransform().position;
+            var delta = predictedPosition - currentPos;
+            var error = delta.magnitude;
+
+            if (error <= _predictionParameters.SmallError)
+            {
+                motor.AddVisualCorrection(delta);
+                return;
+            }
+
+            if (error <= _predictionParameters.MediumError)
+            {
+                var moveDelta = delta * _predictionParameters.MediumMoveGain;
+
+                var movedOk = motor.TryHardMove(moveDelta);
+                var newPosition = motor.GetTransform().position;
+                var residual = predictedPosition - newPosition;
+                motor.AddVisualCorrection(residual);
+                
+                if (!movedOk && residual.magnitude > _predictionParameters.LargeError)
+                {
+                    movedOk = motor.TryHardMove(residual);
+                    
+                    if (!movedOk)
+                        motor.TeleportUnsafe(predictedPosition);
+                }
+                
+                return;
+            }
+
+            if (error <= _predictionParameters.LargeError)
+            {
+                var movedOk = motor.TryHardMove(delta);
+                
+                if (!movedOk)
+                    motor.TeleportUnsafe(predictedPosition);
+                
+                return;
+            }
+            
+            motor.TeleportUnsafe(predictedPosition);
         }
 
         private static PredictionStateFrame BuildStateFromServerAtTickN(

@@ -31,6 +31,9 @@ namespace Player.Local
         private WeaponInputFrame _lastWeaponInputFrame;
         private Vector3 _aimDirection;
         private Vector3 _visualCorrector;
+        private Vector3 _visualLocalOffset;
+        private Quaternion _visualRotationOffset;
+        private Vector3 _cameraLocalOffset;
         private float _targetYaw;
         private float _targetPitch;
         private UnityEngine.Camera _mainCamera;
@@ -39,6 +42,16 @@ namespace Player.Local
         private bool _isOnGround = true;
 
         private const float THRESHOLD = 0.01f;
+        private Transform PhysicalRoot => _characterController != null ? _characterController.transform : transform;
+
+        private void Awake()
+        {
+            var physicalRoot = PhysicalRoot;
+
+            _visualLocalOffset = physicalRoot.InverseTransformPoint(_visualRoot.position);
+            _visualRotationOffset = Quaternion.Inverse(physicalRoot.rotation) * _visualRoot.rotation;
+            _cameraLocalOffset = physicalRoot.InverseTransformPoint(_cameraTarget.position);
+        }
 
         [Inject]
         public void Construct(
@@ -60,7 +73,7 @@ namespace Player.Local
         
         public Transform GetTransform()
         {
-            return transform;
+            return PhysicalRoot;
         }
 
         public Transform GetCameraTarget()
@@ -76,17 +89,20 @@ namespace Player.Local
         public void UpdateVisualSmoothing(float dt, float halfLife)
         {
             var factor = Mathf.Pow(0.5f, dt / Mathf.Max(0.0001f, halfLife));
+            var physicalRoot = PhysicalRoot;
             
             _visualCorrector *= factor;
             
-            _visualRoot.position = _visualCorrector;
+            _visualRoot.position = physicalRoot.TransformPoint(_visualLocalOffset) + _visualCorrector;
+            _visualRoot.rotation = physicalRoot.rotation * _visualRotationOffset;
+            _cameraTarget.position = physicalRoot.TransformPoint(_cameraLocalOffset);
         }
 
         public bool TryHardMove(Vector3 delta)
         {
-            var before = transform.position;
+            var before = PhysicalRoot.position;
             _characterController.Move(delta);
-            var after = transform.position;
+            var after = PhysicalRoot.position;
             
             return (after - before).sqrMagnitude >= (delta.sqrMagnitude * 0.25f);
         }
@@ -98,7 +114,7 @@ namespace Player.Local
             if (wasEnabled)
                 _characterController.enabled = false;
 
-            transform.position = position;
+            PhysicalRoot.position = position;
 
             if (wasEnabled)
                 _characterController.enabled = true;
@@ -160,6 +176,8 @@ namespace Player.Local
             {
                 LocalRotate();
             }
+
+            UpdateVisualSmoothing(Time.deltaTime, halfLife: 0.08f);
         }
 
         private void CharacterMove(float time)
@@ -169,12 +187,12 @@ namespace Player.Local
             var currentState = BuildPredictedState(0, "Idle");
             var predictedState = SimulatePredicted(in currentState, in _lastInputFrame, time);
             
-            ApplyPredictedState(in predictedState, useCharacterControllerMove: true);
+            ApplyPredictedState(in predictedState, true);
             
             _inputFrameSyncService.CaptureAndQueue(
                 in _lastInputFrame,
                 time,
-                transform.position,
+                PhysicalRoot.position,
                 new Vector3(0f, _verticalVelocity, 0f),
                 _targetDirection,
                 _isOnGround,
@@ -253,7 +271,7 @@ namespace Player.Local
             return nextState;
         }
 
-        public void ApplyPredictedState(in PredictionStateFrame state)
+        public void ApplyPredictedState(in PredictionStateFrame state, bool isApplyPosition)
         {
             _verticalVelocity = state.Velocity.y;
             
@@ -263,9 +281,12 @@ namespace Player.Local
                 ? state.MoveDirection.normalized
                 : Vector3.forward;
 
-            transform.rotation = Quaternion.Euler(0f, state.Rotation, 0f);
+            PhysicalRoot.rotation = Quaternion.Euler(0f, state.Rotation, 0f);
             
-            var move = state.Position - transform.position;
+            if (!isApplyPosition)
+                return;
+            
+            var move = state.Position - PhysicalRoot.position;
             _characterController.Move(move);
         }
 
@@ -274,10 +295,10 @@ namespace Player.Local
             return new PredictionStateFrame()
             {
                 InputTick = inputTick,
-                Position = transform.position,
+                Position = PhysicalRoot.position,
                 Velocity = new Vector3(0f, _verticalVelocity, 0f),
                 MoveDirection = _targetDirection.sqrMagnitude > 0f ? _targetDirection.normalized : Vector3.forward,
-                Rotation = transform.rotation.eulerAngles.y,
+                Rotation = PhysicalRoot.rotation.eulerAngles.y,
                 IsGrounded = _isOnGround,
                 AnimationState = animationState
             };
@@ -311,14 +332,14 @@ namespace Player.Local
                 _hits[0].point 
                 : ray.GetPoint(_rotationCameraParameters.RaycastDistance);
             
-            var direction = mouseWorldPosition - transform.position;
+            var direction = mouseWorldPosition - PhysicalRoot.position;
             direction.y = 0f;
 
             if (direction.sqrMagnitude < 0.0001f)
                 return;
 
             var targetRotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * _rotationCameraParameters.RotateSpeed);
+            PhysicalRoot.rotation = Quaternion.Slerp(PhysicalRoot.rotation, targetRotation, Time.deltaTime * _rotationCameraParameters.RotateSpeed);
             
             var cameraAngleOverride = _rotationCameraParameters.AngleOverride;
             
