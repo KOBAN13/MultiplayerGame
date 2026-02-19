@@ -31,7 +31,7 @@ namespace Player.Shared
         private void Move()
         {
             var position = _snapshotsService.GetInterpolatedPosition();
-            _transform.position =  position;
+            _transform.position = position;
         }
 
         private void Rotate(bool isAimRotation)

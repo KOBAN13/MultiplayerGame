@@ -32,13 +32,16 @@ namespace Player.Local
         private Vector3 _aimDirection;
         private Vector3 _visualCorrector;
         private Vector3 _visualLocalOffset;
+        private Vector3 _cameraLocalOffsetFromVisual;
         private Quaternion _visualRotationOffset;
-        private Vector3 _cameraLocalOffset;
+        private Vector3 _visualWorldPos;
+        private Quaternion _visualWorldRot;
         private float _targetYaw;
         private float _targetPitch;
         private UnityEngine.Camera _mainCamera;
         private Vector3 _targetDirection = Vector3.forward;
         private float _verticalVelocity;
+        private float _simulationDeltaTime;
         private bool _isOnGround = true;
 
         private const float THRESHOLD = 0.01f;
@@ -50,7 +53,9 @@ namespace Player.Local
 
             _visualLocalOffset = physicalRoot.InverseTransformPoint(_visualRoot.position);
             _visualRotationOffset = Quaternion.Inverse(physicalRoot.rotation) * _visualRoot.rotation;
-            _cameraLocalOffset = physicalRoot.InverseTransformPoint(_cameraTarget.position);
+            _cameraLocalOffsetFromVisual = _visualRoot.InverseTransformPoint(_cameraTarget.position);
+            _visualWorldPos = _visualRoot.position;
+            _visualWorldRot = _visualRoot.rotation;
         }
 
         [Inject]
@@ -89,13 +94,20 @@ namespace Player.Local
         public void UpdateVisualSmoothing(float dt, float halfLife)
         {
             var factor = Mathf.Pow(0.5f, dt / Mathf.Max(0.0001f, halfLife));
+            var lerp = 1f - factor;
             var physicalRoot = PhysicalRoot;
             
             _visualCorrector *= factor;
-            
-            _visualRoot.position = physicalRoot.TransformPoint(_visualLocalOffset) + _visualCorrector;
-            _visualRoot.rotation = physicalRoot.rotation * _visualRotationOffset;
-            _cameraTarget.position = physicalRoot.TransformPoint(_cameraLocalOffset);
+
+            var targetPosition = physicalRoot.TransformPoint(_visualLocalOffset) + _visualCorrector;
+            var targetRotation = physicalRoot.rotation * _visualRotationOffset;
+
+            _visualWorldPos = Vector3.Lerp(_visualWorldPos, targetPosition, lerp);
+            _visualWorldRot = Quaternion.Slerp(_visualWorldRot, targetRotation, lerp);
+
+            _visualRoot.position = _visualWorldPos;
+            _visualRoot.rotation = _visualWorldRot;
+            _cameraTarget.position = _visualRoot.TransformPoint(_cameraLocalOffsetFromVisual);
         }
 
         public bool TryHardMove(Vector3 delta)
@@ -118,11 +130,15 @@ namespace Player.Local
 
             if (wasEnabled)
                 _characterController.enabled = true;
+
+            _visualCorrector = Vector3.zero;
+            SnapVisualToPhysical();
         }
 
         public void OnEnable()
         {
             _mainCamera = UnityEngine.Camera.main;
+            SnapVisualToPhysical();
             
             _inputSource.AimCommand
                 .Subscribe(OnPlayerAim)
@@ -135,12 +151,23 @@ namespace Player.Local
             
             var localSimulationRate = Math.Max(1, _predictionParameters.CountGenerateStateLocalSimulation);
             var period = TimeSpan.FromSeconds(1f / localSimulationRate);
-            var time = 0.033f; //TEST
+            _simulationDeltaTime = 1f / localSimulationRate;
             _inputFrameSyncService.Reset();
             
             Observable.Interval(period)
-                .Subscribe(_ => CharacterMove(time))
+                .Subscribe(_ => CharacterMove())
                 .AddTo(this);
+        }
+
+        private void SnapVisualToPhysical()
+        {
+            var physicalRoot = PhysicalRoot;
+            _visualWorldPos = physicalRoot.TransformPoint(_visualLocalOffset) + _visualCorrector;
+            _visualWorldRot = physicalRoot.rotation * _visualRotationOffset;
+
+            _visualRoot.position = _visualWorldPos;
+            _visualRoot.rotation = _visualWorldRot;
+            _cameraTarget.position = _visualRoot.TransformPoint(_cameraLocalOffsetFromVisual);
         }
 
         private void OnPlayerAttack()
@@ -177,21 +204,21 @@ namespace Player.Local
                 LocalRotate();
             }
 
-            UpdateVisualSmoothing(Time.deltaTime, halfLife: 0.08f);
+            UpdateVisualSmoothing(Time.deltaTime, _predictionParameters.VisualHalfLife);
         }
 
-        private void CharacterMove(float time)
+        private void CharacterMove()
         {
             _lastInputFrame = _inputSource.ReadInputFrame(_mainCamera.transform.rotation.eulerAngles.y, _aimDirection, _targetPitch);
 
             var currentState = BuildPredictedState(0, "Idle");
-            var predictedState = SimulatePredicted(in currentState, in _lastInputFrame, time);
+            var predictedState = SimulatePredicted(in currentState, in _lastInputFrame, _simulationDeltaTime);
             
             ApplyPredictedState(in predictedState, true);
             
             _inputFrameSyncService.CaptureAndQueue(
                 in _lastInputFrame,
-                time,
+                _simulationDeltaTime,
                 PhysicalRoot.position,
                 new Vector3(0f, _verticalVelocity, 0f),
                 _targetDirection,

@@ -260,12 +260,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Animator: {fileID: 6636690418272243136}
-  RootTransform: {fileID: 2727283764638856046}
   _visualRoot: {fileID: 4581746200053470398}
-  _enableVisualSmoothing: 1
-  _visualPositionSmoothTime: 0.06
-  _visualRotationLerpSpeed: 12
-  _visualSnapDistance: 1.5
+  _physicalRoot: {fileID: 2727283764638856046}
 --- !u!1 &7560057743526673926
 GameObject:
   m_ObjectHideFlags: 0
