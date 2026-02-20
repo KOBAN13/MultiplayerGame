@@ -20,17 +20,23 @@ namespace Player.Remote
         
         private IPlayerSnapshotMotor _snapshotMotor;
         private IRemotePlayerParameters _remotePlayerParameters;
+        private Func<ISnapshotsServiceRegistry, int, Transform, IRemotePlayerParameters, IPlayerSnapshotMotor> _snapshotMotorFactory;
 
         [Inject]
         private void Construct(IRemotePlayerParameters remotePlayerParameters, 
-            Func<ISnapshotsService, Transform, IRemotePlayerParameters, IPlayerSnapshotMotor> snapshotMotorFactory
+            Func<ISnapshotsServiceRegistry, int, Transform, IRemotePlayerParameters, IPlayerSnapshotMotor> snapshotMotorFactory
         )
         {
             _remotePlayerParameters = remotePlayerParameters;
-            
-            _snapshotMotor = snapshotMotorFactory(
-                SnapshotsService,
-                _physicalRoot, 
+            _snapshotMotorFactory = snapshotMotorFactory;
+        }
+
+        protected override void OnSnapshotServiceInitialized()
+        {
+            _snapshotMotor = _snapshotMotorFactory(
+                SnapshotsServiceRegistry,
+                PlayerId,
+                _physicalRoot,
                 _remotePlayerParameters);
         }
 

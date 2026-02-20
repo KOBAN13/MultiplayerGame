@@ -46,15 +46,16 @@ namespace Di
             Register<InputFrameSyncService>(Lifetime.Transient);
             Register<ReconciliationService>(Lifetime.Singleton);
             
-            Builder.RegisterFactory<ISnapshotsService, Transform, IRemotePlayerParameters, IPlayerSnapshotMotor>(
-                (snapshotsService, playerTransform, playerParameters) =>
+            Builder.RegisterFactory<ISnapshotsServiceRegistry, int, Transform, IRemotePlayerParameters, IPlayerSnapshotMotor>(
+                (snapshotsServiceRegistry, playerId, playerTransform, playerParameters) =>
                     new SnapshotCharacterMotor(
-                        snapshotsService,
+                        snapshotsServiceRegistry,
+                        playerId,
                         playerTransform, 
                         playerParameters));
 
-            Builder.RegisterFactory<ISnapshotsService, IPlayerSnapshotReceiver>(
-                snapshotsService => new PlayerSnapshotReceiver(snapshotsService));
+            Builder.RegisterFactory<ISnapshotsServiceRegistry, int, IPlayerSnapshotReceiver>(
+                (snapshotsServiceRegistry, playerId) => new PlayerSnapshotReceiver(snapshotsServiceRegistry, playerId));
         }
 
         private void BindNetwork()
@@ -62,6 +63,7 @@ namespace Di
             Register<NetworkStateReceiver>(Lifetime.Singleton);
             Register<ServerTimeService>(Lifetime.Singleton);
             Register<SnapshotsService>(Lifetime.Transient);
+            Register<SnapshotsServiceRegistry>(Lifetime.Singleton);
         }
 
         private void BindInstaller()

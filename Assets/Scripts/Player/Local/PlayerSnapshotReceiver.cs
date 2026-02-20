@@ -9,15 +9,14 @@ namespace Player.Local
     {
         private readonly ISnapshotsService _snapshotsService;
         
-        public PlayerSnapshotReceiver(ISnapshotsService snapshotsService)
+        public PlayerSnapshotReceiver(ISnapshotsServiceRegistry snapshotsServiceRegistry, int playerId)
         {
-            _snapshotsService = snapshotsService;
+            _snapshotsService = snapshotsServiceRegistry.GetSnapshotService(playerId);
         }
         
         public void SetSnapshot(in SnapshotData snapshotData)
         {
             _snapshotsService.SyncServerTime(snapshotData.ServerTime);
-            
             _snapshotsService.AddSnapshot(snapshotData);
         }
     }

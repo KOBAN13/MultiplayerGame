@@ -7,19 +7,22 @@ namespace Player.Shared
 {
     public class SnapshotCharacterMotor : IPlayerSnapshotMotor
     {
-        private readonly ISnapshotsService _snapshotsService;
         private readonly Transform _transform;
         private readonly IRemotePlayerParameters _remotePlayerParameters;
         private float _rotationVelocity;
+        
+        private readonly ISnapshotsService _snapshotsService;
 
         public SnapshotCharacterMotor(
-            ISnapshotsService snapshotsService,
+            ISnapshotsServiceRegistry snapshotsServiceRegistry,
+            int playerId,
             Transform transform, 
             IRemotePlayerParameters remotePlayerParameters)
         {
-            _snapshotsService = snapshotsService;
             _transform = transform;
             _remotePlayerParameters = remotePlayerParameters;
+            
+            _snapshotsService = snapshotsServiceRegistry.GetSnapshotService(playerId);
         }
 
         public void Tick(bool isAim)

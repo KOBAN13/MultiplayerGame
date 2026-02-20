@@ -10,20 +10,23 @@ namespace Player.Remote
         private readonly CharacterController _characterController;
         private readonly Transform _transform;
         private readonly float _rotationSpeed;
-        private readonly ISnapshotsService _snapshotsService;
+        private readonly ISnapshotsServiceRegistry _snapshotsServiceRegistry;
+        private readonly int _playerId;
         private float _rotationVelocity;
 
         public RemoteRotationPlayer(
             CharacterController characterController, 
             Transform transform, 
             float rotationSpeed, 
-            ISnapshotsService snapshotsService
+            ISnapshotsServiceRegistry snapshotsServiceRegistry,
+            int playerId
         )
         {
             _characterController = characterController;
             _transform = transform;
             _rotationSpeed = rotationSpeed;
-            _snapshotsService = snapshotsService;
+            _snapshotsServiceRegistry = snapshotsServiceRegistry;
+            _playerId = playerId;
         }
         
         public void RotateCharacter()
@@ -31,7 +34,11 @@ namespace Player.Remote
             if (!_characterController.isGrounded)
                 return;
 
-            var yaw = _snapshotsService.GetInterpolatedRotationDirection();
+            var snapshotsService = _snapshotsServiceRegistry.GetSnapshotService(_playerId);
+            if (snapshotsService == null)
+                return;
+
+            var yaw = snapshotsService.GetInterpolatedRotationDirection();
 
             var rotation = Mathf.SmoothDampAngle(
                 _transform.eulerAngles.y,

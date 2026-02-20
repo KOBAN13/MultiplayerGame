@@ -11,17 +11,38 @@ namespace Player
     {
         [SerializeField] protected Animator Animator;
         
+        protected int PlayerId;
         protected ISnapshotsService SnapshotsService;
-        protected IPlayerSnapshotReceiver PlayerSnapshotReceiver;
+        protected ISnapshotsServiceRegistry SnapshotsServiceRegistry { get; private set; }
+
+        private IPlayerSnapshotReceiver _playerSnapshotReceiver;
+        private Func<ISnapshotsServiceRegistry, int, IPlayerSnapshotReceiver> _playerSnapshotReceiverFactory;
 
         [Inject]
         private void Construct(
-            ISnapshotsService snapshotsService, 
-            Func<ISnapshotsService, IPlayerSnapshotReceiver> playerSnapshotReceiverFactory
+            ISnapshotsServiceRegistry snapshotsServiceRegistry,
+            Func<ISnapshotsServiceRegistry, int, IPlayerSnapshotReceiver> playerSnapshotReceiverFactory
         )
         {
-            SnapshotsService = snapshotsService;
-            PlayerSnapshotReceiver = playerSnapshotReceiverFactory(SnapshotsService);
+            SnapshotsServiceRegistry = snapshotsServiceRegistry;
+            _playerSnapshotReceiverFactory = playerSnapshotReceiverFactory;
+        }
+
+        public void Initialize(int playerId)
+        {
+            PlayerId = playerId;
+            SnapshotsServiceRegistry.AddSnapshotService(playerId);
+            SnapshotsService = SnapshotsServiceRegistry.GetSnapshotService(playerId);
+
+            if (SnapshotsService == null)
+                throw new InvalidOperationException($"Failed to resolve snapshots service for playerId={playerId}.");
+
+            _playerSnapshotReceiver = _playerSnapshotReceiverFactory(SnapshotsServiceRegistry, playerId);
+            OnSnapshotServiceInitialized();
+        }
+
+        protected virtual void OnSnapshotServiceInitialized()
+        {
         }
         
         public virtual void SetAnimationState(string state)
@@ -31,7 +52,7 @@ namespace Player
 
         public virtual void SetSnapshot(in SnapshotData snapshot)
         {
-            PlayerSnapshotReceiver.SetSnapshot(snapshot);
+            _playerSnapshotReceiver.SetSnapshot(snapshot);
         }
     }
 }

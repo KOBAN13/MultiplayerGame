@@ -60,6 +60,8 @@ namespace Services.Connections
         {
             if (!_remotePlayerRegistry.TryAdd(joinRequest.UserId, player))
                 return;
+            
+            player.Initialize(joinRequest.UserId);
 
             var firstSnapshot = new SnapshotData()
             {
@@ -82,6 +84,8 @@ namespace Services.Connections
         {
             if (!_remotePlayerRegistry.TryAdd(joinRequest.UserId, player))
                 return;
+            
+            player.Initialize(joinRequest.UserId);
 
             var firstSnapshot = new SnapshotData()
             {

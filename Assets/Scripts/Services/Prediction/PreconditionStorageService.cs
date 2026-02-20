@@ -40,8 +40,8 @@ namespace Services.Prediction
             if (lastProcessedInputSequence <= 0)
                 return;
             
-            _pendingFrames.RemoveAll(frame => frame.InputTick <= lastProcessedInputSequence);
-            _inputFrames.RemoveAll(frame => frame.InputTick <= lastProcessedInputSequence);
+            _pendingFrames.RemoveAll(frame => frame.InputTick < lastProcessedInputSequence);
+            _inputFrames.RemoveAll(frame => frame.InputTick < lastProcessedInputSequence);
         }
         
         public void AddPrecondition(in PredictionStateFrame predictionStateFrame)
