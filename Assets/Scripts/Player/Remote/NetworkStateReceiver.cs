@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Helpers;
 using Player.Db;
 using Services.Db;
@@ -11,6 +10,7 @@ using Sfs2X.Requests;
 using UnityEngine;
 using Utils.Enums;
 using VContainer.Unity;
+using Object = UnityEngine.Object;
 
 namespace Player.Remote
 {
@@ -20,6 +20,7 @@ namespace Player.Remote
         private readonly IPlayerJoinGameService _playerJoinGameService;
         private readonly IRemotePlayerRegistry _remotePlayerRegistry;
         private readonly IReconciliationService _reconciliationService;
+        private readonly ISnapshotsServiceRegistry _snapshotsServiceRegistry;
         
         private const string ROOM_GROUP_NAME = "Game";
         
@@ -27,13 +28,13 @@ namespace Player.Remote
             SmartFox sfs,
             IPlayerJoinGameService playerJoinGameService,
             IRemotePlayerRegistry remotePlayerRegistry, 
-            IReconciliationService reconciliationService
-        )
+            IReconciliationService reconciliationService, ISnapshotsServiceRegistry snapshotsServiceRegistry)
         {
             _sfs = sfs;
             _playerJoinGameService = playerJoinGameService;
             _remotePlayerRegistry = remotePlayerRegistry;
             _reconciliationService = reconciliationService;
+            _snapshotsServiceRegistry = snapshotsServiceRegistry;
         }
         
         public void Initialize()
@@ -42,14 +43,32 @@ namespace Player.Remote
             
             _sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnServerPlayerState);
             _sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnPlayerEnterGame);
+            _sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnPlayerLeaveGame);
             
             _sfs.Send(new SubscribeRoomGroupRequest(ROOM_GROUP_NAME));
         }
-        
-        public void Dispose()
+
+        private void OnPlayerLeaveGame(BaseEvent evt)
         {
-            _sfs.RemoveEventListener(SFSEvent.EXTENSION_RESPONSE, OnServerPlayerState);
-            _sfs.RemoveEventListener(SFSEvent.EXTENSION_RESPONSE, OnPlayerEnterGame);
+            var cmd = (string)evt.Params[SFSResponseHelper.CMD];
+            
+            if (cmd != SFSResponseHelper.PLAYER_LEAVE_GAME_ROOM)
+                return;
+            
+            var data = (SFSObject)evt.Params["params"];
+            var userId = data.GetInt(SFSResponseHelper.USER_ID);
+
+            if (_remotePlayerRegistry.TryGet(userId, out var player))
+            {
+                _remotePlayerRegistry.Remove(userId);
+                Object.Destroy(player);
+            }
+            else
+            {
+                _remotePlayerRegistry.Remove(userId);
+            }
+            
+            _snapshotsServiceRegistry.RemoveSnapshotService(userId);
         }
 
         private void OnPlayerEnterGame(BaseEvent evt)
@@ -136,6 +155,13 @@ namespace Player.Remote
         {
             var data = SFSObject.NewInstance();
             _sfs.Send(new ExtensionRequest(SFSResponseHelper.CREATE_GAME_ROOM, data, _sfs.LastJoinedRoom));
+        }
+        
+        public void Dispose()
+        {
+            _sfs.RemoveEventListener(SFSEvent.EXTENSION_RESPONSE, OnServerPlayerState);
+            _sfs.RemoveEventListener(SFSEvent.EXTENSION_RESPONSE, OnPlayerEnterGame);
+            _sfs.RemoveEventListener(SFSEvent.EXTENSION_RESPONSE, OnPlayerLeaveGame);
         }
     }
 }
