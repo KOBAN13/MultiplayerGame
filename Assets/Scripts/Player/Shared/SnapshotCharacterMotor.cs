@@ -1,4 +1,5 @@
 using Db.Interface;
+using Player.Db;
 using Player.Interface;
 using Services.Interface;
 using UnityEngine;
@@ -7,7 +8,8 @@ namespace Player.Shared
 {
     public class SnapshotCharacterMotor : IPlayerSnapshotMotor
     {
-        private readonly Transform _transform;
+        private readonly Transform _visualRoot;
+        private readonly Transform _physicalRoot;
         private readonly IRemotePlayerParameters _remotePlayerParameters;
         private float _rotationVelocity;
         
@@ -16,42 +18,73 @@ namespace Player.Shared
         public SnapshotCharacterMotor(
             ISnapshotsServiceRegistry snapshotsServiceRegistry,
             int playerId,
-            Transform transform, 
-            IRemotePlayerParameters remotePlayerParameters)
+            Transform visualRoot, 
+            IRemotePlayerParameters remotePlayerParameters, 
+            Transform physicalRoot)
         {
-            _transform = transform;
+            _visualRoot = visualRoot;
             _remotePlayerParameters = remotePlayerParameters;
-            
+            _physicalRoot = physicalRoot;
+
             _snapshotsService = snapshotsServiceRegistry.GetSnapshotService(playerId);
         }
 
-        public void Tick(bool isAim)
+        public void Tick()
         {
-            Rotate(isAim);
+            RemotePlayerRotation();
+            
             Move();
         }
 
         private void Move()
         {
             var position = _snapshotsService.GetInterpolatedPosition();
-            _transform.position = position;
+            _visualRoot.position = position;
+        }
+        
+        private void RemotePlayerRotation()
+        {
+            var aimData = _snapshotsService.GetAimData();
+            
+            if (aimData.isAim)
+                AimRotate(aimData);
+            else
+                Rotate();
         }
 
-        private void Rotate(bool isAimRotation)
+        private void Rotate()
         {
             var yaw = _snapshotsService.GetInterpolatedRotationDirection();
 
             var rotation = Mathf.SmoothDampAngle(
-                _transform.eulerAngles.y,
+                _visualRoot.eulerAngles.y,
                 yaw,
                 ref _rotationVelocity,
                 _remotePlayerParameters.RotationSmoothTime
             );
+            
+            _visualRoot.rotation = Quaternion.Euler(0f, rotation, 0f);
+        }
+        
+        private void AimRotate(in AimData data)
+        {
+            var direction = data.AimDirection;
+            direction.y = 0f;
 
-            if (!isAimRotation)
-            {
-                _transform.rotation = Quaternion.Euler(0f, rotation, 0f);
-            }
+            if (direction.sqrMagnitude < 0.0001f)
+                return;
+
+            var targetRotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
+            PhysicalRoot.rotation = Quaternion.Slerp(PhysicalRoot.rotation, targetRotation, Time.deltaTime * _remotePlayerParameters.RotateSpeed);
+            
+            var cameraAngleOverride = _remotePlayerParameters.AngleOverride;
+            
+            var yawRotation = Quaternion.Euler(data.AimPitch + cameraAngleOverride, 0.0f, 0.0f);
+            
+            _yawTarget.localRotation = Quaternion.Slerp(
+                _yawTarget.localRotation,
+                yawRotation,
+                Time.deltaTime * _remotePlayerParameters.RotateSpeed);
         }
     }
 }

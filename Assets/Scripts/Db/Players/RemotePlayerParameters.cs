@@ -10,5 +10,7 @@ namespace Db.Players
         [field: SerializeField] public float VisualRotationLerpSpeed { get; private set; }
         [field: SerializeField] public float VisualSnapDistance { get; private set; }
         [field: SerializeField] public float RotationSmoothTime { get; private set; }
+        [field: SerializeField] public float RotateSpeed { get; private set; }
+        [field: SerializeField] public float AngleOverride { get; private set; }
     }
 }

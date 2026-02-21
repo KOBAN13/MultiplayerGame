@@ -28,7 +28,9 @@ namespace Player.Remote
             SmartFox sfs,
             IPlayerJoinGameService playerJoinGameService,
             IRemotePlayerRegistry remotePlayerRegistry, 
-            IReconciliationService reconciliationService, ISnapshotsServiceRegistry snapshotsServiceRegistry)
+            IReconciliationService reconciliationService, 
+            ISnapshotsServiceRegistry snapshotsServiceRegistry
+        )
         {
             _sfs = sfs;
             _playerJoinGameService = playerJoinGameService;
@@ -61,7 +63,7 @@ namespace Player.Remote
             if (_remotePlayerRegistry.TryGet(userId, out var player))
             {
                 _remotePlayerRegistry.Remove(userId);
-                Object.Destroy(player);
+                Object.Destroy(player.gameObject);
             }
             else
             {
@@ -123,6 +125,11 @@ namespace Player.Remote
                 var xDirection = playerData.GetFloat("horizontal");
                 var zDirection = playerData.GetFloat("vertical");
                 var isGrounded = playerData.GetBool("isGrounded");
+                var isAim = playerData.GetBool("isAim");
+                var aimDirectionX = playerData.GetFloat("aimDirectionX");
+                var aimDirectionY = playerData.GetFloat("aimDirectionY");
+                var aimDirectionZ = playerData.GetFloat("aimDirectionZ");
+                var aimPitch = playerData.GetFloat("aimPitch");
                 
                 var animationState = playerData.GetUtfString("animationState");
                 
@@ -134,6 +141,13 @@ namespace Player.Remote
                 
                 var snapshotData = new SnapshotData()
                 {
+                    AimData = new AimData
+                    {
+                        AimDirection = new Vector3(aimDirectionX, aimDirectionY, aimDirectionZ),
+                        AimPitch = aimPitch,
+                        isAim = isAim
+                    },
+                    
                     Position = position,
                     Input = direction,
                     Rotation = rotation,

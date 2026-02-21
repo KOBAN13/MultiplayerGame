@@ -93,6 +93,7 @@ namespace Player.Prediction
                 input.PutFloat("aimDirectionZ", frame.AimDirection.z);
                 input.PutFloat("aimPitch", frame.AimPitch);
                 input.PutLong("inputTick", frame.InputTick);
+                input.PutBool("isAim", frame.Aim);
 
                 inputs.AddSFSObject(input);
             }

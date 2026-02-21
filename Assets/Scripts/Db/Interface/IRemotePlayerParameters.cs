@@ -6,5 +6,8 @@
         float VisualRotationLerpSpeed { get; }
         float VisualSnapDistance { get; }
         float RotationSmoothTime { get; }
+        
+        float RotateSpeed { get; }
+        float AngleOverride { get; }
     }
 }

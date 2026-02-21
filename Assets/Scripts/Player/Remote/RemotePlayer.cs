@@ -50,7 +50,7 @@ namespace Player.Remote
 
         private void Update()
         {
-            _snapshotMotor.Tick(false);
+            _snapshotMotor.Tick();
         }
 
         private void LateUpdate()

@@ -45,14 +45,6 @@ namespace Di
             Register<InputFrameBuffer>(Lifetime.Singleton);
             Register<InputFrameSyncService>(Lifetime.Transient);
             Register<ReconciliationService>(Lifetime.Singleton);
-            
-            Builder.RegisterFactory<ISnapshotsServiceRegistry, int, Transform, IRemotePlayerParameters, IPlayerSnapshotMotor>(
-                (snapshotsServiceRegistry, playerId, playerTransform, playerParameters) =>
-                    new SnapshotCharacterMotor(
-                        snapshotsServiceRegistry,
-                        playerId,
-                        playerTransform, 
-                        playerParameters));
 
             Builder.RegisterFactory<ISnapshotsServiceRegistry, int, IPlayerSnapshotReceiver>(
                 (snapshotsServiceRegistry, playerId) => new PlayerSnapshotReceiver(snapshotsServiceRegistry, playerId));

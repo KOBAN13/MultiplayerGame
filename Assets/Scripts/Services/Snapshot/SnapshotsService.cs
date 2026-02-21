@@ -70,6 +70,36 @@ namespace Services.Snapshot
                 : Mathf.LerpAngle(older.Rotation, newer.Rotation, time);
         }
 
+        public AimData GetAimData()
+        {
+            switch (_snapshots.Count)
+            {
+                case 0:
+                    return default;
+                case 1:
+                    return _snapshots[0].AimData;
+            }
+
+            GetInterpolationPair(out var older, out var newer, out var time);
+            var olderAim = older.AimData;
+            var newerAim = newer.AimData;
+            var t = Mathf.Clamp01(time);
+
+            var isAim = olderAim.isAim == newerAim.isAim
+                ? olderAim.isAim
+                : t >= 0.5f;
+
+            var direction = InterpolateAimDirection(olderAim.AimDirection, newerAim.AimDirection, t);
+            var pitch = Mathf.Lerp(olderAim.AimPitch, newerAim.AimPitch, t);
+
+            return new AimData
+            {
+                isAim = isAim,
+                AimDirection = direction,
+                AimPitch = pitch
+            };
+        }
+
         public (long snapshotId, byte alpha) GetRenderSnapshotId()
         {
             switch (_snapshots.Count)
@@ -207,6 +237,23 @@ namespace Services.Snapshot
                 $"[InterpolationDebug] count={_snapshots.Count} serverTime={serverTime:F3} backTime={backTime:F3} " +
                 $"older={older.SnapshotId}:{older.ServerTime:F3} newer={newer.SnapshotId}:{newer.ServerTime:F3} " +
                 $"t={t:F3} jitter={_smoothedJitter:F3}");
+        }
+
+        private static Vector3 InterpolateAimDirection(Vector3 olderDirection, Vector3 newerDirection, float t)
+        {
+            var hasOlder = olderDirection.sqrMagnitude > 0.000001f;
+            var hasNewer = newerDirection.sqrMagnitude > 0.000001f;
+
+            if (!hasOlder && !hasNewer)
+                return Vector3.zero;
+
+            if (!hasOlder)
+                return newerDirection.normalized;
+
+            if (!hasNewer)
+                return olderDirection.normalized;
+
+            return Vector3.Slerp(olderDirection.normalized, newerDirection.normalized, t).normalized;
         }
     }
 }

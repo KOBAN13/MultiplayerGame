@@ -4,6 +4,8 @@ namespace Player.Db
 {
     public struct SnapshotData
     {
+        public AimData AimData;
+        
         public Vector3 Position;
         public Vector3 Input;
         public float Rotation;
