@@ -1,7 +1,7 @@
 ﻿using System;
 using Db.Interface;
 using Player.Interface;
-using Services.Interface;
+using Player.Shared;
 using UnityEngine;
 using VContainer;
 
@@ -20,11 +20,12 @@ namespace Player.Remote
         
         private IPlayerSnapshotMotor _snapshotMotor;
         private IRemotePlayerParameters _remotePlayerParameters;
-        private Func<ISnapshotsServiceRegistry, int, Transform, IRemotePlayerParameters, IPlayerSnapshotMotor> _snapshotMotorFactory;
+        private Func<SnapshotCharacterMotorArgs, IPlayerSnapshotMotor> _snapshotMotorFactory;
 
         [Inject]
-        private void Construct(IRemotePlayerParameters remotePlayerParameters, 
-            Func<ISnapshotsServiceRegistry, int, Transform, IRemotePlayerParameters, IPlayerSnapshotMotor> snapshotMotorFactory
+        private void Construct(
+            IRemotePlayerParameters remotePlayerParameters,
+            Func<SnapshotCharacterMotorArgs, IPlayerSnapshotMotor> snapshotMotorFactory
         )
         {
             _remotePlayerParameters = remotePlayerParameters;
@@ -34,10 +35,12 @@ namespace Player.Remote
         protected override void OnSnapshotServiceInitialized()
         {
             _snapshotMotor = _snapshotMotorFactory(
-                SnapshotsServiceRegistry,
-                PlayerId,
-                _physicalRoot,
-                _remotePlayerParameters);
+                new SnapshotCharacterMotorArgs(
+                    SnapshotsService,
+                    _physicalRoot,
+                    _visualRoot,
+                    YawTarget,
+                    _remotePlayerParameters));
         }
 
         private void Awake()
@@ -62,7 +65,6 @@ namespace Player.Remote
             var visualPositionSmoothTime = _remotePlayerParameters.VisualPositionSmoothTime;
             var visualRotationLerpSpeed = _remotePlayerParameters.VisualRotationLerpSpeed;
             
-
             if (toTarget.sqrMagnitude > visualSnapDistance * visualSnapDistance)
             {
                 _visualWorldPos = targetPosition;

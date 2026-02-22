@@ -9,6 +9,7 @@ using Services.Interface;
 using Sfs2X;
 using Sfs2X.Entities.Data;
 using Sfs2X.Requests;
+using UnityEngine;
 using VContainer.Unity;
 
 namespace Player.Prediction
@@ -94,7 +95,7 @@ namespace Player.Prediction
                 input.PutFloat("aimPitch", frame.AimPitch);
                 input.PutLong("inputTick", frame.InputTick);
                 input.PutBool("isAim", frame.Aim);
-
+                
                 inputs.AddSFSObject(input);
             }
 

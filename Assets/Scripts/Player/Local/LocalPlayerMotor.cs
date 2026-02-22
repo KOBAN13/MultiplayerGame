@@ -14,7 +14,6 @@ namespace Player.Local
     public class LocalPlayerMotor : APlayer
     {
         [SerializeField] private Transform _cameraTarget;
-        [SerializeField] private Transform _yawTarget;
         [SerializeField] private Transform _visualRoot;
         [SerializeField] private AWeapon _currentWeapon;
         [SerializeField] private CharacterController _characterController;
@@ -42,10 +41,12 @@ namespace Player.Local
         private Vector3 _targetDirection = Vector3.forward;
         private float _verticalVelocity;
         private float _simulationDeltaTime;
-        private bool _isOnGround = true;
+        private bool _isOnGround;
+        private bool _lastServerGrounded;
+        private bool _hasServerGrounded;
 
         private const float THRESHOLD = 0.01f;
-        private Transform PhysicalRoot => _characterController != null ? _characterController.transform : transform;
+        private Transform PhysicalRoot => _characterController.transform;
 
         private void Awake()
         {
@@ -130,7 +131,7 @@ namespace Player.Local
 
             if (wasEnabled)
                 _characterController.enabled = true;
-
+            
             _visualCorrector = Vector3.zero;
             SnapVisualToPhysical();
         }
@@ -215,6 +216,7 @@ namespace Player.Local
             var predictedState = SimulatePredicted(in currentState, in _lastInputFrame, _simulationDeltaTime);
             
             ApplyPredictedState(in predictedState, true);
+            var groundedForSync = GetGroundedForSync();
             
             _inputFrameSyncService.CaptureAndQueue(
                 in _lastInputFrame,
@@ -222,7 +224,7 @@ namespace Player.Local
                 PhysicalRoot.position,
                 new Vector3(0f, _verticalVelocity, 0f),
                 _targetDirection,
-                _isOnGround,
+                groundedForSync,
                 _mainCamera.transform.rotation.eulerAngles.y,
                 "Idle");
         }
@@ -301,7 +303,6 @@ namespace Player.Local
         public void ApplyPredictedState(in PredictionStateFrame state, bool isApplyPosition)
         {
             _verticalVelocity = state.Velocity.y;
-            
             _isOnGround = state.IsGrounded;
             
             _targetDirection = state.MoveDirection.sqrMagnitude > 0f
@@ -330,6 +331,18 @@ namespace Player.Local
                 AnimationState = animationState
             };
         }
+
+        public override void SetSnapshot(in SnapshotData snapshot)
+        {
+            _lastServerGrounded = snapshot.IsGrounded;
+            _hasServerGrounded = true;
+            base.SetSnapshot(in snapshot);
+        }
+
+        private bool GetGroundedForSync()
+        {
+            return _hasServerGrounded ? _lastServerGrounded : _isOnGround;
+        }
         
         private void OnPlayerAim(bool isAim)
         {
@@ -338,7 +351,7 @@ namespace Player.Local
                 : EVirtualCameraType.Gameplay);
 
             if (!isAim)
-                _yawTarget.transform.localRotation = Quaternion.identity;
+                YawTarget.transform.localRotation = Quaternion.identity;
         }
 
         private void LocalRotate()
@@ -372,8 +385,8 @@ namespace Player.Local
             
             var yawRotation = Quaternion.Euler(_targetPitch + cameraAngleOverride, 0.0f, 0.0f);
             
-            _yawTarget.localRotation = Quaternion.Slerp(
-                _yawTarget.localRotation,
+            YawTarget.localRotation = Quaternion.Slerp(
+                YawTarget.localRotation,
                 yawRotation,
                 Time.deltaTime * _rotationCameraParameters.RotateSpeed);
             

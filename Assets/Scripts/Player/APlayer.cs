@@ -10,6 +10,7 @@ namespace Player
     public abstract class APlayer : MonoBehaviour
     {
         [SerializeField] protected Animator Animator;
+        [SerializeField] protected Transform YawTarget;
         
         protected int PlayerId;
         protected ISnapshotsService SnapshotsService;

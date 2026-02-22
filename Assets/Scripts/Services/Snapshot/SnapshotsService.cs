@@ -70,6 +70,21 @@ namespace Services.Snapshot
                 : Mathf.LerpAngle(older.Rotation, newer.Rotation, time);
         }
 
+        public bool GetGroundedParam()
+        {
+            switch (_snapshots.Count)
+            {
+                case 0:
+                    return false;
+                case 1:
+                    return _snapshots[0].IsGrounded;
+            }
+
+            GetInterpolationPair(out var older, out var newer, out var time);
+            
+            return older.IsGrounded || newer.IsGrounded;
+        }
+
         public AimData GetAimData()
         {
             switch (_snapshots.Count)

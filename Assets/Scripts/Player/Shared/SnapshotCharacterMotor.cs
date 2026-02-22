@@ -8,82 +8,100 @@ namespace Player.Shared
 {
     public class SnapshotCharacterMotor : IPlayerSnapshotMotor
     {
-        private readonly Transform _visualRoot;
-        private readonly Transform _physicalRoot;
-        private readonly IRemotePlayerParameters _remotePlayerParameters;
-        private float _rotationVelocity;
+        private readonly SnapshotCharacterMotorArgs _args;
         
+        private float _rotationVelocity;
+
         private readonly ISnapshotsService _snapshotsService;
+        private readonly Transform _physicalRoot;
+        private readonly Transform _visualRoot;
+        private readonly Transform _yawTarget;
+        private readonly IRemotePlayerParameters _remotePlayerParameters;
 
-        public SnapshotCharacterMotor(
-            ISnapshotsServiceRegistry snapshotsServiceRegistry,
-            int playerId,
-            Transform visualRoot, 
-            IRemotePlayerParameters remotePlayerParameters, 
-            Transform physicalRoot)
+        public SnapshotCharacterMotor(SnapshotCharacterMotorArgs args)
         {
-            _visualRoot = visualRoot;
-            _remotePlayerParameters = remotePlayerParameters;
-            _physicalRoot = physicalRoot;
-
-            _snapshotsService = snapshotsServiceRegistry.GetSnapshotService(playerId);
+            _snapshotsService = args._snapshotsService;
+            _remotePlayerParameters = args._remotePlayerParameters;
+            _physicalRoot = args._physicalRoot;
+            _visualRoot = args._visualRoot;
+            _yawTarget = args._yawTarget;
+            _args = args;
         }
 
         public void Tick()
         {
             RemotePlayerRotation();
-            
             Move();
         }
 
         private void Move()
         {
             var position = _snapshotsService.GetInterpolatedPosition();
-            _visualRoot.position = position;
+            _physicalRoot.position = position;
         }
         
         private void RemotePlayerRotation()
         {
             var aimData = _snapshotsService.GetAimData();
-            
+
             if (aimData.isAim)
+            {
                 AimRotate(aimData);
-            else
-                Rotate();
+                return;
+            }
+
+            Rotate();
+            ResetYawTarget();
         }
 
         private void Rotate()
         {
+            var isGrounded = _snapshotsService.GetGroundedParam();
+            
+            if (!isGrounded)
+                return;
+            
             var yaw = _snapshotsService.GetInterpolatedRotationDirection();
 
             var rotation = Mathf.SmoothDampAngle(
-                _visualRoot.eulerAngles.y,
+                _physicalRoot.eulerAngles.y,
                 yaw,
                 ref _rotationVelocity,
                 _remotePlayerParameters.RotationSmoothTime
             );
-            
-            _visualRoot.rotation = Quaternion.Euler(0f, rotation, 0f);
+
+            _physicalRoot.rotation = Quaternion.Euler(0f, rotation, 0f);
         }
-        
+
         private void AimRotate(in AimData data)
         {
             var direction = data.AimDirection;
             direction.y = 0f;
 
-            if (direction.sqrMagnitude < 0.0001f)
-                return;
+            if (direction.sqrMagnitude > 0.0001f)
+            {
+                var targetRotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
 
-            var targetRotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
-            PhysicalRoot.rotation = Quaternion.Slerp(PhysicalRoot.rotation, targetRotation, Time.deltaTime * _remotePlayerParameters.RotateSpeed);
+                _physicalRoot.rotation = Quaternion.Slerp(
+                    _physicalRoot.rotation,
+                    targetRotation,
+                    Time.deltaTime * _remotePlayerParameters.RotateSpeed);
+            }
             
             var cameraAngleOverride = _remotePlayerParameters.AngleOverride;
-            
             var yawRotation = Quaternion.Euler(data.AimPitch + cameraAngleOverride, 0.0f, 0.0f);
-            
+
             _yawTarget.localRotation = Quaternion.Slerp(
                 _yawTarget.localRotation,
                 yawRotation,
+                Time.deltaTime * _remotePlayerParameters.RotateSpeed);
+        }
+
+        private void ResetYawTarget()
+        {
+            _yawTarget.localRotation = Quaternion.Slerp(
+                _yawTarget.localRotation,
+                Quaternion.identity,
                 Time.deltaTime * _remotePlayerParameters.RotateSpeed);
         }
     }

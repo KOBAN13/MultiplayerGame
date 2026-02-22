@@ -48,6 +48,9 @@ namespace Di
 
             Builder.RegisterFactory<ISnapshotsServiceRegistry, int, IPlayerSnapshotReceiver>(
                 (snapshotsServiceRegistry, playerId) => new PlayerSnapshotReceiver(snapshotsServiceRegistry, playerId));
+
+            Builder.RegisterFactory<SnapshotCharacterMotorArgs, IPlayerSnapshotMotor>(
+                args => new SnapshotCharacterMotor(args));
         }
 
         private void BindNetwork()

@@ -294,8 +294,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Animator: {fileID: 6636690418272243136}
+  YawTarget: {fileID: 481357721493712596}
   _cameraTarget: {fileID: 2662657865831511742}
-  _yawTarget: {fileID: 481357721493712596}
   _visualRoot: {fileID: 401861009955074642}
   _currentWeapon: {fileID: 4528788046502173804}
   _characterController: {fileID: 7676939041677741881}

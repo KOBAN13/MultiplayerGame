@@ -16,3 +16,5 @@ MonoBehaviour:
   <VisualRotationLerpSpeed>k__BackingField: 12
   <VisualSnapDistance>k__BackingField: 1.5
   <RotationSmoothTime>k__BackingField: 0.12
+  <RotateSpeed>k__BackingField: 15
+  <AngleOverride>k__BackingField: 0
