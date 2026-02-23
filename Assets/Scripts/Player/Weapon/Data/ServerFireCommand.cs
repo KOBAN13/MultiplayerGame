@@ -1,11 +1,8 @@
-﻿using UnityEngine;
-
-namespace Player.Weapon
+﻿namespace Player.Weapon.Data
 {
-    public struct FireCommand
+    public struct ServerFireCommand
     {
         public int weaponId;
-        public Vector3 position;
         public byte alpha;
         public long snapshotId;
         public ShotData shotData;

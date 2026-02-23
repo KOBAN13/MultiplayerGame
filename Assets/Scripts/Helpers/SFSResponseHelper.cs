@@ -35,6 +35,9 @@
         
         public const string PLAYER_COLLIDER_DATA = "playerColliderData";
         public const string COLLISION_DATA = "collisionData";
+        
         public const string RAYCAST = "raycast";
+        public const string RAYCAST_EXCLUDE_SENDER = "raycastExcludeSender";
+        public const string RAYCAST_SENDER_ONLY = "raycastSenderOnly";
     }
 }

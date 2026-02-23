@@ -1,4 +1,5 @@
 ﻿using Db.Projectile;
+using Player.Weapon.Data;
 using UnityEngine;
 using Utils.Enums;
 
@@ -8,7 +9,7 @@ namespace Player.Weapon
     {
         EWeaponType WeaponType { get; }
         int GetWeaponId();
-        void Attack(ref FireCommand command);
+        void Attack(ref ServerFireCommand command);
         void Reload();
         AWeaponData GetWeaponData();
         void SetOwner(GameObject owner);

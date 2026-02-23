@@ -261,6 +261,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Animator: {fileID: 6636690418272243136}
   YawTarget: {fileID: 481357721493712596}
+  CurrentWeapon: {fileID: 4528788046502173804}
   _visualRoot: {fileID: 4581746200053470398}
   _physicalRoot: {fileID: 2727283764638856046}
 --- !u!1 &7560057743526673926

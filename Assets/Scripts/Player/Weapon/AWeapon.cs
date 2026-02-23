@@ -1,7 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using Db.Projectile;
+using Player.Weapon.Data;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Utils.Enums;
 using VContainer;
 
@@ -44,7 +44,7 @@ namespace Player.Weapon
             _currentProjectileCount = Data.MagazineSize;
         }
 
-        public virtual void Attack(ref FireCommand command)
+        public virtual void Attack(ref ServerFireCommand command)
         {
             if (Time.time < _nextAttackTime || _isReloading) 
                 return;
@@ -75,7 +75,7 @@ namespace Player.Weapon
 
         public void SetOwner(GameObject owner) => Owner = owner;
         
-        protected abstract void PerformedAttack(ref FireCommand command);
+        protected abstract void PerformedAttack(ref ServerFireCommand command);
 
         private async UniTaskVoid ReloadAsync()
         {

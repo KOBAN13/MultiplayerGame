@@ -1,6 +1,6 @@
-﻿using System;
-using Db.Projectile;
+﻿using Db.Projectile;
 using Helpers;
+using Player.Weapon.Data;
 using Player.Weapon.Projectile;
 using Sfs2X;
 using Sfs2X.Entities.Data;
@@ -21,7 +21,6 @@ namespace Player.Weapon
         private readonly AProjectile _projectile = new BulletProjectile();
         private Vector3 _lastShotRayOrigin;
         private Vector3 _lastShotRayDirection;
-        private Vector3 _positionPlayerInShoot;
 
         private SingleShotWeaponData SingleShotWeaponData => (SingleShotWeaponData)Data;
 
@@ -32,16 +31,16 @@ namespace Player.Weapon
             _poolService = poolService;
         }
         
-        protected override void PerformedAttack(ref FireCommand command)
+        protected override void PerformedAttack(ref ServerFireCommand command)
         {
             command.shotData.layerMask = SingleShotWeaponData.LayerMask;
             command.shotData.distanceToShot = SingleShotWeaponData.DistanceToShot;
             
             SendShotToServer(command);
-            SimulateShot(SingleShotWeaponData, command.shotData, command);
+            SimulateShot(SingleShotWeaponData, command.shotData);
         }
 
-        private void SendShotToServer(FireCommand command)
+        private void SendShotToServer(ServerFireCommand command)
         {
             var shotData = command.shotData;
             
@@ -68,7 +67,7 @@ namespace Player.Weapon
             _sfs.Send(new ExtensionRequest(SFSResponseHelper.RAYCAST, data, _sfs.LastJoinedRoom));
         }
 
-        private void SimulateShot(SingleShotWeaponData weaponData, ShotData shotData, FireCommand command)
+        private void SimulateShot(SingleShotWeaponData weaponData, ShotData shotData)
         {
             var distance = weaponData.DistanceToShot;
 
@@ -88,7 +87,6 @@ namespace Player.Weapon
                 
                 _lastShotRayOrigin = shotData.origin;
                 _lastShotRayDirection = shotData.direction;
-                _positionPlayerInShoot = command.position;
 
                 Debug.DrawLine(_lastShotRayOrigin, hitPoint, Color.red, 1.0f);
             }
@@ -96,13 +94,6 @@ namespace Player.Weapon
             {
                 Debug.DrawLine(_lastShotRayOrigin, _lastShotRayOrigin + _lastShotRayDirection * distance, Color.yellow, 1.0f);
             }
-        }
-
-        private void OnDrawGizmos()
-        {
-            Gizmos.matrix = Matrix4x4.identity;
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawSphere(_positionPlayerInShoot, 0.2f);
         }
     }
 }

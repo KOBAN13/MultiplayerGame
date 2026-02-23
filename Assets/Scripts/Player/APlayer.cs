@@ -1,6 +1,7 @@
 ﻿using System;
 using Player.Db;
 using Player.Interface.Local;
+using Player.Weapon;
 using Services.Interface;
 using UnityEngine;
 using VContainer;
@@ -11,6 +12,7 @@ namespace Player
     {
         [SerializeField] protected Animator Animator;
         [SerializeField] protected Transform YawTarget;
+        [SerializeField] protected AWeapon CurrentWeapon;
         
         protected int PlayerId;
         protected ISnapshotsService SnapshotsService;

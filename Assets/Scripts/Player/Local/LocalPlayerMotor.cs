@@ -4,6 +4,7 @@ using Input;
 using Player.Db;
 using Player.Interface.Local;
 using Player.Weapon;
+using Player.Weapon.Data;
 using R3;
 using UnityEngine;
 using Utils.Enums;
@@ -15,7 +16,6 @@ namespace Player.Local
     {
         [SerializeField] private Transform _cameraTarget;
         [SerializeField] private Transform _visualRoot;
-        [SerializeField] private AWeapon _currentWeapon;
         [SerializeField] private CharacterController _characterController;
         
         private IInputSource _inputSource;
@@ -177,7 +177,7 @@ namespace Player.Local
 
             var render = SnapshotsService.GetRenderSnapshotId();
             
-            var fireCommand = new FireCommand
+            var fireCommand = new ServerFireCommand
             {
                 snapshotId = render.snapshotId,
                 alpha = render.alpha,
@@ -188,7 +188,7 @@ namespace Player.Local
                 }
             };
 
-            _currentWeapon.Attack(ref fireCommand);
+            CurrentWeapon.Attack(ref fireCommand);
         }
 
         public void Update()
