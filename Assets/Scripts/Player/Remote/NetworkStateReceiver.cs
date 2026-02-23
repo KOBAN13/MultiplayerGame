@@ -124,7 +124,7 @@ namespace Player.Remote
                 var rotation = playerData.GetFloat("rotation");
                 var xDirection = playerData.GetFloat("horizontal");
                 var zDirection = playerData.GetFloat("vertical");
-                var isGrounded = playerData.GetBool("isGrounded");
+                var isGrounded = playerData.GetBool("isOnGround");
                 var isAim = playerData.GetBool("isAim");
                 var aimDirectionX = playerData.GetFloat("aimDirectionX");
                 var aimDirectionY = playerData.GetFloat("aimDirectionY");
