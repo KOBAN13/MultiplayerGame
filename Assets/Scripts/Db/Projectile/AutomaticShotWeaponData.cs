@@ -3,7 +3,7 @@
 namespace Db.Projectile
 {
     [CreateAssetMenu(fileName = "AutomaticShotWeaponData", menuName = "Db/AutomaticShotWeaponData")]
-    public class AutomaticShotWeaponData : AWeaponData
+    public class AutomaticShotWeaponData : AHitScanWeaponData
     {
         
     }

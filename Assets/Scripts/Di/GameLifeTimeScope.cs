@@ -9,6 +9,7 @@ using Player.Local;
 using Player.Prediction;
 using Player.Remote;
 using Player.Shared;
+using Player.Weapon.Services;
 using Services;
 using Services.Connections;
 using Services.Interface;
@@ -77,6 +78,7 @@ namespace Di
         {
             Register<PoolService>(Lifetime.Singleton);
             Register<PreconditionStorageService>(Lifetime.Singleton);
+            Register<ShotFxSimulator>(Lifetime.Singleton);
         }
     }
 }

@@ -1,6 +1,10 @@
 ﻿using System;
+using Db.Projectile;
 using Helpers;
 using Player.Db;
+using Player.Weapon;
+using Player.Weapon.Data;
+using Player.Weapon.Services;
 using Services.Db;
 using Services.Interface;
 using Sfs2X;
@@ -21,6 +25,8 @@ namespace Player.Remote
         private readonly IRemotePlayerRegistry _remotePlayerRegistry;
         private readonly IReconciliationService _reconciliationService;
         private readonly ISnapshotsServiceRegistry _snapshotsServiceRegistry;
+        private readonly IShotFxSimulator _shotFxSimulator;
+        private readonly AHitScanWeaponData _defaultHitScanWeaponData;
         
         private const string ROOM_GROUP_NAME = "Game";
         
@@ -29,14 +35,23 @@ namespace Player.Remote
             IPlayerJoinGameService playerJoinGameService,
             IRemotePlayerRegistry remotePlayerRegistry, 
             IReconciliationService reconciliationService, 
-            ISnapshotsServiceRegistry snapshotsServiceRegistry
-        )
+            ISnapshotsServiceRegistry snapshotsServiceRegistry,
+            IShotFxSimulator shotFxSimulator,
+            WeaponData weaponData)
         {
             _sfs = sfs;
             _playerJoinGameService = playerJoinGameService;
             _remotePlayerRegistry = remotePlayerRegistry;
             _reconciliationService = reconciliationService;
             _snapshotsServiceRegistry = snapshotsServiceRegistry;
+            _shotFxSimulator = shotFxSimulator;
+
+            if (weaponData != null
+                && weaponData.TryGet(EWeaponType.SingleShot, out var singleShotData)
+                && singleShotData is AHitScanWeaponData hitScanWeaponData)
+            {
+                _defaultHitScanWeaponData = hitScanWeaponData;
+            }
         }
         
         public void Initialize()
@@ -46,8 +61,32 @@ namespace Player.Remote
             _sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnServerPlayerState);
             _sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnPlayerEnterGame);
             _sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnPlayerLeaveGame);
+            _sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnRemoteClientShoot);
             
             _sfs.Send(new SubscribeRoomGroupRequest(ROOM_GROUP_NAME));
+        }
+        
+        private void OnRemoteClientShoot(BaseEvent evt)
+        {
+            var cmd = (string)evt.Params[SFSResponseHelper.CMD];
+            
+            if (cmd != SFSResponseHelper.RAYCAST_EXCLUDE_SENDER)
+                return;
+
+            var data = (SFSObject)evt.Params["params"];
+
+            var hitX = data.GetFloat("xPoint");
+            var hitY = data.GetFloat("yPoint");
+            var hitZ = data.GetFloat("zPoint");
+            var isHit = data.GetBool("hit");
+
+            var shotData = new ClientFireCommand
+            {
+                hitPosition = new Vector3(hitX, hitY, hitZ),
+                isHit = isHit
+            };
+
+            _shotFxSimulator.SimulateShotServer(_defaultHitScanWeaponData, shotData);
         }
 
         private void OnPlayerLeaveGame(BaseEvent evt)
@@ -176,6 +215,7 @@ namespace Player.Remote
             _sfs.RemoveEventListener(SFSEvent.EXTENSION_RESPONSE, OnServerPlayerState);
             _sfs.RemoveEventListener(SFSEvent.EXTENSION_RESPONSE, OnPlayerEnterGame);
             _sfs.RemoveEventListener(SFSEvent.EXTENSION_RESPONSE, OnPlayerLeaveGame);
+            _sfs.RemoveEventListener(SFSEvent.EXTENSION_RESPONSE, OnRemoteClientShoot);
         }
     }
 }

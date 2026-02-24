@@ -1,11 +1,7 @@
 ﻿using System;
 using Db.Interface;
-using Helpers;
 using Player.Interface;
 using Player.Shared;
-using Sfs2X;
-using Sfs2X.Core;
-using Sfs2X.Entities.Data;
 using UnityEngine;
 using VContainer;
 
@@ -15,8 +11,6 @@ namespace Player.Remote
     {
         [SerializeField] private Transform _visualRoot;
         [SerializeField] private Transform _physicalRoot;
-
-        private SmartFox _sfs;
 
         private Vector3 _visualVelocity;
         private Vector3 _visualWorldPos;
@@ -31,11 +25,9 @@ namespace Player.Remote
         [Inject]
         private void Construct(
             IRemotePlayerParameters remotePlayerParameters,
-            Func<SnapshotCharacterMotorArgs, IPlayerSnapshotMotor> snapshotMotorFactory,
-            SmartFox sfs
+            Func<SnapshotCharacterMotorArgs, IPlayerSnapshotMotor> snapshotMotorFactory
         )
         {
-            _sfs = sfs;
             _remotePlayerParameters = remotePlayerParameters;
             _snapshotMotorFactory = snapshotMotorFactory;
         }
@@ -57,16 +49,6 @@ namespace Player.Remote
             _visualRotationOffset = Quaternion.Inverse(_physicalRoot.rotation) * _visualRoot.rotation;
             _visualWorldPos = _visualRoot.position;
             _visualWorldRot = _visualRoot.rotation;
-        }
-
-        private void OnEnable()
-        {
-            _sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnRemoteClientShoot);
-        }
-
-        private void OnDestroy()
-        {
-            _sfs.RemoveEventListener(SFSEvent.EXTENSION_RESPONSE, OnRemoteClientShoot);
         }
 
         private void Update()
@@ -104,16 +86,6 @@ namespace Player.Remote
 
             _visualRoot.position = _visualWorldPos;
             _visualRoot.rotation = _visualWorldRot;
-        }
-        
-        private void OnRemoteClientShoot(BaseEvent evt)
-        {
-            var cmd = (string)evt.Params[SFSResponseHelper.CMD];
-            
-            if (cmd != SFSResponseHelper.RAYCAST_EXCLUDE_SENDER)
-                return;
-
-            Debug.LogError("COCK");
         }
     }
 }

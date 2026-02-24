@@ -1,8 +1,11 @@
-﻿namespace Player.Weapon.Data
+﻿using UnityEngine;
+
+namespace Player.Weapon.Data
 {
-    public class ClientFireCommand
+    public struct ClientFireCommand
     {
         public int weaponId;
-        public ShotData shotData;
+        public bool isHit;
+        public Vector3 hitPosition;
     }
 }

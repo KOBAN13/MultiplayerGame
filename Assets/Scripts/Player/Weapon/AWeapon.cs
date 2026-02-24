@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using Db.Projectile;
 using Player.Weapon.Data;
+using Player.Weapon.Services;
 using UnityEngine;
 using Utils.Enums;
 using VContainer;
@@ -17,13 +18,14 @@ namespace Player.Weapon
         
         protected AWeaponData Data;
         protected GameObject Owner;
+        protected IShotFxSimulator ShotFxSimulator;
 
         private float _currentProjectileCount;
         private bool _isReloading;
         private float _nextAttackTime;
         
         [Inject]
-        private void Construct(WeaponData weaponData)
+        private void Construct(WeaponData weaponData, IShotFxSimulator shotFxSimulator)
         {
             if (weaponData == null)
             {
@@ -39,6 +41,7 @@ namespace Player.Weapon
                 return;
             }
 
+            ShotFxSimulator = shotFxSimulator;
             Data = data;
             Owner = gameObject;
             _currentProjectileCount = Data.MagazineSize;
