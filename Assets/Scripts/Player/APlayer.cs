@@ -51,7 +51,7 @@ namespace Player
         
         public virtual void SetAnimationState(int state)
         {
-            Animator.SetInteger(state, 1);
+            //Animator.SetInteger(state, 1);
         }
 
         public virtual void SetSnapshot(in SnapshotData snapshot)

@@ -1,6 +1,7 @@
 ﻿using System;
 using Db.Interface;
 using Input;
+using Player.Animation;
 using Player.Db;
 using Player.Interface.Local;
 using Player.Weapon;
@@ -214,6 +215,9 @@ namespace Player.Local
 
             var currentState = BuildPredictedState(0, 1);
             var predictedState = SimulatePredicted(in currentState, in _lastInputFrame, _simulationDeltaTime);
+            
+            Animator.SetFloat(AnimatorHash.ForwardRun, currentState.MoveDirection.z);
+            Animator.SetFloat(AnimatorHash.ForwardRun, currentState.MoveDirection.x);
             
             ApplyPredictedState(in predictedState, true);
             var groundedForSync = GetGroundedForSync();
