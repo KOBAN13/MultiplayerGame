@@ -129,7 +129,7 @@ namespace Player.Remote
                 var userId = playerData.GetInt("userId");
                 var x = playerData.GetFloat("x");
                 var z = playerData.GetFloat("z");
-                var animationState = playerData.GetUtfString("animationState");
+                var animationState = playerData.GetInt("animationState");
                 var position = new Vector3(x, 0f, z);
                 
                 var playerType = _sfs.MySelf.Id == userId 
@@ -170,7 +170,7 @@ namespace Player.Remote
                 var aimDirectionZ = playerData.GetFloat("aimDirectionZ");
                 var aimPitch = playerData.GetFloat("aimPitch");
                 
-                var animationState = playerData.GetUtfString("animationState");
+                var animationState = playerData.GetInt("animationState");
                 
                 var position = new Vector3(xPosition, yPosition, zPosition);
                 var direction = new Vector3(xDirection, 0f, zDirection);

@@ -14,6 +14,6 @@ namespace Player.Interface.Local
             Vector3 moveDirection,
             bool isGrounded,
             float rotationY,
-            string animationState);
+            int animationState);
     }
 }

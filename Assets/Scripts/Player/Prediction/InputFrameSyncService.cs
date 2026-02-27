@@ -48,7 +48,7 @@ namespace Player.Prediction
             Vector3 moveDirection,
             bool isGrounded,
             float rotationY,
-            string animationState)
+            int animationState)
         {
             _sendAccumulator += deltaTime;
 

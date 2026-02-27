@@ -7,10 +7,10 @@ namespace Services.Db
     {
         public readonly EPlayerType PlayerType;
         public readonly Vector3 Position;
-        public readonly string AnimationState;
+        public readonly int AnimationState;
         public readonly int UserId;
 
-        public PlayerJoinRequest(Vector3 position, string animationState, int userId, EPlayerType playerType)
+        public PlayerJoinRequest(Vector3 position, int animationState, int userId, EPlayerType playerType)
         {
             Position = position;
             AnimationState = animationState;

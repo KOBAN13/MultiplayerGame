@@ -10,7 +10,7 @@ namespace Player.Db
         public Vector3 Input;
         public float Rotation;
         public bool IsGrounded;
-        public string AnimationState;
+        public int AnimationState;
         public long SnapshotId;
         public long LastProcessedInputSequence;
         public float ServerTime;

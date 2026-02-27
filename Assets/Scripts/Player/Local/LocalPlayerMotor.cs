@@ -212,7 +212,7 @@ namespace Player.Local
         {
             _lastInputFrame = _inputSource.ReadInputFrame(_mainCamera.transform.rotation.eulerAngles.y, _aimDirection, _targetPitch);
 
-            var currentState = BuildPredictedState(0, "Idle");
+            var currentState = BuildPredictedState(0, 1);
             var predictedState = SimulatePredicted(in currentState, in _lastInputFrame, _simulationDeltaTime);
             
             ApplyPredictedState(in predictedState, true);
@@ -226,7 +226,7 @@ namespace Player.Local
                 _targetDirection,
                 groundedForSync,
                 _mainCamera.transform.rotation.eulerAngles.y,
-                "Idle");
+                1);
         }
 
         public PredictionStateFrame SimulatePredicted(
@@ -293,9 +293,8 @@ namespace Player.Local
             nextState.Position = targetPosition;
             nextState.Velocity = new Vector3(0f, verticalVelocity, 0f);
             nextState.IsGrounded = isOnGround;
-
-            if (string.IsNullOrEmpty(nextState.AnimationState))
-                nextState.AnimationState = "Idle";
+            
+            //nextState.AnimationState = "Idle";
 
             return nextState;
         }
@@ -318,7 +317,7 @@ namespace Player.Local
             _characterController.Move(move);
         }
 
-        private PredictionStateFrame BuildPredictedState(long inputTick, string animationState)
+        private PredictionStateFrame BuildPredictedState(long inputTick, int animationState)
         {
             return new PredictionStateFrame()
             {

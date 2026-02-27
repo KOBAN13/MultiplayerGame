@@ -1,4 +1,5 @@
 ﻿using System;
+using Player.Animation;
 using Player.Db;
 using Player.Interface.Local;
 using Player.Weapon;
@@ -48,9 +49,9 @@ namespace Player
         {
         }
         
-        public virtual void SetAnimationState(string state)
+        public virtual void SetAnimationState(int state)
         {
-            // TODO: реализовать переключение анимаций
+            Animator.SetInteger(state, 1);
         }
 
         public virtual void SetSnapshot(in SnapshotData snapshot)

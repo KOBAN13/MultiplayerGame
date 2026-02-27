@@ -11,7 +11,7 @@ namespace Player.Interface.Local
             Vector3 moveDirection,
             bool isGrounded,
             float rotation,
-            string animationState,
+            int animationState,
             long inputTick);
 
         PredictionStateFrame Read();
