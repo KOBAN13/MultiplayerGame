@@ -51,6 +51,8 @@ namespace Player.Local
 
         private void Awake()
         {
+            ConfigureAnimator();
+
             var physicalRoot = PhysicalRoot;
 
             _visualLocalOffset = physicalRoot.InverseTransformPoint(_visualRoot.position);
@@ -215,9 +217,8 @@ namespace Player.Local
 
             var currentState = BuildPredictedState(0, 1);
             var predictedState = SimulatePredicted(in currentState, in _lastInputFrame, _simulationDeltaTime);
-            
-            Animator.SetFloat(AnimatorHash.ForwardRun, currentState.MoveDirection.z);
-            Animator.SetFloat(AnimatorHash.ForwardRun, currentState.MoveDirection.x);
+
+            UpdateAnimatorParameters(in _lastInputFrame, in predictedState);
             
             ApplyPredictedState(in predictedState, true);
             var groundedForSync = GetGroundedForSync();
@@ -231,6 +232,30 @@ namespace Player.Local
                 groundedForSync,
                 _mainCamera.transform.rotation.eulerAngles.y,
                 1);
+        }
+
+        private void UpdateAnimatorParameters(in InputFrame inputFrame, in PredictionStateFrame predictedState)
+        {
+            var inputDirection = new Vector3(inputFrame.Movement.x, 0f, inputFrame.Movement.z);
+            var inputMagnitude = Mathf.Clamp01(inputDirection.magnitude);
+
+            if (inputMagnitude <= 0.0001f)
+            {
+                UpdateMovementAnimation(Vector3.zero, PhysicalRoot.rotation, _simulationDeltaTime);
+                return;
+            }
+
+            var locomotionScale = inputFrame.Run
+                ? 1f
+                : Mathf.Clamp01(_localPlayerParameters.SpeedWalk / Mathf.Max(_localPlayerParameters.SpeedRun, 0.001f));
+
+            var scaledInputDirection = inputDirection.normalized * (inputMagnitude * locomotionScale);
+            var worldDirection = Quaternion.Euler(0f, inputFrame.RotationY, 0f) * scaledInputDirection;
+            var referenceRotation = inputFrame.Aim
+                ? PhysicalRoot.rotation
+                : Quaternion.Euler(0f, predictedState.Rotation, 0f);
+
+            UpdateMovementAnimation(worldDirection, referenceRotation, _simulationDeltaTime);
         }
 
         public PredictionStateFrame SimulatePredicted(

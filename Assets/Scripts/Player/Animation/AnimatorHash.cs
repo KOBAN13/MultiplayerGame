@@ -4,8 +4,8 @@ namespace Player.Animation
 {
     public static class AnimatorHash
     {
-        public static readonly int ForwardRun = Animator.StringToHash("Horizontal");
-        public static readonly int BackwardRun = Animator.StringToHash("Vertical");
+        public static readonly int Horizontal = Animator.StringToHash("Horizontal");
+        public static readonly int Vertical = Animator.StringToHash("Vertical");
         public static readonly int MoveSpeed = Animator.StringToHash("MoveSpeed");
         public static readonly int StartWalkForward = Animator.StringToHash("StartWalkForward");
         public static readonly int StopWalkForward = Animator.StringToHash("StopWalkForward");

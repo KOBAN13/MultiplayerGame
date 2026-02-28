@@ -1,5 +1,6 @@
 ﻿using System;
 using Db.Interface;
+using Player.Db;
 using Player.Interface;
 using Player.Shared;
 using UnityEngine;
@@ -45,10 +46,17 @@ namespace Player.Remote
 
         private void Awake()
         {
+            ConfigureAnimator();
             _visualLocalOffset = _physicalRoot.InverseTransformPoint(_visualRoot.position);
             _visualRotationOffset = Quaternion.Inverse(_physicalRoot.rotation) * _visualRoot.rotation;
             _visualWorldPos = _visualRoot.position;
             _visualWorldRot = _visualRoot.rotation;
+        }
+
+        public override void SetSnapshot(in SnapshotData snapshot)
+        {
+            base.SetSnapshot(in snapshot);
+            UpdateMovementAnimation(snapshot.Input, Quaternion.Euler(0f, snapshot.Rotation, 0f), 0f);
         }
 
         private void Update()
