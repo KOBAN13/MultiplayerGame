@@ -118,14 +118,19 @@ namespace Services.Prediction
         {
             var correctedStateAtN = predictedStateAtN;
             correctedStateAtN.InputTick = snapshotData.LastProcessedInputSequence;
-            correctedStateAtN.Position = snapshotData.Position;
+            correctedStateAtN.Position = snapshotData.PlayerState.Position;
             correctedStateAtN.Rotation = snapshotData.Rotation;
-            correctedStateAtN.IsGrounded = snapshotData.IsGrounded;
-            correctedStateAtN.AnimationState = snapshotData.AnimationState;
+            correctedStateAtN.IsGrounded = snapshotData.PlayerState.IsGrounded;
             correctedStateAtN.MoveDirection = Quaternion.Euler(0f, snapshotData.Rotation, 0f) * Vector3.forward;
 
             if (correctedStateAtN.IsGrounded)
+            {
                 correctedStateAtN.Velocity = Vector3.zero;
+            }
+            else
+            {
+                correctedStateAtN.Velocity = new Vector3(0f, snapshotData.PlayerState.Velocity, 0f);
+            }
 
             return correctedStateAtN;
         }

@@ -163,7 +163,12 @@ namespace Player.Remote
                 var rotation = playerData.GetFloat("rotation");
                 var xDirection = playerData.GetFloat("horizontal");
                 var zDirection = playerData.GetFloat("vertical");
+                var velocity = playerData.GetFloat("horizontalVelocity");
                 var isGrounded = playerData.GetBool("isOnGround");
+                var isJumping = playerData.GetBool("isJumping");
+                var isStartRun = playerData.GetBool("isStartRun");
+                var isStopRun = playerData.GetBool("isEndRun");
+                var isDie = false;
                 var isAim = playerData.GetBool("isAim");
                 var aimDirectionX = playerData.GetFloat("aimDirectionX");
                 var aimDirectionY = playerData.GetFloat("aimDirectionY");
@@ -187,11 +192,19 @@ namespace Player.Remote
                         isAim = isAim
                     },
                     
-                    Position = position,
-                    Input = direction,
+                    PlayerState = new PlayerStateData
+                    {
+                        Input = direction,
+                        Position = position,
+                        Velocity = velocity,
+                        IsGrounded = isGrounded,
+                        IsJump = isJumping,
+                        IsStartRun = isStartRun,
+                        IsStopRun = isStopRun,
+                        IsDead = isDie,
+                    },
+                    
                     Rotation = rotation,
-                    IsGrounded = isGrounded,
-                    AnimationState = animationState,
                     ServerTime = serverTime,
                     SnapshotId = snapshotId,
                     LastProcessedInputSequence = lastProcessedInputSequence
@@ -200,7 +213,7 @@ namespace Player.Remote
                 remotePlayer.SetSnapshot(in snapshotData);
                 remotePlayer.SetAnimationState(animationState);
                 
-                _reconciliationService.Reconciliation(remotePlayer, snapshotData.Position, snapshotData);
+                _reconciliationService.Reconciliation(remotePlayer, position, snapshotData);
             }
         }
         

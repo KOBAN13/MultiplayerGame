@@ -45,6 +45,8 @@ namespace Player.Local
         private bool _isOnGround;
         private bool _lastServerGrounded;
         private bool _hasServerGrounded;
+        private bool _hadMovementInput;
+        private bool _pendingShotAnimation;
 
         private const float THRESHOLD = 0.01f;
         private Transform PhysicalRoot => _characterController.transform;
@@ -78,6 +80,8 @@ namespace Player.Local
             _inputFrameSyncService = inputFrameSyncService;
             _predictionParameters = predictionParameters;
             _localPlayerParameters = localPlayerParameters;
+            
+            PlayerAnimationState = new PlayerAnimationState(Animator);
         }
         
         public Transform GetTransform()
@@ -176,6 +180,7 @@ namespace Player.Local
 
         private void OnPlayerAttack()
         {
+            _pendingShotAnimation = true;
             _lastWeaponInputFrame = _inputSource.ReadWeaponInput();
 
             var render = SnapshotsService.GetRenderSnapshotId();
@@ -215,10 +220,10 @@ namespace Player.Local
         {
             _lastInputFrame = _inputSource.ReadInputFrame(_mainCamera.transform.rotation.eulerAngles.y, _aimDirection, _targetPitch);
 
-            var currentState = BuildPredictedState(0, 1);
+            var currentState = BuildPredictedState(0);
             var predictedState = SimulatePredicted(in currentState, in _lastInputFrame, _simulationDeltaTime);
 
-            UpdateAnimatorParameters(in _lastInputFrame, in predictedState);
+            UpdateAnimatorParameters(in currentState, in _lastInputFrame, in predictedState);
             
             ApplyPredictedState(in predictedState, true);
             var groundedForSync = GetGroundedForSync();
@@ -234,28 +239,42 @@ namespace Player.Local
                 1);
         }
 
-        private void UpdateAnimatorParameters(in InputFrame inputFrame, in PredictionStateFrame predictedState)
+        private void UpdateAnimatorParameters(
+            in PredictionStateFrame currentState,
+            in InputFrame inputFrame,
+            in PredictionStateFrame predictedState)
         {
             var inputDirection = new Vector3(inputFrame.Movement.x, 0f, inputFrame.Movement.z);
             var inputMagnitude = Mathf.Clamp01(inputDirection.magnitude);
+            var isMoving = inputMagnitude > 0.0001f;
+            var targetSpeed = inputFrame.Run ? _localPlayerParameters.SpeedRun : _localPlayerParameters.SpeedWalk;
+            var planarSpeed = isMoving ? targetSpeed * inputMagnitude : 0f;
+            var moveSpeed = PlayerAnimationState.NormalizeAnimationSpeed(planarSpeed, _localPlayerParameters.SpeedRun);
+            var localDirection = Vector3.zero;
 
-            if (inputMagnitude <= 0.0001f)
+            if (isMoving)
             {
-                UpdateMovementAnimation(Vector3.zero, PhysicalRoot.rotation, _simulationDeltaTime);
-                return;
+                var worldDirection = Quaternion.Euler(0f, inputFrame.RotationY, 0f) * inputDirection;
+                var referenceRotation = inputFrame.Aim
+                    ? PhysicalRoot.rotation
+                    : Quaternion.Euler(0f, predictedState.Rotation, 0f);
+                
+                localDirection = PlayerAnimationState.ToLocalAnimationDirection(worldDirection, referenceRotation);
             }
 
-            var locomotionScale = inputFrame.Run
-                ? 1f
-                : Mathf.Clamp01(_localPlayerParameters.SpeedWalk / Mathf.Max(_localPlayerParameters.SpeedRun, 0.001f));
+            var animationState = PlayerAnimationState.BuildAnimationState(
+                localDirection,
+                moveSpeed,
+                predictedState.IsGrounded,
+                isMoving && !_hadMovementInput,
+                !isMoving && _hadMovementInput,
+                _pendingShotAnimation,
+                inputFrame.Jump && currentState.IsGrounded,
+                false);
 
-            var scaledInputDirection = inputDirection.normalized * (inputMagnitude * locomotionScale);
-            var worldDirection = Quaternion.Euler(0f, inputFrame.RotationY, 0f) * scaledInputDirection;
-            var referenceRotation = inputFrame.Aim
-                ? PhysicalRoot.rotation
-                : Quaternion.Euler(0f, predictedState.Rotation, 0f);
-
-            UpdateMovementAnimation(worldDirection, referenceRotation, _simulationDeltaTime);
+            PlayerAnimationState.UpdateMovementAnimation(localDirection, moveSpeed, in animationState, _simulationDeltaTime);
+            _hadMovementInput = isMoving;
+            _pendingShotAnimation = false;
         }
 
         public PredictionStateFrame SimulatePredicted(
@@ -346,7 +365,7 @@ namespace Player.Local
             _characterController.Move(move);
         }
 
-        private PredictionStateFrame BuildPredictedState(long inputTick, int animationState)
+        private PredictionStateFrame BuildPredictedState(long inputTick)
         {
             return new PredictionStateFrame()
             {
@@ -355,14 +374,13 @@ namespace Player.Local
                 Velocity = new Vector3(0f, _verticalVelocity, 0f),
                 MoveDirection = _targetDirection.sqrMagnitude > 0f ? _targetDirection.normalized : Vector3.forward,
                 Rotation = PhysicalRoot.rotation.eulerAngles.y,
-                IsGrounded = _isOnGround,
-                AnimationState = animationState
+                IsGrounded = _isOnGround
             };
         }
 
         public override void SetSnapshot(in SnapshotData snapshot)
         {
-            _lastServerGrounded = snapshot.IsGrounded;
+            _lastServerGrounded = snapshot.PlayerState.IsGrounded;
             _hasServerGrounded = true;
             base.SetSnapshot(in snapshot);
         }

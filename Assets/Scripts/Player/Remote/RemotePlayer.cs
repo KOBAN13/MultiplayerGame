@@ -1,5 +1,6 @@
 ﻿using System;
 using Db.Interface;
+using Player.Animation;
 using Player.Db;
 using Player.Interface;
 using Player.Shared;
@@ -31,6 +32,8 @@ namespace Player.Remote
         {
             _remotePlayerParameters = remotePlayerParameters;
             _snapshotMotorFactory = snapshotMotorFactory;
+            
+            PlayerAnimationState = new PlayerAnimationState(Animator);
         }
 
         protected override void OnSnapshotServiceInitialized()
@@ -56,7 +59,14 @@ namespace Player.Remote
         public override void SetSnapshot(in SnapshotData snapshot)
         {
             base.SetSnapshot(in snapshot);
-            UpdateMovementAnimation(snapshot.Input, Quaternion.Euler(0f, snapshot.Rotation, 0f), 0f);
+
+            var speed = Mathf.Abs(snapshot.PlayerState.Velocity);
+            var localDirection = new Vector3(snapshot.PlayerState.Input.x, 0f, snapshot.PlayerState.Input.z);
+            var moveSpeed = PlayerAnimationState.NormalizeAnimationSpeed(speed);
+            
+            Debug.LogError($"Speed: {speed} ; LocalDirection: {localDirection} ; MoveSpeed: {moveSpeed}");
+
+            PlayerAnimationState.UpdateMovementAnimation(localDirection, moveSpeed, in snapshot.PlayerState, 0f);
         }
 
         private void Update()

@@ -11,7 +11,6 @@ namespace Player.Prediction
         private Vector3 _moveDirection;
         private float _rotation;
         private bool _isGrounded;
-        private int _animationState;
         private long _inputTick;
 
         public void Write(
@@ -28,7 +27,6 @@ namespace Player.Prediction
             _moveDirection = moveDirection;
             _rotation = rotation;
             _isGrounded = isGrounded;
-            _animationState = animationState;
             _inputTick = inputTick;
         }
         
@@ -41,7 +39,6 @@ namespace Player.Prediction
                 Velocity = _velocity,
                 MoveDirection = _moveDirection,
                 IsGrounded = _isGrounded,
-                AnimationState = _animationState,
                 Rotation = _rotation
             };
         }

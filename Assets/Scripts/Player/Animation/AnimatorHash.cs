@@ -2,7 +2,7 @@
 
 namespace Player.Animation
 {
-    public static class AnimatorHash
+    public class AnimatorHash
     {
         public static readonly int Horizontal = Animator.StringToHash("Horizontal");
         public static readonly int Vertical = Animator.StringToHash("Vertical");

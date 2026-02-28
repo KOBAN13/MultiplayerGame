@@ -11,6 +11,5 @@ namespace Player.Db
         public Vector3 MoveDirection;
         public float Rotation;
         public bool IsGrounded;
-        public int AnimationState;
     }
 }

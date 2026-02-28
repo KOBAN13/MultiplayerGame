@@ -43,14 +43,14 @@ namespace Services.Snapshot
                 case 0:
                     return Vector3.zero;
                 case 1:
-                    return _snapshots[0].Position;
+                    return _snapshots[0].PlayerState.Position;
             }
 
             GetInterpolationPair(out var older, out var newer, out var time);
 
             return Mathf.Approximately(older.ServerTime, newer.ServerTime) 
-                ? older.Position 
-                : Vector3.Lerp(older.Position, newer.Position, time);
+                ? older.PlayerState.Position 
+                : Vector3.Lerp(older.PlayerState.Position, newer.PlayerState.Position, time);
         }
         
         public float GetInterpolatedRotationDirection()
@@ -77,12 +77,12 @@ namespace Services.Snapshot
                 case 0:
                     return false;
                 case 1:
-                    return _snapshots[0].IsGrounded;
+                    return _snapshots[0].PlayerState.IsGrounded;
             }
 
             GetInterpolationPair(out var older, out var newer, out var time);
             
-            return older.IsGrounded || newer.IsGrounded;
+            return older.PlayerState.IsGrounded || newer.PlayerState.IsGrounded;
         }
 
         public AimData GetAimData()

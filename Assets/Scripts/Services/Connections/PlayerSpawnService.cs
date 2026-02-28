@@ -65,11 +65,19 @@ namespace Services.Connections
 
             var firstSnapshot = new SnapshotData()
             {
-                Position = joinRequest.Position,
-                Input = Vector3.zero,
+                PlayerState = new PlayerStateData
+                {
+                    Position = joinRequest.Position,
+                    Input = Vector3.zero,
+                    Velocity = 0f,
+                    IsGrounded = true,
+                    IsJump = false,
+                    IsStartRun = false,
+                    IsStopRun = false,
+                    IsShot = false,
+                    IsDead = false
+                },
                 Rotation = 0f,
-                IsGrounded = true,
-                AnimationState = joinRequest.AnimationState,
                 ServerTime = 0f,
                 SnapshotId = 1
             };
@@ -89,11 +97,19 @@ namespace Services.Connections
 
             var firstSnapshot = new SnapshotData()
             {
-                Position = joinRequest.Position,
-                Input = Vector3.zero,
+                PlayerState = new PlayerStateData
+                {
+                    Position = joinRequest.Position,
+                    Input = Vector3.zero,
+                    Velocity = 0f,
+                    IsGrounded = true,
+                    IsJump = false,
+                    IsStartRun = false,
+                    IsStopRun = false,
+                    IsShot = false,
+                    IsDead = false
+                },
                 Rotation = 0f,
-                IsGrounded = true,
-                AnimationState = joinRequest.AnimationState,
                 ServerTime = 0f,
                 SnapshotId = 1
             };
