@@ -63,10 +63,9 @@ namespace Player.Remote
             var speed = Mathf.Abs(snapshot.PlayerState.Velocity);
             var localDirection = new Vector3(snapshot.PlayerState.Input.x, 0f, snapshot.PlayerState.Input.z);
             var moveSpeed = PlayerAnimationState.NormalizeAnimationSpeed(speed);
-            
-            Debug.LogError($"Speed: {speed} ; LocalDirection: {localDirection} ; MoveSpeed: {moveSpeed}");
+            var animationDeltaTime = Time.deltaTime > 0f ? Time.deltaTime : 0.016f;
 
-            PlayerAnimationState.UpdateMovementAnimation(localDirection, moveSpeed, in snapshot.PlayerState, 0f);
+            PlayerAnimationState.UpdateMovementAnimation(localDirection, moveSpeed, in snapshot.PlayerState, animationDeltaTime);
         }
 
         private void Update()

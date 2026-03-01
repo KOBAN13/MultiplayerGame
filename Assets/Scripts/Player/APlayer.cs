@@ -53,6 +53,11 @@ namespace Player
         protected void ConfigureAnimator()
         {
             Animator.applyRootMotion = false;
+
+            for (var layerIndex = 0; layerIndex < Animator.layerCount; layerIndex++)
+            {
+                Animator.SetLayerWeight(layerIndex, 1f);
+            }
         }
         
         public virtual void SetAnimationState(int state)
