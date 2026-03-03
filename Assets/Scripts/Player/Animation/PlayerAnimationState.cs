@@ -94,8 +94,17 @@ namespace Player.Animation
 
         public Vector3 ToLocalAnimationDirection(Vector3 worldDirection, Quaternion referenceRotation)
         {
-            var localDirection = Quaternion.Inverse(referenceRotation) * new Vector3(worldDirection.x, 0f, worldDirection.z);
+            var planarDirection = new Vector3(worldDirection.x, 0f, worldDirection.z);
+
+            if (planarDirection.sqrMagnitude <= 0.0001f)
+                return Vector3.zero;
+
+            var yawOnlyRotation = Quaternion.Euler(0f, referenceRotation.eulerAngles.y, 0f);
+            var localDirection = Quaternion.Inverse(yawOnlyRotation) * planarDirection;
             localDirection.y = 0f;
+
+            if (localDirection.sqrMagnitude > 1f)
+                localDirection.Normalize();
 
             return localDirection;
         }

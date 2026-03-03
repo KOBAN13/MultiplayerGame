@@ -26,7 +26,7 @@ namespace Input
         
         public InputFrame ReadInputFrame(float rotationCameraY, Vector3 aimDirection, float aimPitch)
         {
-            var movement = _playerNetworkInputReader.Movement.CurrentValue;
+            var movement = _playerNetworkInputReader.MovementDirection;
             
             if (_forceLeftMovement)
             {

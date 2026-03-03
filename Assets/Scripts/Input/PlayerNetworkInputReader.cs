@@ -9,14 +9,12 @@ namespace Input
     public class PlayerNetworkInputReader : IPlayerNetworkInputReader, PlayerInput.IMovementActions, IInitializable, IDisposable
     {
         private readonly PlayerInput _playerInput;
-        private readonly ReactiveProperty<Vector3> _movement = new();
         private readonly ReactiveProperty<Vector2> _look = new();
         private readonly ReactiveProperty<bool> _aim = new();
         private readonly ReactiveProperty<bool> _shoot = new();
         private readonly ReactiveProperty<bool> _jump = new();
         private readonly ReactiveProperty<bool> _run = new();
         
-        public ReadOnlyReactiveProperty<Vector3> Movement => _movement;
         public ReadOnlyReactiveProperty<bool> Jump => _jump;
         public ReadOnlyReactiveProperty<bool> Run => _run;
         public ReadOnlyReactiveProperty<Vector2> Look => _look;
@@ -25,6 +23,7 @@ namespace Input
         
         public Vector3 Origin { get; private set; }
         public Vector3 Direction { get; private set; }
+        public Vector3 MovementDirection { get; private set; }
 
         public PlayerNetworkInputReader(PlayerInput playerInput)
         {
@@ -41,7 +40,7 @@ namespace Input
         {
             var moveDirection = context.ReadValue<Vector2>();
             
-            _movement.Value = new Vector3(moveDirection.x, 0f, moveDirection.y);
+            MovementDirection = new Vector3(moveDirection.x, 0f, moveDirection.y);
         }
 
         public void OnJump(InputAction.CallbackContext context)
@@ -117,7 +116,6 @@ namespace Input
         {
             _playerInput?.Disable();
             _playerInput?.Dispose();
-            _movement?.Dispose();
             _jump?.Dispose();
             _run?.Dispose();
         }
