@@ -26,7 +26,7 @@ Unity-клиент для мультиплеерной игры с лобби, �
 ## Требования
 
 - `Unity 6000.0.23f1`
-- доступ к интернету для получения server config по URL `https://apisfs.ru:9443/getSfsConfig`
+- доступ к интернету для получения server config.
 - доступный SmartFoxServer backend, совместимый с текущими командами клиента
 
 Версия Unity указана в [ProjectVersion.txt](/mnt/e/MultiplayerGame/ProjectSettings/ProjectVersion.txt).
